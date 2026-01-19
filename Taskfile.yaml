@@ -25,7 +25,7 @@ tasks:
     deps:
       - clean
     cmds:
-      - copier copy --vcs-ref {{.TEMPLATE_REVISION}} . new_dir
+      - copier copy --trust --vcs-ref {{.TEMPLATE_REVISION}} . new_dir
 
   check:generate:case:
     desc: generate a project with the current version from a TEST_CASE
@@ -40,7 +40,7 @@ tasks:
       - rm -rf {{.TEST_CASE}}_dir
       - mkdir {{.TEST_CASE}}_dir
       - cp tests/{{.TEST_CASE}}.yml {{.TEST_CASE}}_dir/.copier-answers.yml
-      - copier copy --vcs-ref {{.TEMPLATE_REVISION}} --defaults . {{.TEST_CASE}}_dir
+      - copier copy --trust --vcs-ref {{.TEMPLATE_REVISION}} --defaults . {{.TEST_CASE}}_dir
       - git config --global init.defaultBranch develop
       - cd {{.TEST_CASE}}_dir && git init .
       - cd {{.TEST_CASE}}_dir && git add .
@@ -72,7 +72,7 @@ tasks:
           Test case directory ${TEST_CASE}.yml does not exist.
           Please use check:generate* tasks to create directories.
     cmds:
-      - cd {{.TEST_CASE}}_dir && poetry update
+      #- cd {{.TEST_CASE}}_dir && poetry update
       - cd {{.TEST_CASE}}_dir && task check
 
   check:validate:cases:
