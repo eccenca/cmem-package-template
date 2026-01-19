@@ -1,9 +1,9 @@
 {%- set deps = [] -%}
 {%- for dep in python_dependencies.split(',') if dep.strip() -%}
-{%- set _ = deps.append('    { "dependency_type": "python-package", "pypi_id": "' ~ dep.strip() ~ '" }') -%}
+{%- set _ = deps.append({"dependency_type": "python-package", "pypi_id": dep.strip()}) -%}
 {%- endfor -%}
 {%- for dep in vocab_dependencies.split(',') if dep.strip() -%}
-{%- set _ = deps.append('    { "dependency_type": "vocabulary", "package_id": "' ~ dep.strip() ~ '" }') -%}
+{%- set _ = deps.append({"dependency_type": "vocabulary", "package_id": dep.strip()}) -%}
 {%- endfor -%}
 {
   "package_id": "{{ package_id }}",
@@ -13,7 +13,13 @@
     "description": "{{ package_description }}"
   },{% if deps %}
   "dependencies": [
-{{ deps | join(',\n') }}
+{%- for dep in deps %}
+    {
+{%- for key, value in dep.items() %}
+      "{{ key }}": "{{ value }}"{% if not loop.last %},{% endif %}
+{%- endfor %}
+    }{% if not loop.last %},{% endif %}
+{%- endfor %}
   ],{% endif %}
   "files": [],
   "package_type": "{{ package_type }}"
