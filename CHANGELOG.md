@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
 
+### Added
+
+- add explicit `--vcs-ref` in example command
+- add input validation to enforce non empty `package_name` and `package_description`
+
 ## v0.2.0
 
 TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section

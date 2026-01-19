@@ -18,10 +18,13 @@ package_id:
 package_name:
   type: str
   help: "Human-readable package name (e.g., 'My Awesome Vocabulary')"
+  validator: "{% if not package_name %}Package name is required{% endif %}"
 
 package_description:
   type: str
   help: "Short description of the package"
+  validator: >-
+    {% if not package_description %}Package description is required{% endif %}
 
 package_type:
   type: str

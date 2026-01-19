@@ -25,7 +25,7 @@ copier copy /path/to/package-template my-new-package
 Or from a git repository:
 
 ```bash
-copier copy https://github.com/eccenca/cmem-package-template.git my-new-package
+copier copy --vcs-ref=main https://github.com/eccenca/cmem-package-template.git my-new-package
 ```
 
 ## Template Variables
