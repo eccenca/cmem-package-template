@@ -43,7 +43,7 @@ tasks:
     deps:
       - build
     cmds:
-      - cmemc package install --input {% raw %}{{.DIST_DIR}}/{{.PACKAGE_ID}}-v{{.PACKAGE_VERSION}}.cpa{% endraw %}
+      - cmemc package install --replace --input {% raw %}{{.DIST_DIR}}/{{.PACKAGE_ID}}-v{{.PACKAGE_VERSION}}.cpa{% endraw %}
       - cmemc package uninstall {% raw %}{{.PACKAGE_ID}}{% endraw %}
     vars:
       PACKAGE_VERSION:
