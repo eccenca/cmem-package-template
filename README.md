@@ -38,20 +38,25 @@ copier copy --vcs-ref=main https://github.com/eccenca/cmem-package-template.git 
 | `package_type` | Type: vocabulary, project | `vocabulary` |
 | `python_dependencies` | Comma-separated Python package dependencies | - |
 | `vocab_dependencies` | Comma-separated vocabulary/project dependencies | - |
-| `license` | License of the package | `mit` |
 
 ## Generated Structure
 
 ```text
 my-new-package/
+├── .copier-answers.env
+├── .copier-answers.yml
 ├── .gitignore
 ├── .gitlab-ci.yml
-├── LICENSE.json
-├── LICENSE.txt
+├── CHANGELOG.md
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
 ├── Taskfile.yaml
 └── {package_id}/
     └── manifest.json
 ```
+
+The default license we add is _Apache License 2.0 ([`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html))_, see <https://spdx.org/licenses/> if you need a different.
 
 ## Development Tasks
 
