@@ -99,11 +99,25 @@ Add the following structure to add a project. We suggest to organize projects in
 ```json
 "files": [
     …
-    { 
-        "file_type": "project", 
-        "file_path": "projects/product-integration-demo.zip", 
-        "project_id": "product-integration-demo" 
+    {
+        "file_type": "project",
+        "file_path": "projects/product-integration-demo.zip",
+        "project_id": "product-integration-demo"
     },
     …
 ]
 ```
+
+[version-shield]: https://img.shields.io/github/v/tag/eccenca/cmem-package-template?label=version&sort=semver
+[changelog]: https://github.com/eccenca/cmem-package-template/blob/main/CHANGELOG.md
+[github-actions]: https://github.com/eccenca/cmem-package-template/actions
+[build-shield-main]: https://img.shields.io/github/actions/workflow/status/eccenca/cmem-package-template/check.yml?logo=github&branch=main&label=main
+[build-shield-develop]: https://img.shields.io/github/actions/workflow/status/eccenca/cmem-package-template/check.yml?logo=github&branch=develop&label=develop
+[copier]: https://copier.readthedocs.io/
+[copier-shield]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-purple.json
+[cmem]: https://documentation.eccenca.com
+[cmem-shield]: https://img.shields.io/endpoint?url=https://dev.documentation.eccenca.com/badge.json
+[ruff-link]: https://docs.astral.sh/ruff/
+[ruff-shield]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&label=Code%20Style
+[poetry-link]: https://python-poetry.org/
+[poetry-shield]: https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json
