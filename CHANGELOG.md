@@ -12,6 +12,11 @@ TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security se
 ### Added
 
 - `other_spdx` license option to use any license from <https://spdx.org/licenses/>
+
+## v0.1.0
+
+### Added
+
 - simple package test case
 - test case for a package with dependencies
 - initial commit
