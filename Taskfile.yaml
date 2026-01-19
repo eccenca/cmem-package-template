@@ -110,6 +110,7 @@ tasks:
           echo "  # BEGIN_LICENSE_CHOICES (auto-updated: task update-licenses)"
           echo "  choices:"
           jq -r ".[] | \"    '\\(.name)': \\\"\\(.key)\\\"\"" $TMP.json
+          echo "    'Other (specify SPDX ID)': \"other_spdx\""
           echo "    'Other (proprietary or custom license)': \"other\""
           echo "    # END_LICENSE_CHOICES"
         } > $TMP.yaml
