@@ -1,0 +1,86 @@
+# Copier template configuration for eccenca Corporate Memory packages
+# https://copier.readthedocs.io/
+---
+_min_copier_version: "9.0.0"
+_subdirectory: src
+
+# Post-generation tasks
+_tasks:
+  - >
+    {% if license != 'other' %}
+    curl -s -L
+    -H "Accept: application/vnd.github+json"
+    -H "X-GitHub-Api-Version: 2022-11-28"
+    "https://api.github.com/licenses/{{ license }}"
+    > LICENSE.json
+    && jq -r '.body' LICENSE.json
+    > LICENSE.txt
+    && echo "Fetched license: {{ license }}"
+    {% else %}
+    echo '{"spdx_id":"UNLICENSED","name":"Proprietary"}'
+    > LICENSE.json
+    && echo "Copyright (c) {{ package_name }}. All rights reserved."
+    > LICENSE.txt
+    && echo "Created placeholder license - please update LICENSE.txt"
+    {% endif %}
+
+# Questions for the user
+package_id:
+  type: str
+  help: "Package ID (e.g., 'my-awesome-vocab')"
+  default: >-
+    {{ _copier_conf.dst_path.name | regex_replace('-package$', '') }}
+  validator: >-
+    {% if not package_id | regex_search('^[a-z][a-z0-9]{1,19}(-[a-z][a-z0-9]{0,19}){1,4}$') %}
+      Package ID must be lowercase letters, numbers, and hyphens
+    {% endif %}
+
+package_name:
+  type: str
+  help: "Human-readable package name (e.g., 'My Awesome Vocabulary')"
+
+package_description:
+  type: str
+  help: "Short description of the package"
+
+package_type:
+  type: str
+  default: "vocabulary"
+  choices:
+    - vocabulary
+    - project
+  help: "Type of package"
+
+python_dependencies:
+  type: str
+  default: ""
+  help: >-
+    Comma-separated Python package dependencies (e.g., 'cmem-plugin-pyshacl, rdflib')
+
+vocab_dependencies:
+  type: str
+  default: ""
+  help: >-
+    Comma-separated vocabulary or project dependencies (e.g., 'aksw-rut-vocab, my-other-project')
+
+license:
+  type: str
+  default: mit
+  help: "License for the package"
+  # BEGIN_LICENSE_CHOICES (auto-updated: task update-licenses)
+  choices:
+    'GNU Affero General Public License v3.0': "agpl-3.0"
+    'Apache License 2.0': "apache-2.0"
+    'BSD 2-Clause "Simplified" License': "bsd-2-clause"
+    'BSD 3-Clause "New" or "Revised" License': "bsd-3-clause"
+    'Boost Software License 1.0': "bsl-1.0"
+    'Creative Commons Zero v1.0 Universal': "cc0-1.0"
+    'Eclipse Public License 2.0': "epl-2.0"
+    'GNU General Public License v2.0': "gpl-2.0"
+    'GNU General Public License v3.0': "gpl-3.0"
+    'GNU Lesser General Public License v2.1': "lgpl-2.1"
+    'MIT License': "mit"
+    'Mozilla Public License 2.0': "mpl-2.0"
+    'The Unlicense': "unlicense"
+    'Other (proprietary or custom license)': "other"
+    # END_LICENSE_CHOICES

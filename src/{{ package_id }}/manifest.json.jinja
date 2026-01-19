@@ -1,0 +1,20 @@
+{%- set deps = [] -%}
+{%- for dep in python_dependencies.split(',') if dep.strip() -%}
+{%- set _ = deps.append('    { "dependency_type": "python-package", "pypi_id": "' ~ dep.strip() ~ '" }') -%}
+{%- endfor -%}
+{%- for dep in vocab_dependencies.split(',') if dep.strip() -%}
+{%- set _ = deps.append('    { "dependency_type": "vocabulary", "package_id": "' ~ dep.strip() ~ '" }') -%}
+{%- endfor -%}
+{
+  "package_id": "{{ package_id }}",
+  "package_version": "0.0.0",
+  "metadata": {
+    "name": "{{ package_name }}",
+    "description": "{{ package_description }}"
+  },{% if deps %}
+  "dependencies": [
+{{ deps | join(',\n') }}
+  ],{% endif %}
+  "files": [],
+  "package_type": "{{ package_type }}"
+}

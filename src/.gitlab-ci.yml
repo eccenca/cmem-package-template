@@ -1,0 +1,38 @@
+---
+default:
+  image: docker-registry.eccenca.com/eccenca-python:v3.13.8
+  # all jobs can be interrupted in case a new commit is pushed
+  interruptible: true
+  before_script:
+    - uv tool install --reinstall cmem-cmemc
+
+stages:
+  - test
+  - build
+  - publish
+
+check:
+  stage: test
+  script:
+    - echo "task check"
+
+build:
+  stage: build
+  needs:
+    - check
+  script:
+    - echo "task build"
+  artifacts:
+    when: always
+    paths:
+      - dist/*.*
+
+publish:
+  # publishing only available on a tag
+  stage: publish
+  needs:
+    - build
+  allow_failure: true
+  when: manual
+  script:
+    - task publish

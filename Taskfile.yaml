@@ -1,0 +1,128 @@
+# https://taskfile.dev
+---
+version: "3"
+
+vars:
+  TEMPLATE_REVISION:
+    sh: git rev-parse HEAD
+
+tasks:
+
+  default:
+    summary: |
+      Just a list of documented tasks.
+    silent: true
+    cmds:
+      - task --list
+
+  clean:
+    desc: clean up working directory
+    cmds:
+      - rm -rf *_dir
+
+  create:
+    desc: create a project with the current version and ask for answers
+    deps:
+      - clean
+    cmds:
+      - copier copy --vcs-ref {{.TEMPLATE_REVISION}} . new_dir
+
+  check:generate:case:
+    desc: generate a project with the current version from a TEST_CASE
+    preconditions:
+      - sh: "[[ -v TEST_CASE ]]"
+        msg: >
+          Environment needs 'TEST_CASE' variable.
+          See tests directory - all yaml files without suffix are test cases.
+      - sh: "[ -f tests/${TEST_CASE}.yml ]"
+        msg: Test case file ${TEST_CASE}.yml does not exist.
+    cmds:
+      - rm -rf {{.TEST_CASE}}_dir
+      - mkdir {{.TEST_CASE}}_dir
+      - cp tests/{{.TEST_CASE}}.yml {{.TEST_CASE}}_dir/.copier-answers.yml
+      - copier copy --vcs-ref {{.TEMPLATE_REVISION}} --defaults . {{.TEST_CASE}}_dir
+      - git config --global init.defaultBranch develop
+      - cd {{.TEST_CASE}}_dir && git init .
+      - cd {{.TEST_CASE}}_dir && git add .
+      - cd {{.TEST_CASE}}_dir && git config init.defaultBranch main
+      - cd {{.TEST_CASE}}_dir && git config user.name "Anonymous Person"
+      - cd {{.TEST_CASE}}_dir && git config user.email "anonymous@example.org"
+      - cd {{.TEST_CASE}}_dir && git commit -m "init from template"
+
+  check:generate:cases:
+    desc: generate all test cases with the current template version
+    deps:
+      - clean
+    vars:
+      TEST_CASES:
+        sh: find tests -type f -name '*.yml' | sed 's/^tests\///g' | sed 's/\.yml$//g'
+    cmds:
+      - for: { var: TEST_CASES }
+        cmd: TEST_CASE={{.ITEM}} task check:generate:case
+
+  check:validate:case:
+    desc: validate a project test case
+    preconditions:
+      - sh: "[[ -v TEST_CASE ]]"
+        msg: >
+          Environment needs 'TEST_CASE' variable.
+          See tests directory - all yaml files without suffix are test cases.
+      - sh: "[ -d ${TEST_CASE}_dir ]"
+        msg: >
+          Test case directory ${TEST_CASE}.yml does not exist.
+          Please use check:generate* tasks to create directories.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && poetry update
+      - cd {{.TEST_CASE}}_dir && task check
+
+  check:validate:cases:
+    desc: validate all test cases
+    vars:
+      TEST_CASES:
+        sh: find tests -type f -name '*.yml' | sed 's/^tests\///g' | sed 's/\.yml$//g'
+    cmds:
+      - for: { var: TEST_CASES }
+        cmd: TEST_CASE={{.ITEM}} task check:validate:case
+
+  check:
+    desc: First generate, the validate all test cases
+    cmds:
+      - task: check:generate:cases
+      - task: check:validate:cases
+
+  update-licenses:
+    desc: Fetch and update the license list from GitHub API
+    preconditions:
+      - sh: command -v jq
+        msg: "jq is required"
+    cmds:
+      - |
+        set -e
+        # Fetch licenses from GitHub API
+        curl -s -L \
+          -H "Accept: application/vnd.github+json" \
+          -H "X-GitHub-Api-Version: 2022-11-28" \
+          https://api.github.com/licenses > /tmp/licenses.json
+
+        # Generate YAML choices to temp file
+        TMP=/tmp/licenses
+        {
+          echo "  # BEGIN_LICENSE_CHOICES (auto-updated: task update-licenses)"
+          echo "  choices:"
+          jq -r ".[] | \"    '\\(.name)': \\\"\\(.key)\\\"\"" $TMP.json
+          echo "    'Other (proprietary or custom license)': \"other\""
+          echo "    # END_LICENSE_CHOICES"
+        } > $TMP.yaml
+
+        # Replace section using awk
+        awk '
+          /BEGIN_LICENSE_CHOICES/ {
+            skip=1
+            while((getline line < "'"$TMP.yaml"'") > 0) print line
+          }
+          /END_LICENSE_CHOICES/ { skip=0; next }
+          !skip { print }
+        ' copier.yaml > copier.yaml.tmp && mv copier.yaml.tmp copier.yaml
+
+        echo "Updated with $(jq length $TMP.json) licenses"
+        rm -f $TMP.json $TMP.yaml

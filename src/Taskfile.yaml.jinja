@@ -1,0 +1,88 @@
+# https://taskfile.dev
+#
+# This is a generated file. We dot not suggest to edit it.
+# Instead, create a file `TaskfileCustom.yml` and add your additions there.
+---
+version: '3'
+
+dotenv: ['.copier-answers.env', '.env']
+
+vars:
+  PACKAGE_DIR: $package_id
+  PACKAGE_ID: $package_id
+  DIST_DIR: dist
+
+includes:
+  custom:
+    taskfile: ./TaskfileCustom.yaml
+    optional: true
+    flatten: true
+
+tasks:
+
+  default:
+    summary: |
+      Just a list of documented tasks
+    silent: true
+    cmds:
+      - task --list
+
+  clean:
+    desc: Removes dist, *.cpa, ...
+    cmds:
+      - rm -rf {% raw %}{{.DIST_DIR}}{% endraw %}
+
+  check:prepare:
+    internal: true
+    summary: |
+      prepare check targets by creating appropriate directory
+    run: once
+    cmds:
+      - mkdir -p {% raw %}{{.DIST_DIR}}{% endraw %}
+
+  check:
+    desc: Run whole test suite
+    deps:
+      - build
+    cmds:
+      - cmemc package install --input {% raw %}{{.DIST_DIR}}/{{.PACKAGE_ID}}-v{{.PACKAGE_VERSION}}.cpa{% endraw %}
+      - cmemc package uninstall {% raw %}{{.PACKAGE_ID}}{% endraw %}
+    vars:
+      PACKAGE_VERSION:
+        sh: cmemc package inspect {% raw %}{{.PACKAGE_DIR}}{% endraw %} --key package_version
+        # sh: git describe --always --dirty
+
+  build:
+    desc: Build package archive
+    deps:
+      - clean
+      - check:prepare
+    cmds:
+      - cmemc package build {% raw %}{{.PACKAGE_DIR}}{% endraw %} --output-dir {% raw %}{{.DIST_DIR}}{% endraw %}
+
+  import:
+    desc: Import (install) package to Corporate Memory
+    deps:
+      - delete
+    cmds:
+      - cmemc package install --input {% raw %}{{.PACKAGE_DIR}}{% endraw %}
+
+  export:
+    desc: Export package content from Corporate Memory
+    cmds:
+      - cmemc package export --replace {% raw %}{{.PACKAGE_ID}}{% endraw %}
+
+  delete:
+    desc: Delete (uninstall) package from Corporate Memory
+    cmds:
+      - cmd: cmemc package uninstall {% raw %}{{.PACKAGE_ID}}{% endraw %}
+        ignore_error: true
+
+  publish:
+    desc: Publish package archive to the marketplace
+    cmds:
+      - cmemc package publish dist/{% raw %}{{.PACKAGE_ID}}-v{{.PACKAGE_VERSION}}.cpa{% endraw %}
+    vars:
+      PACKAGE_VERSION:
+        sh: cmemc package inspect {% raw %}{{.PACKAGE_DIR}}{% endraw %} --key package_version
+        # sh: git describe --always --dirty
