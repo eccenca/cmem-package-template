@@ -5,9 +5,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/)
 
-## [Unreleased]
-
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+## v0.3.0
 
 ### Added
 
@@ -19,8 +17,6 @@ TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security se
 - update generated structure, clarify default license
 
 ## v0.2.0
-
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
 
 ### Added
 
