@@ -6,5 +6,5 @@ package_description: Package Description
 package_id: simple-project
 package_name: Package Name
 package_type: project
-python_dependencies: cmem-plugin-pyshacl
-vocab_dependencies: my-other-project
+python_dependencies:
+vocab_dependencies:
