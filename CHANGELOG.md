@@ -11,7 +11,15 @@ TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security se
 
 ### Added
 
-- `other_spdx` license option to use any license from <https://spdx.org/licenses/>
+- README, CHANGELOG, CONTRIBUTING templates
+
+### Removed
+
+- dynamic license selection
+
+### Changed
+
+- Apache License 2.0 used by default
 
 ## v0.1.0
 
