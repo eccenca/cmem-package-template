@@ -3,7 +3,7 @@ _commit: 37fee3a
 _src_path: /Users/rene/Documents/git/gitlab.eccenca.com/eccenca.market/packages/package-template
 license: mit
 package_description: Package Description
-package_id: simple-project
+package_id: dependency-project
 package_name: Package Name
 package_type: project
 python_dependencies: cmem-plugin-pyshacl
