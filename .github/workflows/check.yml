@@ -48,6 +48,10 @@ jobs:
         run: |
           python3 -m pip install --user copier>=9.0.0
 
+      - name: install cmemc
+        run: |
+          python3 -m pip install --user cmem-cmemc==26.1.0rc1
+
       - name: create projects with default answers and run check
         env:
           CMEM_BASE_URI: ${{ secrets.CMEM_BASE_URI }}
