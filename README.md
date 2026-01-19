@@ -4,8 +4,6 @@
 [![workflow][build-shield-main]][github-actions]
 [![workflow][build-shield-develop]][github-actions]
 [![version][version-shield]][changelog]
-[![poetry][poetry-shield]][poetry-link]
-[![ruff][ruff-shield]][ruff-link]
 [![copier][copier-shield]][copier]
 [![eccenca Corporate Memory][cmem-shield]][cmem]
 
@@ -117,7 +115,3 @@ Add the following structure to add a project. We suggest to organize projects in
 [copier-shield]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-purple.json
 [cmem]: https://documentation.eccenca.com
 [cmem-shield]: https://img.shields.io/endpoint?url=https://dev.documentation.eccenca.com/badge.json
-[ruff-link]: https://docs.astral.sh/ruff/
-[ruff-shield]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json&label=Code%20Style
-[poetry-link]: https://python-poetry.org/
-[poetry-shield]: https://img.shields.io/endpoint?url=https://python-poetry.org/badge/v0.json
