@@ -11,4 +11,6 @@ TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security se
 
 ### Added
 
+- simple package test case
+- test case for a package with dependencies
 - initial commit
