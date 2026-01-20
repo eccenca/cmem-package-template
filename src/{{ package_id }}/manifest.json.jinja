@@ -6,7 +6,7 @@
 {%- set _ = deps.append({"dependency_type": "vocabulary", "package_id": dep.strip()}) -%}
 {%- endfor -%}
 {
-  "$schema": "./../manifest-schema.json",
+  "$schema": "https://marketplace.eccenca.dev/api/manifest",
   "package_id": "{{ package_id }}",
   "package_version": "0.0.0",
   "metadata": {
