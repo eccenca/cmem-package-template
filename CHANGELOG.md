@@ -9,6 +9,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
 
+### Changed
+
+- reorder questions
+
+### Added
+
+- comment question (incl. input length validation)
+- input validation for name and description
+
 ## v0.3.0
 
 ### Added

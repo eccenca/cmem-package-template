@@ -32,10 +32,11 @@ copier copy --vcs-ref=main https://github.com/eccenca/cmem-package-template.git 
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `package_type` | Type: vocabulary, project | `vocabulary` |
 | `package_id` | Package ID (lowercase, hyphens allowed) | - |
 | `package_name` | Human-readable name | - |
 | `package_description` | Short description | - |
-| `package_type` | Type: vocabulary, project | `vocabulary` |
+| `package_comment` | A maintainer or publisher comment | - |
 | `python_dependencies` | Comma-separated Python package dependencies | - |
 | `vocab_dependencies` | Comma-separated vocabulary/project dependencies | - |
 

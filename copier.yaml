@@ -5,9 +5,17 @@ _min_copier_version: "9.0.0"
 _subdirectory: src
 
 # Questions for the user
+package_type:
+  type: str
+  default: "vocabulary"
+  choices:
+    - vocabulary
+    - project
+  help: "Type of package"
+
 package_id:
   type: str
-  help: "Package ID (e.g., 'my-awesome-vocab')"
+  help: "Package ID (e.g., 'my-awesome-vocab', 'my-great-project')"
   default: >-
     {{ _copier_conf.dst_path.name | regex_replace('-package$', '') }}
   validator: >-
@@ -17,22 +25,34 @@ package_id:
 
 package_name:
   type: str
-  help: "Human-readable package name (e.g., 'My Awesome Vocabulary')"
-  validator: "{% if not package_name %}Package name is required{% endif %}"
+  help: "Human-readable package name (e.g., 'My Awesome Vocabulary', 'My Great Project')"
+  validator: >-
+    {% if not package_name %}Package name is required
+    {% elif package_name | length < 3 %}
+      Package name must be at least 3 characters
+    {% elif package_name | length > 50 %}
+      Package name must be at most 50 characters
+    {% endif %}
 
 package_description:
   type: str
-  help: "Short description of the package"
+  help: "Short description of the package (e.g., 'A vocabulary for ...', 'A project that ...')"
   validator: >-
-    {% if not package_description %}Package description is required{% endif %}
+    {% if not package_description %}Package description is required
+    {% elif package_description | length < 10 %}
+      Package description must be at least 10 characters
+    {% elif package_description | length > 150 %}
+      Package description must be at most 150 characters
+    {% endif %}
 
-package_type:
+package_comment:
   type: str
-  default: "vocabulary"
-  choices:
-    - vocabulary
-    - project
-  help: "Type of package"
+  default: ""
+  help: "Optional comment for the package metadata"
+  validator: >-
+    {% if package_comment | length > 300 %}
+      Comment must be at most 300 characters
+    {% endif %}
 
 python_dependencies:
   type: str
