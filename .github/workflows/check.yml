@@ -50,7 +50,7 @@ jobs:
 
       - name: install cmemc
         run: |
-          python3 -m pip install --user cmem-cmemc==26.1.0rc1
+          python3 -m pip install --user cmem-cmemc==26.1.0rc2
 
       - name: create projects with default answers and run check
         env:
