@@ -16,16 +16,10 @@ A [Copier](https://copier.readthedocs.io/) template for creating eccenca Corpora
 
 ## Usage
 
-Create a new package from this template:
+Create a new package directory from this template:
 
 ```bash
-copier copy /path/to/package-template my-new-package
-```
-
-Or from a git repository:
-
-```bash
-copier copy --vcs-ref=main https://github.com/eccenca/cmem-package-template.git my-new-package
+copier copy gh:eccenca/cmem-package-template your-new-vocabulary-package
 ```
 
 ## Template Variables
@@ -36,14 +30,13 @@ copier copy --vcs-ref=main https://github.com/eccenca/cmem-package-template.git 
 | `package_id` | Package ID (lowercase, hyphens allowed) | - |
 | `package_name` | Human-readable name | - |
 | `package_description` | Short description | - |
-| `package_comment` | A maintainer or publisher comment | - |
 | `python_dependencies` | Comma-separated Python package dependencies | - |
 | `vocab_dependencies` | Comma-separated vocabulary/project dependencies | - |
 
 ## Generated Structure
 
 ```text
-my-new-package/
+your-new-vocabulary-package/
 ├── .copier-answers.env
 ├── .copier-answers.yml
 ├── .gitignore
@@ -54,6 +47,10 @@ my-new-package/
 ├── README.md
 ├── Taskfile.yaml
 └── {package_id}/
+    ├── README.md (link)
+    ├── LICENSE (link)
+    ├── CHANGELOG.md (link)
+    ├── example.ttl (link)
     └── manifest.json
 ```
 
@@ -74,7 +71,7 @@ task publish      # Publish to marketplace
 
 ## Adding files
 
-Add files (package contents) by copying those into the package folder (or respective sub-folder) and referencing them in the files section.
+Add files (package contents) by copying or linking those into the package folder (or respective sub-folder) and referencing them in the files section.
 
 ### Graphs
 
