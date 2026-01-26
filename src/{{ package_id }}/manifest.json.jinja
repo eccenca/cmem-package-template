@@ -6,20 +6,25 @@
 {%- set _ = deps.append({"dependency_type": "vocabulary", "package_id": dep.strip()}) -%}
 {%- endfor -%}
 {
+  "$schema": "https://eccenca.market/api/manifest",
   "package_id": "{{ package_id }}",
   "package_version": "0.0.0",
   "metadata": {
     "name": "{{ package_name }}",
     "description": "{{ package_description }}",
     "license": "Apache-2.0",
+    "comment": null,
     "agents": [
       {
         "agent_role": "publisher",
         "agent_name": "eccenca GmbH",
         "agent_url": "https://eccenca.com/",
+        "agent_email": null,
         "agent_type": "organization"
       }
-    ]
+    ],
+    "urls": [],
+    "tags": []
   },{% if deps %}
   "dependencies": [
 {%- for dep in deps %}
