@@ -3,6 +3,7 @@
 ---
 _min_copier_version: "9.0.0"
 _subdirectory: src
+_preserve_symlinks: true
 
 # Questions for the user
 package_type:
