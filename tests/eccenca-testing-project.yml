@@ -7,5 +7,4 @@ package_id: eccenca-testing-project
 package_name: My Awesome Project
 package_type: project
 python_dependencies: cmem-plugin-yaml, cmem-plugin-jq
-vocab_dependencies: semanticarts-gist-vocab
 

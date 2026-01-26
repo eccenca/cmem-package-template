@@ -4,7 +4,10 @@ default:
   # all jobs can be interrupted in case a new commit is pushed
   interruptible: true
   before_script:
-    - uv tool install --reinstall cmem-cmemc
+    - uv tool install --reinstall cmem-cmemc@26.1.0rc2
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
 
 stages:
   - test
@@ -14,14 +17,14 @@ stages:
 check:
   stage: test
   script:
-    - echo "task check"
+    - task check
 
 build:
   stage: build
   needs:
     - check
   script:
-    - echo "task build"
+    - task build
   artifacts:
     when: always
     paths:
@@ -36,3 +39,4 @@ publish:
   when: manual
   script:
     - task publish
+
