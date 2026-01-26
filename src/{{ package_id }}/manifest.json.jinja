@@ -11,6 +11,7 @@
   "metadata": {
     "name": "{{ package_name }}",
     "description": "{{ package_description }}",
+    "license": "Apache-2.0",
     "agents": [
       {
         "agent_role": "publisher",
@@ -36,6 +37,16 @@
       "graph_iri": "https://example.org/data/",
       "import_into": [],
       "register_as_vocabulary": {% if package_type == 'vocabulary' %}true{% else %}false{% endif %}
+    },
+    {
+      "file_path": "CHANGELOG.md",
+      "file_type": "text",
+      "file_role": "changelog"
+    },
+    {
+      "file_path": "LICENSE",
+      "file_type": "text",
+      "file_role": "license"
     }
   ],
   "package_type": "{{ package_type }}"
