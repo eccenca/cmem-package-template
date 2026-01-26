@@ -5,7 +5,28 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/)
 
-## v0.4.0
+## [0.5.0] 2025-01-26
+
+### Added
+
+- example graph
+- adding more features to the manifest by default (readme, license, changelog)
+
+### Changed
+
+- upgrading to cmemc RC2
+- preserving symlinks to re-use LICENSE, README and CHANGELOG
+- improving the Taskfile with git checks
+- remove Taskfile template for better maintenance
+- replacing the tests
+
+### Fixed
+
+- tests
+- unneeded workflow parts
+
+
+## [0.4.0] 2025-01-20
 
 ### Changed
 
@@ -16,7 +37,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - comment question (incl. input length validation)
 - input validation for name and description
 
-## v0.3.0
+## [0.3.0] 2025-01-20
 
 ### Added
 
@@ -27,7 +48,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - update generated structure, clarify default license
 
-## v0.2.0
+
+## [0.2.0] 2026-01-19
 
 ### Added
 
@@ -41,10 +63,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - Apache License 2.0 used by default
 
-## v0.1.0
+
+## [0.1.0] 2026-01-19
 
 ### Added
 
 - simple package test case
 - test case for a package with dependencies
 - initial commit
+
