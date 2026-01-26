@@ -11,7 +11,14 @@
   "metadata": {
     "name": "{{ package_name }}",
     "description": "{{ package_description }}",
-    "comment": "{{ package_comment }}"
+    "agents": [
+      {
+        "agent_role": "publisher",
+        "agent_name": "eccenca GmbH",
+        "agent_url": "https://eccenca.com/",
+        "agent_type": "organization"
+      }
+    ]
   },{% if deps %}
   "dependencies": [
 {%- for dep in deps %}
@@ -22,6 +29,14 @@
     }{% if not loop.last %},{% endif %}
 {%- endfor %}
   ],{% endif %}
-  "files": [],
+  "files": [
+    {
+      "file_path": "example.ttl",
+      "file_type": "graph",
+      "graph_iri": "https://example.org/data/",
+      "import_into": [],
+      "register_as_vocabulary": {% if package_type == 'vocabulary' %}true{% else %}false{% endif %}
+    }
+  ],
   "package_type": "{{ package_type }}"
 }

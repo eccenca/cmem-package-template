@@ -9,13 +9,13 @@ package_type:
   type: str
   default: "vocabulary"
   choices:
-    - vocabulary
-    - project
+    Vocabulary Package: "vocabulary"
+    Project Package: "project"
   help: "Type of package"
 
 package_id:
   type: str
-  help: "Package ID (e.g., 'my-awesome-vocab', 'my-great-project')"
+  help: "Package ID (e.g., 'eccenca-supply-chain-vocab', 'w3c-org-vocab')"
   default: >-
     {{ _copier_conf.dst_path.name | regex_replace('-package$', '') }}
   validator: >-
@@ -26,6 +26,7 @@ package_id:
 package_name:
   type: str
   help: "Human-readable package name (e.g., 'My Awesome Vocabulary', 'My Great Project')"
+  default: My Awesome Vocabulary
   validator: >-
     {% if not package_name %}Package name is required
     {% elif package_name | length < 3 %}
@@ -37,6 +38,7 @@ package_name:
 package_description:
   type: str
   help: "Short description of the package (e.g., 'A vocabulary for ...', 'A project that ...')"
+  default: Create Knowledge Graphs with eccenca Corporate Memory :-)
   validator: >-
     {% if not package_description %}Package description is required
     {% elif package_description | length < 10 %}
@@ -45,33 +47,27 @@ package_description:
       Package description must be at most 150 characters
     {% endif %}
 
-package_comment:
-  type: str
-  default: ""
-  help: "Optional comment for the package metadata"
-  validator: >-
-    {% if package_comment | length > 300 %}
-      Comment must be at most 300 characters
-    {% endif %}
-
 python_dependencies:
   type: str
+  when: "{{ package_type != 'vocabulary' }}"
   default: ""
   help: >-
     Comma-separated Python package dependencies
-    (e.g., 'cmem-plugin-pyshacl, rdflib')
+    (e.g., 'cmem-plugin-pyshacl, cmem-plugin-llm')
 
 vocab_dependencies:
   type: str
+  when: "{{ package_type != 'vocabulary' }}"
   default: ""
   help: >-
     Comma-separated vocabulary or project dependencies
     (e.g., 'aksw-rut-vocab, my-other-project')
 
 github_page:
-    type: str
-    default: ""
-    help: >-
-      github_page: This URL (e.g. https://github.com/user/repo) will be used as
-      the base for icons and the homepage link.
-      Leave blank if your project is not on github.
+  type: str
+  default: ""
+  help: >-
+    github_page: This URL (e.g. https://github.com/user/repo) will be used as
+    the base for icons and the homepage link.
+    Leave blank if your project is not on github.
+

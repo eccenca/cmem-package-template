@@ -1,0 +1,5 @@
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://example.org/data/> a void:Dataset;
+  rdfs:label "Example (remove me)"@en .
