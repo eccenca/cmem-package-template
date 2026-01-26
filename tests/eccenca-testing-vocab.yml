@@ -1,0 +1,6 @@
+# Changes here will be overwritten by Copier
+package_type: vocabulary
+package_id: eccenca-testing-vocab
+package_name: My Awesome Vocabulary
+package_description: Create Knowledge Graphs with eccenca Corporate Memory :-)
+
