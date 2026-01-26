@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Fixed
 
 - gitlab build plan
+- tests
 
 
 ## [0.5.0] 2025-01-26
