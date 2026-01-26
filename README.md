@@ -19,8 +19,16 @@ A [Copier](https://copier.readthedocs.io/) template for creating eccenca Corpora
 Create a new package directory from this template:
 
 ```bash
+# create a new directory with the latest release of the template
 copier copy gh:eccenca/cmem-package-template your-new-vocabulary-package
 ```
+
+```bash
+# create a new directory with the latest develop snapshot of the template
+copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-package
+```
+
+
 
 ## Template Variables
 
