@@ -3,7 +3,7 @@
 {%- set _ = deps.append({"dependency_type": "python-package", "pypi_id": dep.strip()}) -%}
 {%- endfor -%}
 {%- for dep in vocab_dependencies.split(',') if dep.strip() -%}
-{%- set _ = deps.append({"dependency_type": "vocabulary", "package_id": dep.strip()}) -%}
+{%- set _ = deps.append({"dependency_type": "marketplace-package", "package_id": dep.strip()}) -%}
 {%- endfor -%}
 {
   "$schema": "https://eccenca.market/api/manifest",
