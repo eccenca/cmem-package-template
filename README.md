@@ -18,17 +18,15 @@ A [Copier](https://copier.readthedocs.io/) template for creating eccenca Corpora
 
 Create a new package directory from this template:
 
-```bash
+``` sh
 # create a new directory with the latest release of the template
 copier copy gh:eccenca/cmem-package-template your-new-vocabulary-package
 ```
 
-```bash
+``` sh
 # create a new directory with the latest develop snapshot of the template
 copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-package
 ```
-
-
 
 ## Template Variables
 
@@ -40,6 +38,7 @@ copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-pack
 | `package_description` | Short description | - |
 | `python_dependencies` | Comma-separated Python package dependencies | - |
 | `vocab_dependencies` | Comma-separated vocabulary/project dependencies | - |
+| `github_page` | Link to GitHub page of the package | - |
 
 ## Generated Structure
 
@@ -68,7 +67,7 @@ The default license we add is _Apache License 2.0 ([`Apache-2.0`](https://spdx.o
 
 After generating the package, use [Task](https://taskfile.dev/) to run common operations:
 
-```bash
+``` bash
 task              # List available tasks
 task build        # Build package archive
 task check        # Run test suite
@@ -77,15 +76,95 @@ task export       # Export package from Corporate Memory
 task publish      # Publish to marketplace
 ```
 
+## Package Metadata
+
+Packages describe themselves in the `manifest.json` file.
+Some metadata has been asked during the `copier copy` process.
+Further metadata can be added to the `manifest.json` file:
+
+- `comment:` A maintainer or publisher comment - not processed or shown to users. A simple string:
+
+  ``` json
+  "comment": "This is a comment left by the package maintainer.",
+  ```
+
+- `agents:` List of person and organizations. An array of agent objects,
+  - valid values for `agent_type` are
+    - `person` and
+    - `organization`,
+  - valid values for `agent_role` are
+    - `publisher`,
+    - `maintainer` or
+    - `author`.
+
+  ``` json
+  "agents": [
+      {
+          "agent_type": "organization",
+          "agent_role": "publisher",
+          "agent_name": "eccenca GmbH",
+          "agent_email": "info@eccenca.com",
+          "agent_url": "https://eccenca.com"
+      },
+      {
+          "agent_type": "person",
+          "agent_role": "maintainer",
+          "agent_name": "John Doe",
+          "agent_email": "john.doe@example.com",
+          "agent_url": "https://example.com"
+      }
+  ]
+  ```
+
+- `urls:` List of package URLs. An array of URL objects,
+  - valid values for `url_role` are:
+    - `homepage`,
+    - `source`,
+    - `documentation` and
+    - `issues`.
+
+  ``` json
+  "urls": [
+      {
+          "url_ref": "https://documentation.eccenca.com",
+          "url_role": "documentation"
+      },
+      {
+          "url_ref": "https://eccenca.com",
+          "url_role": "homepage"
+      },
+      {
+          "url_ref": "https://github.com/eccenca/cmem-package-template",
+          "url_role": "source"
+      },
+      {
+          "url_ref": "https://github.com/eccenca/cmem-package-template/issues",
+          "url_role": "issues"
+    }
+  ]
+  ```
+
+- `tags:` List of package tags. An array of strings:
+
+  ``` json
+  "tags": [
+      "example",
+      "template",
+      "eccenca"
+  ]
+  ```
+
 ## Adding files
 
 Add files (package contents) by copying or linking those into the package folder (or respective sub-folder) and referencing them in the files section.
 
 ### Graphs
 
-Add the following structure to add a graph. `register_as_vocabulary` and `import_into` are optional instructions. We suggest to organize graphs in a respective sub-folder (here `graphs/`), but this is up to you:
+The following adds a graph.
+`register_as_vocabulary` and `import_into` are optional instructions.
+We suggest to organize graphs in a respective sub-folder (here `graphs/`), but this is up to you:
 
-```json
+``` json
 "files": [
     …
     {
@@ -103,15 +182,37 @@ Add the following structure to add a graph. `register_as_vocabulary` and `import
 
 ### Projects
 
-Add the following structure to add a project. We suggest to organize projects in a respective sub-folder (here `projects/`), but this is up to you:
+The following adds a project.
+We suggest to organize projects in a respective sub-folder (here `projects/`), but this is up to you:
 
-```json
+``` json
 "files": [
     …
     {
         "file_type": "project",
         "file_path": "projects/product-integration-demo.zip",
         "project_id": "product-integration-demo"
+    },
+    …
+]
+```
+
+### Icons and Images
+
+The following adds an image and/or icon:
+
+``` json
+"files": [
+    …
+    {
+        "file_path": "periodic-table.png",
+        "file_type": "image",
+        "file_role": "marketplace"
+    },
+    {
+        "file_path": "icon.png",
+        "file_type": "image",
+        "file_role": "icon"
     },
     …
 ]

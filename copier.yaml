@@ -70,5 +70,4 @@ github_page:
   help: >-
     github_page: This URL (e.g. https://github.com/user/repo) will be used as
     the base for icons and the homepage link.
-    Leave blank if your project is not on github.
-
+    Leave blank if your package is not on github.
