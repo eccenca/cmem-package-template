@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+
+
+## [0.6.0] 2026-01-27
+
 ### Added
 
 - documentation
@@ -15,7 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - resource group for check job
 
 
-## [0.5.1] 2025-01-26
+## [0.5.1] 2026-01-26
 
 ### Fixed
 
@@ -23,7 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - tests
 
 
-## [0.5.0] 2025-01-26
+## [0.5.0] 2026-01-26
 
 ### Added
 
@@ -44,7 +49,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - unneeded workflow parts
 
 
-## [0.4.0] 2025-01-20
+## [0.4.0] 2026-01-20
 
 ### Changed
 
@@ -55,7 +60,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - comment question (incl. input length validation)
 - input validation for name and description
 
-## [0.3.0] 2025-01-20
+## [0.3.0] 2026-01-20
 
 ### Added
 
