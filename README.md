@@ -38,6 +38,7 @@ copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-pack
 | `package_description` | Short description | - |
 | `python_dependencies` | Comma-separated Python package dependencies | - |
 | `vocab_dependencies` | Comma-separated vocabulary/project dependencies | - |
+| `github_page` | Link to GitHub page of the package | - |
 
 ## Generated Structure
 
