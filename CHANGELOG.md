@@ -7,7 +7,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- documentation
+  - more examples
+- gitlab
+  - resource group for check job
 
 
 ## [0.5.1] 2025-01-26

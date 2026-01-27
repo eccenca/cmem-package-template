@@ -16,6 +16,7 @@ stages:
 
 check:
   stage: test
+  resource_group: testing-server
   script:
     - task check
 
