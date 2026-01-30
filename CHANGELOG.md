@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Changed
+
+- rename manifest to `cpa-manifest.json`
+
 ### Added
 
 - extend gitginore: .DS_Store
