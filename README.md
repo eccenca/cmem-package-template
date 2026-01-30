@@ -7,7 +7,7 @@
 [![copier][copier-shield]][copier]
 [![eccenca Corporate Memory][cmem-shield]][cmem]
 
-A [Copier](https://copier.readthedocs.io/) template for creating eccenca Corporate Memory packages.
+A [Copier](https://copier.readthedocs.io/) template for creating [eccenca Corporate Memory (Marketplace) packages](https://go.eccenca.com/feature/marketplace-packages).
 
 ## Prerequisites
 

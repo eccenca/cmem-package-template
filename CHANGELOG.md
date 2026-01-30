@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/)
 
+## [Unreleased]
+
+### Changed
+
+- rename manifest to `cpa-manifest.json`
+- upgrading to cmemc RC3
+
+### Added
+
+- extend gitginore: .DS_Store
+
+
 ## [0.6.0] 2026-01-27
 
 ### Added

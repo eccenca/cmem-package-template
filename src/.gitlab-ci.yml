@@ -4,7 +4,7 @@ default:
   # all jobs can be interrupted in case a new commit is pushed
   interruptible: true
   before_script:
-    - uv tool install --reinstall cmem-cmemc@26.1.0rc2
+    - uv tool install --reinstall cmem-cmemc@26.1.0rc3
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive

@@ -1,2 +1,4 @@
 *.cpa
 dist
+.DS_Store
+
