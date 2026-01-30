@@ -7,6 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+
+
+## [0.7.0] 2026-01-30
+
 ### Changed
 
 - rename manifest to `cpa-manifest.json`
