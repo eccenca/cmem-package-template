@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 
 - rename manifest to `cpa-manifest.json`
+- upgrading to cmemc RC3
 
 ### Added
 
