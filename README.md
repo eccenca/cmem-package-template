@@ -58,7 +58,7 @@ your-new-vocabulary-package/
     ├── LICENSE (link)
     ├── CHANGELOG.md (link)
     ├── example.ttl (link)
-    └── manifest.json
+    └── cpa-manifest.json
 ```
 
 The default license we add is _Apache License 2.0 ([`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html))_, see <https://spdx.org/licenses/> if you need a different.
@@ -76,17 +76,21 @@ task export       # Export package from Corporate Memory
 task publish      # Publish to marketplace
 ```
 
-## Package Metadata
+## Package Manifest
 
-Packages describe themselves in the `manifest.json` file.
-Some metadata has been asked during the `copier copy` process.
-Further metadata can be added to the `manifest.json` file:
+Packages describe themselves in the `cpa-manifest.json` file.
+Some metadata has been asked during the `copier` process.
+Further metadata can be added to the `cpa-manifest.json` file:
+
+### Metadata
 
 - `comment:` A maintainer or publisher comment - not processed or shown to users. A simple string:
 
   ``` json
   "comment": "This is a comment left by the package maintainer.",
   ```
+
+#### Agents
 
 - `agents:` List of person and organizations. An array of agent objects,
   - valid values for `agent_type` are
@@ -116,6 +120,8 @@ Further metadata can be added to the `manifest.json` file:
   ]
   ```
 
+#### URLs
+
 - `urls:` List of package URLs. An array of URL objects,
   - valid values for `url_role` are:
     - `homepage`,
@@ -144,6 +150,8 @@ Further metadata can be added to the `manifest.json` file:
   ]
   ```
 
+#### Tags
+
 - `tags:` List of package tags. An array of strings:
 
   ``` json
@@ -154,11 +162,11 @@ Further metadata can be added to the `manifest.json` file:
   ]
   ```
 
-## Adding files
+### Adding files
 
 Add files (package contents) by copying or linking those into the package folder (or respective sub-folder) and referencing them in the files section.
 
-### Graphs
+#### Graphs
 
 The following adds a graph.
 `register_as_vocabulary` and `import_into` are optional instructions.
@@ -180,7 +188,7 @@ We suggest to organize graphs in a respective sub-folder (here `graphs/`), but t
 ]
 ```
 
-### Projects
+#### Projects
 
 The following adds a project.
 We suggest to organize projects in a respective sub-folder (here `projects/`), but this is up to you:
@@ -197,7 +205,7 @@ We suggest to organize projects in a respective sub-folder (here `projects/`), b
 ]
 ```
 
-### Icons and Images
+#### Icons and Images
 
 The following adds an image and/or icon:
 
