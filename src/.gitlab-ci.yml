@@ -32,12 +32,13 @@ build:
       - dist/*.*
 
 publish:
-  # publishing only available on a tag
   stage: publish
+  only:
+    - main
+    - master
   needs:
     - build
   allow_failure: true
-  when: manual
   script:
     - task publish
 
