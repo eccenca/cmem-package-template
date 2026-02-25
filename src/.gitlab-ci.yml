@@ -4,7 +4,7 @@ default:
   # all jobs can be interrupted in case a new commit is pushed
   interruptible: true
   before_script:
-    - uv tool install --reinstall cmem-cmemc@26.1.0rc3
+    - uv tool install --reinstall cmem-cmemc@26.1.0rc5
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
@@ -40,5 +40,14 @@ publish:
     - build
   allow_failure: true
   script:
-    - task publish
+    - |
+      if [ -z "${ECCENCA_MARKETPLACE_PASSWORD}" ]; then
+        echo "ECCENCA_MARKETPLACE_PASSWORD not available ..."
+        exit 1
+      elif [ -z "${ECCENCA_MARKETPLACE_ACCOUNT}" ]; then
+        echo "ECCENCA_MARKETPLACE_ACCOUNT not available ..."
+        exit 1
+      else
+        task publish
+      fi
 

@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/)
 
+## [Unreleased]
+
+### Changed
+
+- gitlab: use cmemc 26.1.0rc5
+- gitlab: check for ECCENCA_MARKETPLACE_ACCOUNT and ECCENCA_MARKETPLACE_PASSWORD variables
+
+
 ## [0.8.0] 2026-02-11
 
 ### Changed
