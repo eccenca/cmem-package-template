@@ -7,7 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Changed
+
+- gitlab: use cmemc 26.1.0rc5
+- gitlab: check for ECCENCA_MARKETPLACE_ACCOUNT and ECCENCA_MARKETPLACE_PASSWORD variables
 
 
 ## [0.8.0] 2026-02-11
