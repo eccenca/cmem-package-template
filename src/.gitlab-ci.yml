@@ -1,10 +1,10 @@
 ---
 default:
-  image: docker-registry.eccenca.com/eccenca-python:v3.13.8
+  image: docker-registry.eccenca.com/eccenca-python:v3.13.12
   # all jobs can be interrupted in case a new commit is pushed
   interruptible: true
   before_script:
-    - uv tool install --reinstall cmem-cmemc@26.1.0rc5
+    - uv tool install --reinstall cmem-cmemc@26.1.0rc6
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
