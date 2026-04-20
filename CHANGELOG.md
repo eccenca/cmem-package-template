@@ -7,7 +7,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- export task now extracts project archives to enable better version control (needs cmemc 26.2.0)
 
 
 ## [0.9.7] 2026-03-16
