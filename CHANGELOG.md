@@ -9,7 +9,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Added
 
-- export task now extracts project archives to enable better version control (needs cmemc 26.2.0)
+- export task now extracts project archives to enable better version control (needs cmemc 26.1.1)
+
+### Changed
+
+- gitlab: use cmemc 26.1.1
 
 
 ## [0.9.7] 2026-03-16
