@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/)
 
+## [1.0.0] 2026-04-27
+
+### Added
+
+- export task now extracts project archives to enable better version control (needs cmemc 26.1.1)
+
+### Changed
+
+- gitlab: use cmemc 26.1.1
+
+
 ## [0.9.7] 2026-03-16
 
 ### Fixed

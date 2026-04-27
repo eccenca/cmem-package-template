@@ -76,7 +76,7 @@ tasks:
   export:
     desc: Export package content from Corporate Memory
     cmds:
-      - cmemc package export --replace {{.PACKAGE_ID}}
+      - cmemc package export --replace --extract {{.PACKAGE_ID}}
 
   delete:
     desc: Delete (uninstall) package from Corporate Memory
