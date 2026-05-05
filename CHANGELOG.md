@@ -10,6 +10,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
 
 
+## [1.1.0] 2026-05-05
+
+### Added
+
+- build task handles language tag metadata of manifest automatically (needs cmemc 26.1.2)
+
+
 ## [1.0.0] 2026-04-27
 
 ### Added
