@@ -1,6 +1,7 @@
 <!--
-    This Markdown README is shipped with the package.
+    This Markdown DOCUMENTATION is shipped with the package.
 
-    Please do not repeat content from the package metadata here,
-    since the marketplace UI will show this anyway above content of this file.
+    Start this Markdown with additional package details, not with the package 
+    name or description. The marketplace frontend already displays `package_name` 
+    and `package_description` before this content.
 -->
