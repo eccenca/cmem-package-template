@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/)
 
+## [Unreleased]
+
+### Fixed
+
+- Use cmemc 26.2.0 in gitlab pipeline to ensure that dependency resolution works correctly against remote marketplace services
+
 ## [1.2.0] 2026-06-12
 
 ### Changed
