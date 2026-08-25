@@ -7,8 +7,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Fixed
 
+- Use cmemc 26.2.0 in gitlab pipeline to ensure that dependency resolution works correctly against remote marketplace services
 
 ## [1.2.0] 2026-06-12
 
