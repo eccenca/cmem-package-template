@@ -7,7 +7,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Fixed
+
+- Disable the interrupt of gitlab pipelines to not have pipelines cancel and leave lock file artifacts wrongfully on the configured instance
 
 ## [1.2.1] 2026-08-25
 
