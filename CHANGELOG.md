@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/) and this project adheres to [Semantic Versioning](https://semver.org/)
 
+## [Unreleased]
+
+### Fixed
+
+- Disable the interrupt of gitlab pipelines to not have pipelines cancel and leave lock file artifacts wrongfully on the configured instance
+
 ## [1.2.1] 2026-08-25
 
 ### Fixed

@@ -2,7 +2,7 @@
 default:
   image: docker-registry.eccenca.com/eccenca-python:v3.13.12-1
   # all jobs can be interrupted in case a new commit is pushed
-  interruptible: true
+  interruptible: false
   before_script:
     - uv tool install --reinstall cmem-cmemc@26.2.0
 
