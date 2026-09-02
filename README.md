@@ -198,7 +198,7 @@ Example:
 @prefix vann: <http://purl.org/vocab/vann/> .
 
 <https://example.org/> a owl:Ontology ;
-    vann:preferredNamespacePrefix "examplePrefix" ;
+    vann:preferredNamespacePrefix "ex" ;
     vann:preferredNamespaceUri "https://example.org/" .
 ```
 
