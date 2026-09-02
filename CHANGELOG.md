@@ -7,7 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Changed
+
+- Use cmemc 26.2.1 in gitlab and github pipelines
+- Use eccenca-python v3.13.13 image in gitlab pipeline
+- Bump github actions: checkout v7, setup-task v3, setup-python v7
 
 ## [1.2.2] 2026-08-26
 
