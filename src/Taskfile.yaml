@@ -12,7 +12,7 @@ vars:
   PACKAGE_ID: $package_id
   DIST_DIR: dist
   GIT_DESCRIBE:
-    sh: git describe --always --dirty 2>/dev/null || echo ""
+    sh: git describe --tags --always --dirty 2>/dev/null || echo ""
   PACKAGE_VERSION:
     sh: echo {{if regexMatch "^v.*" .GIT_DESCRIBE}}{{.GIT_DESCRIBE}}{{else}}v0.0.0-{{.GIT_DESCRIBE}}{{end}}
 
@@ -34,15 +34,7 @@ tasks:
   clean:
     desc: Removes dist, *.cpa, ...
     cmds:
-      - rm -rf {{.DIST_DIR}}
-
-  check:prepare:
-    internal: true
-    summary: |
-      prepare check targets by creating appropriate directory
-    run: once
-    cmds:
-      - mkdir -p {{.DIST_DIR}}
+      - rm -rf {{.DIST_DIR}} *.cpa
 
   check:
     desc: Run whole test suite
@@ -55,11 +47,10 @@ tasks:
   build:
     desc: Build package archive
     preconditions:
-      - sh: git describe --always --dirty 2>/dev/null
+      - sh: git describe --tags --always --dirty 2>/dev/null
         msg: "Package directory must be a git repository. Run: git init; git add .; git commit -m 'init'"
     deps:
       - clean
-      - check:prepare
     cmds:
       - >
         cmemc package build {{.PACKAGE_DIR}}
@@ -86,6 +77,11 @@ tasks:
 
   publish:
     desc: Publish package archive to the marketplace
+    preconditions:
+      - sh: test -f {{.DIST_DIR}}/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa
+        msg: >
+          No package archive for version {{.PACKAGE_VERSION}} found in
+          {{.DIST_DIR}}. Run 'task build' first.
     cmds:
-      - cmemc package publish dist/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa
+      - cmemc package publish {{.DIST_DIR}}/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa
 

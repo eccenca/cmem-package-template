@@ -18,10 +18,14 @@ package_id:
   type: str
   help: "Package ID (e.g., 'eccenca-supply-chain-vocab', 'w3c-org-vocab')"
   default: >-
-    {{ _copier_conf.dst_path.name | regex_replace('-package$', '') }}
+    {{ _copier_conf.dst_path.name | regex_replace('-package$', '')
+       | lower | replace('_', '-') }}
   validator: >-
     {% if not package_id | regex_search('^[a-z][a-z0-9]{1,19}(-[a-z][a-z0-9]{0,19}){1,4}$') %}
-      Package ID must be lowercase letters, numbers, and hyphens
+      Package ID must be at least two hyphen-separated segments
+      (at most five) of lowercase letters and numbers, each starting
+      with a letter and at least two characters long,
+      e.g. 'my-vocab' or 'eccenca-supply-chain-vocab'
     {% endif %}
 
 package_name:
@@ -48,6 +52,8 @@ package_description:
       Package description must be at most 150 characters
     {% endif %}
 
+# Vocabulary packages cannot have dependencies at all, so both dependency
+# questions below are asked for project packages only.
 python_dependencies:
   type: str
   when: "{{ package_type != 'vocabulary' }}"
@@ -61,7 +67,8 @@ vocab_dependencies:
   when: "{{ package_type != 'vocabulary' }}"
   default: ""
   help: >-
-    Comma-separated vocabulary or project dependencies
+    Comma-separated marketplace packages (vocabularies or projects)
+    this project depends on
     (e.g., 'aksw-rut-vocab, my-other-project')
 
 github_page:
@@ -69,5 +76,5 @@ github_page:
   default: ""
   help: >-
     github_page: This URL (e.g. https://github.com/user/repo) will be used as
-    the base for icons and the homepage link.
+    the homepage, source and issues links of the package.
     Leave blank if your package is not on github.

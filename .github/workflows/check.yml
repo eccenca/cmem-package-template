@@ -38,7 +38,7 @@ jobs:
 
       - name: install copier
         run: |
-          python3 -m pip install --user copier>=9.0.0
+          python3 -m pip install --user 'copier>=9.0.0'
 
       - name: install cmemc
         run: |

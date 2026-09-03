@@ -1,5 +1,12 @@
-@prefix void: <http://rdfs.org/ns/void#> .
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+@prefix void: <http://rdfs.org/ns/void#> .
 
-<https://example.org/data/> a void:Dataset;
-  rdfs:label "Example (remove me)"@en .
+# The IRI of this resource matches the `graph_iri` of the file in cpa-manifest.json.
+# `owl:Ontology` plus the two vann properties are required as soon as the graph is
+# registered with `register_as_vocabulary` - see the template README for details.
+<https://example.org/data/> a owl:Ontology, void:Dataset;
+  rdfs:label "Example (remove me)"@en ;
+  vann:preferredNamespacePrefix "ex" ;
+  vann:preferredNamespaceUri "https://example.org/data/" .
