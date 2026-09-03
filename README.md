@@ -188,6 +188,22 @@ We suggest to organize graphs in a respective sub-folder (here `graphs/`), but t
 ]
 ```
 
+##### Note:
+When using `register_as_vocabulary`, ensure that your graph contains an ontology declaration (`owl:Ontology`) and the corresponding VANN namespace metadata. In particular, the ontology resource should define both `vann:preferredNamespacePrefix` and `vann:preferredNamespaceUri`.
+
+Example:
+
+```turtle
+@prefix owl:  <http://www.w3.org/2002/07/owl#> .
+@prefix vann: <http://purl.org/vocab/vann/> .
+
+<https://example.org/> a owl:Ontology ;
+    vann:preferredNamespacePrefix "ex" ;
+    vann:preferredNamespaceUri "https://example.org/" .
+```
+
+These annotations allow the vocabulary to be registered correctly and provide consumers with the preferred namespace URI and prefix associated with the ontology.
+
 #### Projects
 
 The following adds a project.
