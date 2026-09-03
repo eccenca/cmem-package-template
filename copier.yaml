@@ -52,6 +52,8 @@ package_description:
       Package description must be at most 150 characters
     {% endif %}
 
+# Vocabulary packages cannot have dependencies at all, so both dependency
+# questions below are asked for project packages only.
 python_dependencies:
   type: str
   when: "{{ package_type != 'vocabulary' }}"
@@ -62,9 +64,11 @@ python_dependencies:
 
 vocab_dependencies:
   type: str
+  when: "{{ package_type != 'vocabulary' }}"
   default: ""
   help: >-
-    Comma-separated vocabulary or project dependencies
+    Comma-separated marketplace packages (vocabularies or projects)
+    this project depends on
     (e.g., 'aksw-rut-vocab, my-other-project')
 
 github_page:

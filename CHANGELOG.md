@@ -13,7 +13,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
-- Vocabulary packages are now asked for vocabulary and project dependencies too, instead of the question being skipped for exactly the package type that needs it most
 - `example.ttl` ships with the `owl:Ontology` declaration and vann namespace metadata that `register_as_vocabulary` requires, so the default generated package no longer contradicts the documentation
 - Removed the workflow badge from the generated README, which could only ever 404 because the template ships no github workflow
 
