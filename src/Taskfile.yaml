@@ -12,7 +12,7 @@ vars:
   PACKAGE_ID: $package_id
   DIST_DIR: dist
   GIT_DESCRIBE:
-    sh: git describe --always --dirty 2>/dev/null || echo ""
+    sh: git describe --tags --always --dirty 2>/dev/null || echo ""
   PACKAGE_VERSION:
     sh: echo {{if regexMatch "^v.*" .GIT_DESCRIBE}}{{.GIT_DESCRIBE}}{{else}}v0.0.0-{{.GIT_DESCRIBE}}{{end}}
 
@@ -55,7 +55,7 @@ tasks:
   build:
     desc: Build package archive
     preconditions:
-      - sh: git describe --always --dirty 2>/dev/null
+      - sh: git describe --tags --always --dirty 2>/dev/null
         msg: "Package directory must be a git repository. Run: git init; git add .; git commit -m 'init'"
     deps:
       - clean

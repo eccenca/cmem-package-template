@@ -7,11 +7,11 @@
 {%- endfor -%}
 {
   "$schema": "https://eccenca.market/api/manifest",
-  "package_id": "{{ package_id }}",
+  "package_id": {{ package_id | tojson }},
   "package_version": "0.0.0",
   "metadata": {
-    "name": "{{ package_name }}",
-    "description": "{{ package_description }}",
+    "name": {{ package_name | tojson }},
+    "description": {{ package_description | tojson }},
     "license": "Apache-2.0",
     "comment": null,
     "agents": [
@@ -30,7 +30,7 @@
 {%- for dep in deps %}
     {
 {%- for key, value in dep.items() %}
-      "{{ key }}": "{{ value }}"{% if not loop.last %},{% endif %}
+      {{ key | tojson }}: {{ value | tojson }}{% if not loop.last %},{% endif %}
 {%- endfor %}
     }{% if not loop.last %},{% endif %}
 {%- endfor %}

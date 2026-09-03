@@ -8,6 +8,8 @@ default:
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
+  # full history incl. tags, so that `git describe` can derive the package version
+  GIT_DEPTH: 0
 
 stages:
   - test

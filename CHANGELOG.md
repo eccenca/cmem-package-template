@@ -7,7 +7,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Fixed
+
+- Derive the package version with `git describe --tags`, so that lightweight release tags are no longer silently published as `v0.0.0-<sha>`
+- Set `GIT_DEPTH: 0` in the gitlab pipeline, so that `git describe` can see release tags outside the default shallow clone
+- Escape package metadata in `cpa-manifest.json`, so that quotes or backslashes in the package name or description no longer produce an invalid manifest
+- Quote the copier version specifier in the github workflow, which the shell parsed as a redirection instead of a version floor
 
 ## [1.3.0] 2026-09-03
 
