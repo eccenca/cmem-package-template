@@ -11,7 +11,7 @@ A [Copier](https://copier.readthedocs.io/) template for creating [eccenca Corpor
 
 ## Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - Copier >= 9.0.0: `pip install copier` or `uv tool install copier`
 
 ## Usage
@@ -50,14 +50,15 @@ your-new-vocabulary-package/
 ├── .gitlab-ci.yml
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
+├── DOCUMENTATION.md   (shipped with the package, shown in the marketplace)
 ├── LICENSE
-├── README.md
+├── README.md          (for the package maintainer, not shipped)
 ├── Taskfile.yaml
 └── {package_id}/
-    ├── README.md (link)
-    ├── LICENSE (link)
-    ├── CHANGELOG.md (link)
-    ├── example.ttl (link)
+    ├── README.md      (link to ../DOCUMENTATION.md)
+    ├── LICENSE        (link to ../LICENSE)
+    ├── CHANGELOG.md   (link to ../CHANGELOG.md)
+    ├── example.ttl
     └── cpa-manifest.json
 ```
 
@@ -197,12 +198,12 @@ Example:
 @prefix owl:  <http://www.w3.org/2002/07/owl#> .
 @prefix vann: <http://purl.org/vocab/vann/> .
 
-<https://example.org/> a owl:Ontology ;
+<http://www.example.org/file/> a owl:Ontology ;
     vann:preferredNamespacePrefix "ex" ;
-    vann:preferredNamespaceUri "https://example.org/" .
+    vann:preferredNamespaceUri "http://www.example.org/file/" .
 ```
 
-These annotations allow the vocabulary to be registered correctly and provide consumers with the preferred namespace URI and prefix associated with the ontology.
+The ontology resource carries the same IRI as the `graph_iri` of the file entry above. These annotations allow the vocabulary to be registered correctly and provide consumers with the preferred namespace URI and prefix associated with the ontology.
 
 #### Projects
 

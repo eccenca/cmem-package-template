@@ -7,7 +7,26 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- The `github_page` answer now fills the homepage, source and issues URLs of the package manifest, which its help text promised but nothing implemented
+
+### Changed
+
+- `example.ttl` ships with the `owl:Ontology` declaration and vann namespace metadata that `register_as_vocabulary` requires, so the default generated package no longer contradicts the documentation
+- Removed the workflow badge from the generated README, which could only ever 404 because the template ships no github workflow
+
+### Fixed
+
+- Derive the package version with `git describe --tags`, so that lightweight release tags are no longer silently published as `v0.0.0-<sha>`
+- Set `GIT_DEPTH: 0` in the gitlab pipeline, so that `git describe` can see release tags outside the default shallow clone
+- Escape package metadata in `cpa-manifest.json`, so that quotes or backslashes in the package name or description no longer produce an invalid manifest
+- Quote the copier version specifier in the github workflow, which the shell parsed as a redirection instead of a version floor
+- `task check` no longer rewrites the global git `init.defaultBranch` setting of the machine it runs on
+- `task publish` honours `DIST_DIR` and reports a missing archive instead of failing with a bare file-not-found
+- `task clean` also removes `*.cpa` archives now, as its description always claimed
+- Explain the actual naming rule when a `package_id` is rejected, and derive a valid default from directory names containing underscores or capitals
+- Corrected the generated structure and the Python prerequisite in the template README
 
 ## [1.3.0] 2026-09-03
 
