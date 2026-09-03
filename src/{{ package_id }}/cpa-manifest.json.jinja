@@ -5,6 +5,13 @@
 {%- for dep in vocab_dependencies.split(',') if dep.strip() -%}
 {%- set _ = deps.append({"dependency_type": "marketplace-package", "package_id": dep.strip()}) -%}
 {%- endfor -%}
+{%- set urls = [] -%}
+{%- if github_page -%}
+{%- set base = github_page.rstrip('/') -%}
+{%- set _ = urls.append({"url_ref": base, "url_role": "homepage"}) -%}
+{%- set _ = urls.append({"url_ref": base, "url_role": "source"}) -%}
+{%- set _ = urls.append({"url_ref": base ~ "/issues", "url_role": "issues"}) -%}
+{%- endif -%}
 {
   "$schema": "https://eccenca.market/api/manifest",
   "package_id": {{ package_id | tojson }},
@@ -23,7 +30,15 @@
         "agent_type": "organization"
       }
     ],
-    "urls": [],
+    "urls": [
+{%- for url in urls %}
+      {
+{%- for key, value in url.items() %}
+        {{ key | tojson }}: {{ value | tojson }}{% if not loop.last %},{% endif %}
+{%- endfor %}
+      }{% if not loop.last %},{% endif %}
+{%- endfor %}
+    ],
     "tags": []
   },{% if deps %}
   "dependencies": [

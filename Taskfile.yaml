@@ -41,10 +41,8 @@ tasks:
       - mkdir {{.TEST_CASE}}_dir
       - cp tests/{{.TEST_CASE}}.yml {{.TEST_CASE}}_dir/.copier-answers.yml
       - copier copy --trust --vcs-ref {{.TEMPLATE_REVISION}} --defaults . {{.TEST_CASE}}_dir
-      - git config --global init.defaultBranch develop
-      - cd {{.TEST_CASE}}_dir && git init .
+      - cd {{.TEST_CASE}}_dir && git init -b main .
       - cd {{.TEST_CASE}}_dir && git add .
-      - cd {{.TEST_CASE}}_dir && git config init.defaultBranch main
       - cd {{.TEST_CASE}}_dir && git config user.name "Anonymous Person"
       - cd {{.TEST_CASE}}_dir && git config user.email "anonymous@example.org"
       - cd {{.TEST_CASE}}_dir && git commit -m "init from template"
@@ -69,7 +67,7 @@ tasks:
           See tests directory - all yaml files without suffix are test cases.
       - sh: "[ -d ${TEST_CASE}_dir ]"
         msg: >
-          Test case directory ${TEST_CASE}.yml does not exist.
+          Test case directory ${TEST_CASE}_dir does not exist.
           Please use check:generate* tasks to create directories.
     cmds:
       #- cd {{.TEST_CASE}}_dir && poetry update
