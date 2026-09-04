@@ -67,14 +67,14 @@ These are independent literals with no coupling; they have silently diverged bef
 
 Git-flow style: feature branches → `develop` → `main`. Feature branches must be current with `develop` before merging — a stale branch silently reverts template fixes in `src/`.
 
+`main` is a **fast-forward pointer** onto `develop`, never carrying commits of its own, so `main` is always an ancestor of `develop`. Do not merge into `main` with `--no-ff`; that is what the pre-1.5.0 procedure did and it is what broke the fast-forward.
+
 A release is a **git tag**, and nothing else — `copier copy gh:eccenca/cmem-package-template` resolves the newest tag, so tagging *is* publishing. This repo deliberately has no GitHub Release objects.
 
-1. On `develop`: rename `## [Unreleased]` to `## [X.Y.Z] <YYYY-MM-DD>` in `CHANGELOG.md` (commit message: `update CHANGELOG`).
-2. Merge `develop` into `main` with a merge commit (`--no-ff`).
-3. Create a **signed annotated** tag on `main`, with the version string as its message: `git tag -s vX.Y.Z -m "vX.Y.Z"`.
-4. Push `main` and the tag, then re-add the `## [Unreleased]` + TODO stub on `develop` (commit message: `add unreleased section`).
+The full procedure — preflight checks, version derivation, commit and tag messages, and the exact push order — lives in `.claude/skills/release/SKILL.md` and is invoked with `/release`. It is not repeated here, because it is only relevant at release time. Two things from it are worth knowing while doing ordinary work:
 
-Version choice follows this repo's own precedent: releases with an `### Added` section take a minor bump, `### Fixed`-only releases take a patch.
+- A release makes **exactly two branch pushes**. The `check` job declares `concurrency: testing_environment`, a static group shared by every branch, and GitHub keeps only one *pending* run per group — so a third push cancels whichever run was waiting. Avoid pushing to `develop` while a release is in flight for the same reason.
+- The procedure is a deliberate mirror of the one in the sibling repository `eccenca/cmem-plugin-template`. Read that repository's `.claude/skills/release/SKILL.md` before redesigning anything here, and consider porting improvements in both directions.
 
 ## Conventions
 
