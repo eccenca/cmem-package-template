@@ -194,6 +194,12 @@ name rendering empty removes the file. This matches the evidence: every
 `build/` and `explore/` tree in the fleet is in a project package, while the 24
 vocabulary packages hold one ontology `.ttl` and an icon.
 
+Upstream only ever applies such a conditional to a *file* name, and a skill is a
+directory, so the mechanism was verified before being designed in: rendering a
+`skills/{% if package_type != 'vocabulary' %}shapes{% endif %}/SKILL.md` for both
+answers produces the directory in a project package and **nothing at all** in a
+vocabulary one — not even an empty directory.
+
 ### Where the rules file points
 
 `src/{{ '.claude' }}/rules/copier-template.md` gains a short paragraph naming
