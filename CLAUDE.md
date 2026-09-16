@@ -63,6 +63,53 @@ These are independent literals with no coupling; they have silently diverged bef
 - `src/{{ package_id }}/cpa-manifest.json.jinja` builds the manifest: `python_dependencies` become `dependency_type: python-package` entries, `vocab_dependencies` become `marketplace-package` entries, and `register_as_vocabulary` is true only when `package_type == 'vocabulary'`.
 - `src/.gitlab-ci.yml.jinja` is Jinja-rendered rather than copied verbatim, because the `marketplace` answer gates the `publish` stage entry and the `publish` job — an internal package gets a pipeline with no trace of publishing. Literal `{{` or `{%` in that file now needs escaping.
 - `src/Taskfile.yaml` reads `dotenv: ['.copier-answers.env', '.env']` — `package_dir` / `package_id` come from `.copier-answers.env.jinja`, not from Jinja substitution into the Taskfile. Users extend it via an optional `TaskfileCustom.yaml` (included with `flatten: true`); the generated Taskfile itself is marked not-to-be-edited.
+- `src/{{ '.claude' }}/` ships agent support into every generated package — rules, the `template-feedback` skill, the `Stop` hook and `settings.json`. The quoted-expression directory name is deliberate; see *Feedback from generated packages*.
+
+## Feedback from generated packages
+
+Generated packages report findings back through the `template-feedback` skill
+shipped in `src/{{ '.claude' }}/skills/`. Two things point at it: the rule in
+`src/{{ '.claude' }}/rules/copier-template.md`, which names the moments worth
+reporting, and a blocking `Stop` hook that speaks only when the working tree
+shows evidence of template friction — a template owned file was edited, a
+`copier update` left `.rej` files or conflict markers behind. The hook is
+`src/{{ '.claude' }}/hooks/template-feedback.py`, which `settings.json` runs
+directly rather than through a task, because a task runner writes to stdout and
+picks its own exit codes, and stdout is the hook's JSON channel. A package
+switches the hook off with an empty `.claude/no-template-feedback` file, which
+is project owned and therefore survives `copier update`.
+
+The shipped directory is named `src/{{ '.claude' }}/`, an expression that
+always renders to `.claude`, because a literal `src/.claude/` would be picked
+up by Claude Code *in this repository*: sessions working on the template would
+silently load a generated package's rules and skills.
+
+Nothing is filed unattended. The skill drafts, shows the user the exact title
+and body, and only then files — and `gh issue create` is deliberately left out
+of the shipped permission allowlist, so the harness prompts as well. The two
+gates are independent on purpose, because filing is the one irreversible,
+public thing this feature does.
+
+Reports arrive as issues labelled `template-feedback`, through
+`.github/ISSUE_TEMPLATE/template-feedback.yml`. They deliberately do **not**
+name the package they came from: most generated packages are private, several
+are customer specific, and this tracker is public. What the form asks for
+instead is `_commit`, `package_type` and whether `marketplace` and
+`github_page` are answered.
+
+The maintainer side is `/template-triage`, a skill of this repository with no
+twin under `src/` — triage edits `src/`, which would be nonsense inside a
+generated package. Accepted findings become one commit each in `src/` with a
+changelog entry; declined ones become an entry in *Deliberate decisions*, which
+is what stops them coming back.
+
+`task check` covers exactly one part of this: `check:hook:case` asserts that the
+shipped hook stays silent on a clean tree and respects `stop_hook_active`. It
+cannot tell you the hook fires on the right evidence — that needs a hand run in
+a rendered case, piping a `Stop` payload into
+`<case>_dir/.claude/hooks/template-feedback.py`. Remember that a test case is
+rendered from `git rev-parse HEAD`, so a change under `src/` has to be
+committed before it shows up in one.
 
 ## Branching and release process
 
@@ -83,3 +130,42 @@ The full procedure — preflight checks, version derivation, commit and tag mess
 - Generated packages default to `Apache-2.0`.
 - `package_id` is validated by a regex in `copier.yaml`: lowercase, 2–5 hyphen-separated segments.
 - CI runs Python 3.13, while the README states Python 3.8+ as the user-facing prerequisite.
+
+## Deliberate decisions — please do not re-raise these
+
+The following look like oversights during a review, but are intentional. They
+have each been considered and left as they are. This is the section the shipped
+`template-feedback` skill sends every would-be reporter to, and the section
+`/template-triage` writes a declined finding into.
+
+### Vocabulary packages are asked no dependency questions
+
+`python_dependencies` and `vocab_dependencies` in `copier.yaml` carry
+`when: "{{ package_type != 'vocabulary' }}"`, so a vocabulary package is never
+asked about either. This is not a missing question: a marketplace vocabulary
+package cannot declare dependencies at all, so an answer would have nowhere to
+go in `cpa-manifest.json`. Asking anyway would invite an answer that is
+silently dropped.
+
+### `main` carries no commits of its own
+
+`main` is a fast-forward pointer onto `develop` and never receives a merge
+commit. The pre-1.5.0 procedure merged with `--no-ff`, which is what broke the
+fast-forward relationship and had to be repaired. A release is a tag, and
+`main` only ever moves to a commit that already exists on `develop`.
+
+### Generated packages get `.claude/rules/`, never a `CLAUDE.md`
+
+Agent support is delivered as `.claude/rules/`, `.claude/settings.json` and
+`.claude/skills/`. The template writes no `CLAUDE.md`, no `AGENTS.md` and no
+`.mcp.json` into a generated package.
+
+Claude Code auto-loads `*.md` under `.claude/rules/` as project documentation,
+which buys two things a shipped `CLAUDE.md` cannot. Agent writes stay harmless:
+the `#` memory shortcut and `/init` write to `CLAUDE.md` by name, whatever a
+"do not edit, this is generated" header says, and leaving that file to the
+project means those writes cannot become `copier update` conflicts. And both
+files are read, so a package that already has a hand-written `CLAUDE.md` does
+not have to choose.
+
+The cost is accepted: rules are Claude-Code-specific.

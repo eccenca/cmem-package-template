@@ -7,7 +7,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- Generated packages now ship a `.claude/` directory: rules describing which files the template owns and where project specific additions go, a `template-feedback` skill that drafts an issue for the template's tracker, and a session end check that notices when a template owned file got in the way
+  - the check is a blocking `Stop` hook and speaks only on evidence; a package switches it off with an empty `.claude/no-template-feedback` file
+  - nothing is filed without the user seeing the exact issue text and confirming it
 
 ## [1.5.0] 2026-09-16
 
