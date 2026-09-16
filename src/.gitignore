@@ -3,3 +3,4 @@ dist
 .DS_Store
 .env
 .claude/settings.local.json
+__pycache__/

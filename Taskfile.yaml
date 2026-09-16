@@ -62,24 +62,15 @@ tasks:
     desc: smoke test the Stop hook a generated package ships
     summary: |
       Nothing else here ever executes the shipped agent files, and this one is
-      a blocking Stop hook: if it spoke when it should not, or ignored the
-      loop guard, every session in every generated package would stop being
-      able to end. Both cases are asserted against a freshly generated, clean
-      working tree.
+      a blocking Stop hook: if it stayed silent when a template owned file was
+      edited the feature would be dead, and if it spoke on a clean tree or
+      ignored the loop guard every session in every generated package would
+      stop being able to end. All three are asserted.
 
-      This cannot tell you the hook fires on the right evidence. That is still
-      a hand run in a rendered case - see CLAUDE.md.
+      This cannot tell you the hook fires on the right evidence in a real
+      repository. That is still a hand run in a rendered case - see CLAUDE.md.
     cmds:
-      - >
-        cd {{.TEST_CASE}}_dir &&
-        out=$(printf '%s' '{"hook_event_name":"Stop","session_id":"smoke-{{.TEST_CASE}}-quiet","stop_hook_active":false}'
-        | python3 .claude/hooks/template-feedback.py) &&
-        { [ -z "$out" ] || { echo "hook spoke on a clean tree: $out"; exit 1; }; }
-      - >
-        cd {{.TEST_CASE}}_dir &&
-        out=$(printf '%s' '{"hook_event_name":"Stop","session_id":"smoke-{{.TEST_CASE}}-loop","stop_hook_active":true}'
-        | python3 .claude/hooks/template-feedback.py) &&
-        { [ -z "$out" ] || { echo "hook ignored stop_hook_active: $out"; exit 1; }; }
+      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-hook.py
 
   check:skills:case:
     desc: assert the skills a generated package ships are present and well formed

@@ -25,7 +25,10 @@ This file is not part of the package and is not covered by ``task check``
 beyond a smoke test, so keep it small, dependency free and readable.
 """
 
+from __future__ import annotations
+
 import json
+import os
 import re
 import subprocess
 import sys
@@ -38,11 +41,22 @@ OPT_OUT = Path(".claude") / "no-template-feedback"
 # so a modification here is the strongest available signal that something in
 # the template did not fit. A generated package gets no GitHub workflows and no
 # pre-commit configuration, which is why neither is listed.
+# Only what the template actually renders. Claiming all of `.claude/` would
+# report a project for adding its own skill, agent or command - the natural
+# thing to do in a directory whose other half is generated.
 TEMPLATE_OWNED = (
-    ".claude/",
+    ".claude/hooks/",
+    ".claude/rules/",
+    ".claude/skills/",
+    ".claude/settings.json",
     ".gitlab-ci.yml",
     "Taskfile.yaml",
 )
+
+# Where a copier update records the version it moved to. A `+_commit:` line
+# anywhere else - a fixture, a documentation example - says nothing about this
+# working tree.
+ANSWERS = ".copier-answers.yml"
 
 
 def owned(path: str) -> bool:
@@ -193,24 +207,45 @@ def collect_evidence() -> list[str]:
 
     # A `copier update` rewrites every template owned path by definition. Do
     # not report the act of taking a new template version as friction with it.
-    updating = any(COPIER_UPDATE.match(line) for _, line in pairs)
+    updating = any(
+        path == ANSWERS and COPIER_UPDATE.match(line) for path, line in pairs
+    )
 
-    touched = sorted({path for _, path in listed if owned(path)})
+    # Untracked files are not evidence of an edit. Generating the template into
+    # a repository that exists but has no commit of it yet leaves every
+    # rendered file untracked, and reporting that would block the first session
+    # of every new package - accusing the template of friction with itself.
+    touched = sorted(
+        {path for code, path in listed if owned(path) and code != "??"}
+    )
     if touched and not updating:
         evidence.append(f"template owned files were changed here: {', '.join(touched)}")
 
-    rejects = sorted({path for _, path in listed if path.endswith(".rej")})
+    # A reject sits beside the file it could not be applied to, so the path to
+    # test is the one without the suffix. Rejects anywhere else came from
+    # `git apply` or `patch` and are this package's business - and their paths
+    # would otherwise be quoted verbatim into a report headed for a public
+    # tracker.
+    rejects = sorted(
+        {
+            path
+            for _, path in listed
+            if path.endswith(".rej") and owned(path[: -len(".rej")])
+        }
+    )
     if rejects:
         evidence.append(f"a copier update left rejected hunks behind: {', '.join(rejects)}")
 
-    # Conflict markers are the opposite case: one inside a template owned file
-    # is precisely the "the update could not be merged" report worth having.
+    # A conflict marker is only this template's business inside a file this
+    # template writes. An ordinary `git merge` conflict in the package's own
+    # content produces exactly the same `+<<<<<<< ` line, and reporting it
+    # would blame the template for a merge it had nothing to do with.
     if any(
         CONFLICT.match(line)
         for path, line in pairs
-        if path is not None and path not in CONFLICT_PROSE
+        if path is not None and owned(path) and path not in CONFLICT_PROSE
     ):
-        evidence.append("conflict markers are still in the working tree")
+        evidence.append("conflict markers are still in a template owned file")
 
     return evidence
 
@@ -223,6 +258,15 @@ def marker_for(session_id: str) -> Path:
 
 def main() -> None:
     """Read the hook payload, and block once if there is something to report."""
+    # Everything below reads the working tree through relative paths, and the
+    # session's working directory is not guaranteed to be the project root.
+    project_dir = os.environ.get("CLAUDE_PROJECT_DIR")
+    if project_dir:
+        try:
+            os.chdir(project_dir)
+        except OSError:
+            return
+
     try:
         payload = json.load(sys.stdin)
     except (json.JSONDecodeError, ValueError, OSError):
