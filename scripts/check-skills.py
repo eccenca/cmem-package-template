@@ -24,8 +24,11 @@ PROJECT_ONLY = ("build-projects", "shapes")
 
 SKILLS = Path(".claude") / "skills"
 
-# A Jinja delimiter surviving into a rendered file means a name or a body was
-# not treated as a template.
+# A Jinja delimiter surviving into a rendered *name* means the name was not
+# treated as a template. Bodies are deliberately not checked: copier's default
+# `_templates_suffix` is `.jinja`, so every file here is copied verbatim, and a
+# skill may legitimately contain `{{ ... }}` - a shape query placeholder, a
+# Taskfile variable, an example of the template's own syntax.
 LEFTOVER = re.compile(r"\{\{|\{%")
 
 FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
@@ -68,8 +71,6 @@ def check_skill(name: str) -> None:
     if not fields.get("description"):
         fail(f"{skill} has no description, so nothing will ever load it")
     for path in (SKILLS / name).rglob("*"):
-        if path.is_file() and LEFTOVER.search(path.read_text(encoding="utf-8", errors="replace")):
-            fail(f"{path} still contains Jinja delimiters")
         if LEFTOVER.search(str(path)):
             fail(f"{path} still has Jinja in its name")
 
