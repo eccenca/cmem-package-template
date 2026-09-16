@@ -14,7 +14,9 @@ variables:
 stages:
   - test
   - build
+{%- if marketplace %}
   - publish
+{%- endif %}
 
 check:
   stage: test
@@ -32,6 +34,7 @@ build:
     when: always
     paths:
       - dist/*.*
+{%- if marketplace %}
 
 publish:
   stage: publish
@@ -51,4 +54,4 @@ publish:
       else
         task publish
       fi
-
+{% endif %}
