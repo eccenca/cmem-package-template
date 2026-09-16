@@ -58,6 +58,29 @@ tasks:
       - for: {var: TEST_CASES}
         cmd: TEST_CASE={{.ITEM}} task check:generate:case
 
+  check:hook:case:
+    desc: smoke test the Stop hook a generated package ships
+    summary: |
+      Nothing else here ever executes the shipped agent files, and this one is
+      a blocking Stop hook: if it spoke when it should not, or ignored the
+      loop guard, every session in every generated package would stop being
+      able to end. Both cases are asserted against a freshly generated, clean
+      working tree.
+
+      This cannot tell you the hook fires on the right evidence. That is still
+      a hand run in a rendered case - see CLAUDE.md.
+    cmds:
+      - >
+        cd {{.TEST_CASE}}_dir &&
+        out=$(printf '%s' '{"hook_event_name":"Stop","session_id":"smoke-{{.TEST_CASE}}-quiet","stop_hook_active":false}'
+        | python3 .claude/hooks/template-feedback.py) &&
+        { [ -z "$out" ] || { echo "hook spoke on a clean tree: $out"; exit 1; }; }
+      - >
+        cd {{.TEST_CASE}}_dir &&
+        out=$(printf '%s' '{"hook_event_name":"Stop","session_id":"smoke-{{.TEST_CASE}}-loop","stop_hook_active":true}'
+        | python3 .claude/hooks/template-feedback.py) &&
+        { [ -z "$out" ] || { echo "hook ignored stop_hook_active: $out"; exit 1; }; }
+
   check:validate:case:
     desc: validate a project test case
     preconditions:
@@ -70,6 +93,8 @@ tasks:
           Test case directory ${TEST_CASE}_dir does not exist.
           Please use check:generate* tasks to create directories.
     cmds:
+      - task: check:hook:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - cd {{.TEST_CASE}}_dir && task check
 
   check:validate:cases:

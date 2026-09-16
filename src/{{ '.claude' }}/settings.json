@@ -1,0 +1,24 @@
+{
+    "permissions": {
+        "allow": [
+            "Bash(task build:*)",
+            "Bash(task check:*)",
+            "Bash(task clean:*)",
+            "Bash(gh issue list:*)",
+            "Bash(gh search issues:*)"
+        ]
+    },
+    "hooks": {
+        "Stop": [
+            {
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "python3 .claude/hooks/template-feedback.py",
+                        "timeout": 30
+                    }
+                ]
+            }
+        ]
+    }
+}
