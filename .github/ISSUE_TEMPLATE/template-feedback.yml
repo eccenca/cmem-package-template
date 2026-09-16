@@ -20,7 +20,12 @@ body:
 
         Before filing, please check the closed issues and the *Deliberate
         decisions - please do not re-raise these* section of
-        [`CLAUDE.md`](https://github.com/eccenca/cmem-package-template/blob/main/CLAUDE.md).
+        [`CLAUDE.md` on `develop`](https://github.com/eccenca/cmem-package-template/blob/develop/CLAUDE.md)
+        - declines are recorded there straight away, while `main` only moves at
+        release time.
+
+        This form is for findings from a generated package. For an ordinary bug
+        or request about this repository itself, open a blank issue instead.
 
   - type: textarea
     id: finding

@@ -55,10 +55,14 @@ duplicate costs a maintainer more than it costs you.
 
 2. Read the *Deliberate decisions - please do not re-raise these* section of
    the template's `CLAUDE.md`:
-   <https://github.com/eccenca/cmem-package-template/blob/main/CLAUDE.md>
+   <https://github.com/eccenca/cmem-package-template/blob/develop/CLAUDE.md>
 
    That section is the list of findings that were considered and rejected on
    purpose. If the finding is there, it is settled. Say so and stop.
+
+   Read it on `develop`, not on `main`: a decline is recorded there as soon as
+   it is made, while `main` only moves when a version is released, so the copy
+   on `main` can be weeks behind.
 
 3. Skim the template's `CHANGELOG.md` for the `## [Unreleased]` section. It may
    already be fixed and waiting for a release, in which case the answer is to

@@ -1,0 +1,6 @@
+---
+# The only guided form here is Template feedback, which force-applies the
+# `template-feedback` label - the sole input to the /template-triage queue. Blank
+# issues therefore stay enabled, so an ordinary bug about this repository does
+# not have to enter that queue to be reported.
+blank_issues_enabled: true

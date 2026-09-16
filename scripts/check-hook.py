@@ -60,9 +60,21 @@ def fail(message: str) -> None:
     sys.exit(1)
 
 
-def restore() -> None:
-    """Undo the edit this check makes."""
-    subprocess.run(["git", "checkout", "--", str(VICTIM)], check=False)
+def restore(original: str) -> None:
+    """Put back exactly what was there before, and say so if that fails.
+
+    `git checkout -- <file>` was wrong here twice over: it resets to the index
+    rather than to what this check overwrote, so a run in a package with
+    uncommitted changes to that file - the post-`copier update` state this hook
+    exists for - would discard them; and a failure would pass unnoticed, leaving
+    the provocation line behind for whatever runs next.
+    """
+    try:
+        VICTIM.write_text(original, encoding="utf-8")
+    except OSError as error:
+        fail(f"could not restore {VICTIM}: {error}")
+    if VICTIM.read_text(encoding="utf-8") != original:
+        fail(f"{VICTIM} was not restored")
 
 
 def main() -> None:
@@ -75,8 +87,10 @@ def main() -> None:
         if quiet:
             fail(f"spoke on a clean tree: {quiet}")
 
-        with VICTIM.open("a", encoding="utf-8") as handle:
-            handle.write("\n# provoke the template feedback hook\n")
+        original = VICTIM.read_text(encoding="utf-8")
+        VICTIM.write_text(
+            original + "\n# provoke the template feedback hook\n", encoding="utf-8"
+        )
         try:
             loud = run("edited-owned-file", stop_hook_active=False, tmpdir=tmpdir)
             if not loud:
@@ -94,7 +108,7 @@ def main() -> None:
             if guarded:
                 fail(f"ignored stop_hook_active with a dirty tree: {guarded}")
         finally:
-            restore()
+            restore(original)
 
     print("check-hook: ok (quiet when clean, blocks on a template owned edit, respects the loop guard)")
 

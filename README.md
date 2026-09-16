@@ -252,6 +252,39 @@ The following adds an image and/or icon:
 ]
 ```
 
+#### Text files
+
+`README.md`, `CHANGELOG.md` and `LICENSE` are declared as `text` entries with a
+`file_role`. The generated package ships all three as symlinks to the files at
+the repository root, already declared; this is the shape to use if one of them
+has to be restored after being removed.
+
+``` json
+"files": [
+    …
+    {
+        "file_path": "README.md",
+        "file_type": "text",
+        "file_role": "readme"
+    },
+    {
+        "file_path": "CHANGELOG.md",
+        "file_type": "text",
+        "file_role": "changelog"
+    },
+    {
+        "file_path": "LICENSE",
+        "file_type": "text",
+        "file_role": "license"
+    },
+    …
+]
+```
+
+Note that a package declaring no license identifier, or the
+`LicenseRef-scancode-unknown` sentinel, must **not** ship a `LICENSE` file at
+all - the marketplace rejects that combination.
+
 [version-shield]: https://img.shields.io/github/v/tag/eccenca/cmem-package-template?label=version&sort=semver
 [changelog]: https://github.com/eccenca/cmem-package-template/blob/main/CHANGELOG.md
 [github-actions]: https://github.com/eccenca/cmem-package-template/actions
