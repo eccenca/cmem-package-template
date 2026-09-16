@@ -24,6 +24,17 @@ repository holds the result. Hand-editing an XML is legitimate - it is often the
 quickest way to rename something consistently - but it is only real once
 installed back into an instance and exported again.
 
+**Push the edit up before pulling anything down.** `--extract` deletes the
+target directory before writing (`shutil.rmtree`), so an export run over
+hand-edited files destroys them and leaves the server's untouched state in their
+place, uncommitted and without an error. The order is:
+
+```bash
+cmemc project import <package_dir>/build/<project-id> <project-id>   # your edits go up
+cmemc project export --extract --replace --without-userdata \
+    --output-dir <package_dir>/build <project-id>                   # the result comes back
+```
+
 ```bash
 cmemc project export --extract --replace --without-userdata \
     --output-dir <package_dir>/build <project-id>
@@ -104,9 +115,13 @@ package ships, so a test fixture inserted beforehand is wiped by the install
 that was supposed to test it.
 
 ```bash
-cmemc workflow execute <project-id>:<workflow-id>
+cmemc workflow execute --wait <project-id>:<workflow-id>
 cmemc query execute <file.sparql> --accept text/csv
 ```
+
+**`--wait` is what makes this a test.** Without it cmemc sends the start signal
+and returns, so the command exits 0 whether the workflow succeeded or failed,
+and the query on the next line reads a graph that is still being written.
 
 A workflow is addressed as `<project-id>:<workflow-id>`; `cmemc workflow list`
 shows what is there. There is no `cmemc project execute`.

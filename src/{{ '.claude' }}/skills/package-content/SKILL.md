@@ -53,6 +53,12 @@ Otherwise read the *Package Manifest* section of the template's README:
   naming the `.zip` and the build re-zips on the fly. See the `build-projects`
   skill if this package has one.
 - **image** - `file_type: image` with `file_role: icon` or `marketplace`.
+- **text** - `file_type: text` with `file_role: readme`, `changelog` or
+  `license`. This is the entry the three literal filenames need, and it is easy
+  to miss because they arrive as symlinks the template already declared. If you
+  remove and later restore a `LICENSE` - see the licence matrix below - this is
+  the shape to restore it with, not a `file_role: license` invented at the top
+  level.
 
 `register_as_vocabulary` is decided by content, not preference. It requires the
 graph to declare an `owl:Ontology` **at the graph IRI**, carrying

@@ -127,8 +127,12 @@ task check
 
 This renders every test case, smoke tests the shipped hook and runs each
 generated package's own checks against a live Corporate Memory deployment, so
-it needs `CMEM_BASE_URI` and `OAUTH_CLIENT_SECRET` and serialises against the
-nightly run. It must be green before you report done. Note what it does *not*
+it needs `CMEM_BASE_URI` and `OAUTH_CLIENT_SECRET`. It is **not** serialised
+against CI: `concurrency: testing_environment` only orders GitHub Actions runs
+against each other, so a local run collides with the nightly 3am one, and both
+install and uninstall the same package ids on the same deployment. Either run it
+well away from 03:00 or accept that a red result may be the collision rather
+than a regression. It must be green before you report done. Note what it does *not*
 cover: it never runs a generated package's GitLab pipeline, and the two agent
 file checks it does run are narrow. `check:hook:case` asserts the Stop hook
 speaks on a template owned edit and stays quiet otherwise; `check:skills:case`
