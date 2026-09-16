@@ -47,8 +47,11 @@ OPT_OUT = Path(".claude") / "no-template-feedback"
 TEMPLATE_OWNED = (
     ".claude/hooks/",
     ".claude/rules/",
-    ".claude/skills/",
     ".claude/settings.json",
+    ".claude/skills/build-projects/",
+    ".claude/skills/package-content/",
+    ".claude/skills/shapes/",
+    ".claude/skills/template-feedback/",
     ".gitlab-ci.yml",
     "Taskfile.yaml",
 )

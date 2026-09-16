@@ -75,6 +75,27 @@ def check_skill(name: str) -> None:
             fail(f"{path} still has Jinja in its name")
 
 
+def check_hook_agrees() -> None:
+    """Assert the hook's owned-path list names exactly the shipped skills.
+
+    The hook reports an edit to a template owned file, and it owns the skills
+    this template ships - but not a skill the project wrote itself, which lives
+    in the same directory. It therefore names them one by one, and that list has
+    to move whenever this one does. Getting it wrong is silent in both
+    directions: a missing entry stops reporting a real edit, a stale entry
+    reports the project for its own work.
+    """
+    hook = Path(".claude") / "hooks" / "template-feedback.py"
+    if not hook.is_file():
+        return
+    listed = set(re.findall(r'"\.claude/skills/([^/"]+)/"', hook.read_text(encoding="utf-8")))
+    known = set(ALWAYS) | set(PROJECT_ONLY)
+    if listed != known:
+        fail(
+            f"{hook} owns skills {sorted(listed)}, this check expects {sorted(known)}"
+        )
+
+
 def main() -> None:
     """Check the skills this package should and should not have."""
     if not SKILLS.is_dir():
@@ -91,6 +112,8 @@ def main() -> None:
     else:
         for name in PROJECT_ONLY:
             check_skill(name)
+
+    check_hook_agrees()
 
     expected = set(ALWAYS) | (set() if kind == "vocabulary" else set(PROJECT_ONLY))
     found = {d.name for d in SKILLS.iterdir() if d.is_dir()}
