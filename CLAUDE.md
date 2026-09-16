@@ -103,8 +103,35 @@ generated package. Accepted findings become one commit each in `src/` with a
 changelog entry; declined ones become an entry in *Deliberate decisions*, which
 is what stops them coming back.
 
-`task check` covers exactly one part of this: `check:hook:case` asserts that the
-shipped hook stays silent on a clean tree and respects `stop_hook_active`. It
+## Skills shipped into generated packages
+
+Beyond `template-feedback`, `src/{{ '.claude' }}/skills/` holds three authoring
+skills: `package-content` (the manifest contract, licence rules, offline
+checking), `build-projects` (DataIntegration exports) and `shapes` (the shape
+catalog). They exist because four packages in the fleet had each written the
+same knowledge into their own `CLAUDE.md` - the survey behind them is in
+`docs/superpowers/specs/2026-09-16-package-authoring-skills-design.md`.
+
+`build-projects` and `shapes` are dropped for vocabulary packages by a
+conditional directory name,
+`skills/{% if package_type != 'vocabulary' %}shapes{% endif %}/`. Copier removes
+such a directory entirely rather than leaving an empty one.
+
+Two rules keep them honest. They state general truths as fact and eccenca house
+style as overridable defaults, marked as such. And they never restate the
+manifest field reference: `manifest_schema`/`manifest_check` from the
+`cmem-marketplace` MCP server are authoritative and this repository's README is
+the fallback, so there is no second copy to drift - the failure this repository
+already has with the cmemc pin.
+
+`check:skills:case` asserts that the right skills ship, with parseable
+frontmatter and a `name` matching the directory, and that the conditional two
+are absent from a vocabulary package. It cannot assess what a skill *says*;
+that is a hand read.
+
+`task check` covers exactly one part of the feedback cycle: `check:hook:case`
+asserts that the shipped hook stays silent on a clean tree and respects
+`stop_hook_active`. It
 cannot tell you the hook fires on the right evidence — that needs a hand run in
 a rendered case, piping a `Stop` payload into
 `<case>_dir/.claude/hooks/template-feedback.py`. Remember that a test case is

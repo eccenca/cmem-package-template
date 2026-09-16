@@ -12,6 +12,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Generated packages now ship a `.claude/` directory: rules describing which files the template owns and where project specific additions go, a `template-feedback` skill that drafts an issue for the template's tracker, and a session end check that notices when a template owned file got in the way
   - the check is a blocking `Stop` hook and speaks only on evidence; a package switches it off with an empty `.claude/no-template-feedback` file
   - nothing is filed without the user seeing the exact issue text and confirming it
+- Three authoring skills in the same directory: `package-content` (what `cpa-manifest.json` must declare, the licence rules, and how to check a package without a Corporate Memory connection), `build-projects` (DataIntegration project exports and workflow tasks) and `shapes` (the SHACL/shui shape catalog that drives the Explore UI)
+  - vocabulary packages receive `package-content` only, since a build project and a shape catalog are things they do not have
 
 ## [1.5.0] 2026-09-16
 

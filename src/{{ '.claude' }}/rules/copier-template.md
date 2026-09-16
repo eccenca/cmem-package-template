@@ -30,6 +30,24 @@ about it once. Answering "this one is specific to this project" is a complete
 answer. A project that does not want the check at all creates an empty
 `.claude/no-template-feedback` file, which the template never overwrites.
 
+## Skills ship with this project
+
+Besides these rules, the template ships skills under `.claude/skills/`. Run
+`/` to see which ones this project has - they depend on the answers it was
+generated with:
+
+- `package-content` - the manifest contract, adding or removing shipped files,
+  the licence rules, and how to check a package without a Corporate Memory
+  connection
+- `build-projects` - DataIntegration project exports, their layout, which
+  workflow task to reach for, and how to test one
+- `shapes` - the shape catalog: node and property shapes, groups, URI
+  templates, widgets, navigation and validation
+- `template-feedback` - reporting a finding back to the template
+
+A vocabulary package ships fewer of them, because a build project and a shape
+catalog are things it does not have.
+
 ## Two files carry the documentation, and they face different readers
 
 `DOCUMENTATION.md` is shipped inside the package and is what the marketplace
