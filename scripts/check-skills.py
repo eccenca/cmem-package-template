@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+"""Assert that a rendered test case ships the skills it should.
+
+Run from inside a generated package directory; `check:skills:case` does that.
+It answers one question only - did the right skill files arrive, intact - and
+deliberately says nothing about whether their content is any good. That is a
+hand read, and pretending otherwise would make `task check` look like it covers
+the skills when it does not.
+
+Exits non-zero with a one-line reason on the first failure.
+"""
+
+import re
+import sys
+from pathlib import Path
+
+# Skills every generated package gets, whatever it answered.
+ALWAYS = ("template-feedback", "package-content")
+
+# Skills a vocabulary package must NOT get: a vocabulary package ships one
+# ontology graph and an icon, so a build project and a shape catalog are things
+# it will never have. They are dropped by a conditional directory name.
+PROJECT_ONLY = ("build-projects", "shapes")
+
+SKILLS = Path(".claude") / "skills"
+
+# A Jinja delimiter surviving into a rendered file means a name or a body was
+# not treated as a template.
+LEFTOVER = re.compile(r"\{\{|\{%")
+
+FRONTMATTER = re.compile(r"\A---\n(.*?)\n---\n", re.DOTALL)
+
+
+def fail(message: str) -> None:
+    """Report one reason and stop."""
+    print(f"check-skills: {message}")
+    sys.exit(1)
+
+
+def package_type() -> str:
+    """Return the package_type this case was rendered with."""
+    answers = Path(".copier-answers.yml")
+    if not answers.exists():
+        fail(".copier-answers.yml is missing, cannot tell which skills to expect")
+    for line in answers.read_text(encoding="utf-8").splitlines():
+        if line.startswith("package_type:"):
+            return line.split(":", 1)[1].strip().strip("\"'")
+    fail("no package_type in .copier-answers.yml")
+    return ""  # unreachable, keeps type checkers quiet
+
+
+def check_skill(name: str) -> None:
+    """Assert one skill directory holds a well formed SKILL.md."""
+    skill = SKILLS / name / "SKILL.md"
+    if not skill.is_file():
+        fail(f"{skill} is missing")
+    text = skill.read_text(encoding="utf-8")
+    match = FRONTMATTER.match(text)
+    if not match:
+        fail(f"{skill} has no YAML frontmatter")
+    fields = {}
+    for line in match.group(1).splitlines():
+        if ":" in line and not line.startswith((" ", "-")):
+            key, value = line.split(":", 1)
+            fields[key.strip()] = value.strip()
+    if fields.get("name") != name:
+        fail(f"{skill} declares name {fields.get('name')!r}, expected {name!r}")
+    if not fields.get("description"):
+        fail(f"{skill} has no description, so nothing will ever load it")
+    for path in (SKILLS / name).rglob("*"):
+        if path.is_file() and LEFTOVER.search(path.read_text(encoding="utf-8", errors="replace")):
+            fail(f"{path} still contains Jinja delimiters")
+        if LEFTOVER.search(str(path)):
+            fail(f"{path} still has Jinja in its name")
+
+
+def main() -> None:
+    """Check the skills this package should and should not have."""
+    if not SKILLS.is_dir():
+        fail(f"{SKILLS} does not exist")
+
+    kind = package_type()
+    for name in ALWAYS:
+        check_skill(name)
+
+    if kind == "vocabulary":
+        for name in PROJECT_ONLY:
+            if (SKILLS / name).exists():
+                fail(f"{SKILLS / name} shipped into a vocabulary package")
+    else:
+        for name in PROJECT_ONLY:
+            check_skill(name)
+
+    expected = set(ALWAYS) | (set() if kind == "vocabulary" else set(PROJECT_ONLY))
+    found = {d.name for d in SKILLS.iterdir() if d.is_dir()}
+    if found != expected:
+        fail(f"unexpected skill directories: {sorted(found - expected)}")
+
+    print(f"check-skills: ok ({kind}: {', '.join(sorted(expected))})")
+
+
+if __name__ == "__main__":
+    main()

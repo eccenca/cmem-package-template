@@ -81,6 +81,17 @@ tasks:
         | python3 .claude/hooks/template-feedback.py) &&
         { [ -z "$out" ] || { echo "hook ignored stop_hook_active: $out"; exit 1; }; }
 
+  check:skills:case:
+    desc: assert the skills a generated package ships are present and well formed
+    summary: |
+      Nothing here can test what a skill says - that is a hand read. What this
+      asserts is that they ship: frontmatter parses, the name matches the
+      directory, no Jinja leaked into a rendered file, and the two skills that
+      are conditional on package_type are present for a project package and
+      absent for a vocabulary one.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-skills.py
+
   check:validate:case:
     desc: validate a project test case
     preconditions:
@@ -94,6 +105,8 @@ tasks:
           Please use check:generate* tasks to create directories.
     cmds:
       - task: check:hook:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:skills:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - cd {{.TEST_CASE}}_dir && task check
 
