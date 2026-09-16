@@ -1,0 +1,86 @@
+---
+name: Template feedback
+description: Report something learned in a generated package that could improve this template
+title: "[feedback] "
+labels: ["template-feedback"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form for findings that came out of working in a package
+        generated from this template - a pipeline step that fails the same way
+        everywhere, a missing task, a manifest field every package has to add
+        by hand, a statement in the shipped `.claude/` rules or skills that
+        turned out to be wrong.
+
+        **Do not name a private or customer specific repository, and do not
+        paste content from one.** Most generated packages are private; this
+        tracker is public. Describe the finding in general terms and, where a
+        reproduction helps, write a minimal synthetic one.
+
+        Before filing, please check the closed issues and the *Deliberate
+        decisions - please do not re-raise these* section of
+        [`CLAUDE.md`](https://github.com/eccenca/cmem-package-template/blob/main/CLAUDE.md).
+
+  - type: textarea
+    id: finding
+    attributes:
+      label: The finding
+      description: What got in the way, in general terms.
+    validations:
+      required: true
+
+  - type: textarea
+    id: generalises
+    attributes:
+      label: Why this generalises
+      description: >
+        Name at least one other kind of package this would help. A finding that
+        only applies to the package it came from is not template feedback.
+    validations:
+      required: true
+
+  - type: input
+    id: target
+    attributes:
+      label: Which part of the template
+      description: >
+        The file under `src/` this concerns, if known - for example
+        `src/Taskfile.yaml` or the package manifest template.
+    validations:
+      required: false
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested change
+      description: What the template should do instead.
+    validations:
+      required: false
+
+  - type: input
+    id: template-version
+    attributes:
+      label: Template version
+      description: The `_commit` value from the package's `.copier-answers.yml`.
+      placeholder: v1.5.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: package-type
+    attributes:
+      label: package_type
+      options:
+        - vocabulary
+        - project
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: answers
+    attributes:
+      label: Other copier answers
+      options:
+        - label: "`marketplace` is answered yes"
+        - label: "`github_page` is answered"
