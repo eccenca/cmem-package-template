@@ -44,6 +44,7 @@ copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-pack
 
 ```text
 your-new-vocabulary-package/
+├── .claude/            (agent support: rules, skills and a session end check)
 ├── .copier-answers.env
 ├── .copier-answers.yml
 ├── .gitignore
@@ -61,6 +62,14 @@ your-new-vocabulary-package/
     ├── example.ttl
     └── cpa-manifest.json
 ```
+
+`.claude/` holds what an agent working in the generated package reads: rules
+describing which files the template owns, a `settings.json` that registers a
+session end check and pre-approves `task build`, `task check` and `task clean`,
+and skills covering package content, build projects, the shape catalog and how
+to report a finding back to this template. A vocabulary package receives fewer
+skills than a project package, because a build project and a shape catalog are
+things it does not have.
 
 The default license we add is _Apache License 2.0 ([`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html))_, see <https://spdx.org/licenses/> if you need a different.
 

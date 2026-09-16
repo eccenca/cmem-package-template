@@ -129,9 +129,12 @@ This renders every test case, smoke tests the shipped hook and runs each
 generated package's own checks against a live Corporate Memory deployment, so
 it needs `CMEM_BASE_URI` and `OAUTH_CLIENT_SECRET` and serialises against the
 nightly run. It must be green before you report done. Note what it does *not*
-cover: it never runs a generated package's GitLab pipeline, and beyond the
-`check:hook:case` smoke test it never exercises the shipped agent files. A
-finding about a skill or the pipeline needs a hand run in a rendered case.
+cover: it never runs a generated package's GitLab pipeline, and the two agent
+file checks it does run are narrow. `check:hook:case` asserts the Stop hook
+speaks on a template owned edit and stays quiet otherwise; `check:skills:case`
+asserts the right skills ship with parseable frontmatter. Neither reads what a
+skill or a rules file actually says, so a finding about their content needs a
+hand run in a rendered case.
 
 Before summarising, read `## [Unreleased]` as a whole. Repetition is invisible
 while writing one entry at a time and obvious once the section is read end to
