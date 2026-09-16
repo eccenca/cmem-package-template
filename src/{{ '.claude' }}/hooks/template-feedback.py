@@ -115,7 +115,10 @@ def git(*args: str) -> str | None:
 
     The configuration passed here pins the output format the parsers assume:
     colour off (`color.diff` outranks `color.ui` and paints even into a pipe),
-    the `a/` and `b/` diff prefixes on, and paths unquoted.
+    the `a/` and `b/` diff prefixes on and spelled that way, paths relative to
+    the repository root, and nothing quoted. `attributed()` reads `+++ b/` and
+    a user's `diff.dstPrefix` or `diff.relative` would otherwise silently
+    change it.
     """
     command = [
         "git",
@@ -128,6 +131,12 @@ def git(*args: str) -> str | None:
         "diff.noprefix=false",
         "-c",
         "diff.mnemonicPrefix=false",
+        "-c",
+        "diff.srcPrefix=a/",
+        "-c",
+        "diff.dstPrefix=b/",
+        "-c",
+        "diff.relative=false",
         *args,
     ]
     try:
