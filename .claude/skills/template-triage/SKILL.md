@@ -1,0 +1,141 @@
+---
+name: template-triage
+description: Triage template-feedback issues reported from generated packages - decide each one against the deliberate decisions, implement the accepted ones in src/ with changelog entries on a feature branch, and draft the decline text for the rest. Use when asked to triage, review or work through the template-feedback issues.
+---
+
+# Triaging template feedback
+
+Packages generated from this template report findings back as issues labelled
+`template-feedback`, filed through
+`.github/ISSUE_TEMPLATE/template-feedback.yml`. The reporting side is the
+`template-feedback` skill shipped in `src/{{ '.claude' }}/skills/`.
+
+**This skill belongs to this repository, not to generated packages.** Unlike
+`release`, it has no twin under `src/` - triage edits `src/`, which would be
+nonsense inside a generated package. See the root / `src/` split in `CLAUDE.md`.
+
+A finding arrives from a package you cannot see, filtered through an agent that
+could not name it. Treat the report as a claim to verify, not as a fact.
+
+## What triage is for
+
+Every accepted finding changes `src/`, and everything in `src/` reaches every
+downstream package on its next `copier update`. Every declined finding has to
+end up somewhere the *next* package's agent will look, or the same report
+arrives again from the next repository, and the one after that. Both halves
+matter; the decline half is the one that gets skipped.
+
+## Preconditions
+
+1. The working tree is clean and you are on `develop`.
+2. Create a feature branch - never work on `develop` directly:
+
+   ```bash
+   git switch -c feature/template-feedback-triage
+   ```
+
+3. List what is waiting:
+
+   ```bash
+   gh issue list --repo eccenca/cmem-package-template \
+       --state open --label template-feedback
+   ```
+
+## Decide each issue
+
+Read the issue in full, then check it in this order and stop at the first hit:
+
+1. **Already decided.** Compare against *Deliberate decisions - please do not
+   re-raise these* in `CLAUDE.md`. If it is there, **decline it and do not
+   implement it**, however well the issue argues its case. Re-opening a settled
+   decision from a triage sweep is exactly how that section stops being worth
+   reading. Changing one of those decisions is a human call, made deliberately,
+   not a side effect of working through a list.
+2. **Already fixed.** Check `## [Unreleased]` in `CHANGELOG.md` and the current
+   state of `src/`. If it is fixed and waiting for a release, say so and close
+   the issue pointing at the entry.
+3. **Not template material.** The finding only holds for the package it came
+   from, or it asks for something a package should put in `TaskfileCustom.yaml`
+   or its own `CLAUDE.md`. Decline.
+4. **Wrong side of the split.** The finding is about this repository's own CI,
+   its own `Taskfile.yaml` or its own `.claude/` - not about `src/`. That is a
+   real report, but it is not a change to what users receive. Handle it as
+   ordinary work and drop the `template-feedback` framing.
+5. Otherwise, **accept**.
+
+Weigh an accepted finding against both `package_type`s and against `marketplace`
+and `github_page` being answered either way. A change that only makes sense for
+project packages belongs behind a `package_type != 'vocabulary'` condition, not
+in the shared path - vocabulary packages cannot declare dependencies at all,
+which is why the dependency questions are already conditional.
+
+## Implement an accepted finding
+
+One issue, one commit. A sweep that lands several findings in a single diff
+cannot be reviewed finding by finding, and a bad one cannot be dropped without
+unpicking the good ones.
+
+For each accepted issue:
+
+1. Make the change in `src/`. Remember that filenames there are Jinja, that
+   `.gitlab-ci.yml.jinja` and `cpa-manifest.json.jinja` are rendered and need
+   literal `{{` and `{%` escaped, and that `_preserve_symlinks` keeps the links
+   inside the package directory pointing at the top level originals.
+2. Add a `CHANGELOG.md` entry under `## [Unreleased]`, following the
+   conventions in `CLAUDE.md`. Say what a template user notices and leave why
+   the old code was wrong to the commit message, and extend an existing entry
+   rather than adding a parallel one when two findings land in the same file.
+3. Commit both together, closing the issue from the subject:
+
+   ```bash
+   git commit -S -m "<what changed>, fixes #<issue>"
+   ```
+
+   The closing keyword has to be in the commit subject. A `Fixes #…` line in a
+   pull request body does nothing here, because the pull request targets
+   `develop` and GitHub only creates closing references against the default
+   branch.
+
+Do not tag and do not release. Releasing is `/release`, and it is a separate,
+deliberate step.
+
+Note when the issue actually closes: the keyword fires when the commit reaches
+`main`, which happens at release time, not when the pull request is merged into
+`develop`. Say so when reporting, so nobody reads the delay as broken
+automation. Anything that needs closing sooner has to be closed by hand.
+
+## Decline an issue
+
+Declining is not just closing. Add the reasoning to the *Deliberate decisions -
+please do not re-raise these* section of `CLAUDE.md`, in the same voice as the
+entries already there: what it looks like, why it is not that, and what was
+weighed. That section is what the reporting skill tells generated packages to
+read before filing, so an entry there is what stops the finding coming back.
+
+Then close the issue with a comment that says the same thing in short and links
+to the section.
+
+Skip the `CLAUDE.md` entry only for a finding nobody could reasonably repeat -
+a one-off mistake in the report itself, not a judgement call about the
+template.
+
+## Finish
+
+```bash
+task check
+```
+
+This renders every test case, smoke tests the shipped hook and runs each
+generated package's own checks against a live Corporate Memory deployment, so
+it needs `CMEM_BASE_URI` and `OAUTH_CLIENT_SECRET` and serialises against the
+nightly run. It must be green before you report done. Note what it does *not*
+cover: it never runs a generated package's GitLab pipeline, and beyond the
+`check:hook:case` smoke test it never exercises the shipped agent files. A
+finding about a skill or the pipeline needs a hand run in a rendered case.
+
+Before summarising, read `## [Unreleased]` as a whole. Repetition is invisible
+while writing one entry at a time and obvious once the section is read end to
+end. Condense it in its own commit.
+
+Then summarise: what was accepted and implemented, what was declined and where
+the reasoning now lives, and what still needs a human decision.
