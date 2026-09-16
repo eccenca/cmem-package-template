@@ -2,6 +2,7 @@
 _commit: v0.4.0-6-g0e4c8cc
 _src_path: cmem-package-template
 github_page: ''
+marketplace: true
 package_description: Create Knowledge Graphs with eccenca Corporate Memory :-)
 package_id: eccenca-testing-project
 package_name: My Awesome Project

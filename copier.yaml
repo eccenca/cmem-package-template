@@ -71,6 +71,14 @@ vocab_dependencies:
     this project depends on
     (e.g., 'aksw-rut-vocab, my-other-project')
 
+marketplace:
+  type: bool
+  default: true
+  help: >-
+    marketplace: Will this package be published to the eccenca marketplace?
+    Answer no for internal packages - the publish job is then left out of
+    the generated .gitlab-ci.yml.
+
 github_page:
   type: str
   default: ""

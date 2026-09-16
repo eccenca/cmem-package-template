@@ -7,7 +7,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- A `marketplace` answer: answering no leaves the publish job out of the generated `.gitlab-ci.yml`, so internal packages no longer fail their pipeline on `main` for a missing marketplace credential
 
 ## [1.4.0] 2026-09-03
 

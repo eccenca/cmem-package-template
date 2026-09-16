@@ -61,6 +61,7 @@ These are independent literals with no coupling; they have silently diverged bef
 - `src/README.md.jinja` → the generated repo's README, **maintainer-facing** only.
 - `src/DOCUMENTATION.md` → shipped *inside* the package and shown in the marketplace frontend. `src/{{ package_id }}/README.md` is a symlink to it (`_preserve_symlinks: true` in `copier.yaml`); `LICENSE` and `CHANGELOG.md` are symlinked into the package dir the same way. Marketplace-facing prose belongs in `DOCUMENTATION.md`, not `README.md.jinja`.
 - `src/{{ package_id }}/cpa-manifest.json.jinja` builds the manifest: `python_dependencies` become `dependency_type: python-package` entries, `vocab_dependencies` become `marketplace-package` entries, and `register_as_vocabulary` is true only when `package_type == 'vocabulary'`.
+- `src/.gitlab-ci.yml.jinja` is Jinja-rendered rather than copied verbatim, because the `marketplace` answer gates the `publish` stage entry and the `publish` job — an internal package gets a pipeline with no trace of publishing. Literal `{{` or `{%` in that file now needs escaping.
 - `src/Taskfile.yaml` reads `dotenv: ['.copier-answers.env', '.env']` — `package_dir` / `package_id` come from `.copier-answers.env.jinja`, not from Jinja substitution into the Taskfile. Users extend it via an optional `TaskfileCustom.yaml` (included with `flatten: true`); the generated Taskfile itself is marked not-to-be-edited.
 
 ## Branching and release process
