@@ -44,6 +44,21 @@ TEMPLATE_OWNED = (
     "Taskfile.yaml",
 )
 
+
+def owned(path: str) -> bool:
+    """Say whether a path is one the template writes.
+
+    A plain prefix test is wrong here: `Taskfile.yaml.rej` starts with
+    `Taskfile.yaml` without being it, and reporting a rejected hunk as an edit
+    to a template owned file describes something that did not happen. A
+    directory entry matches everything below it; a file entry matches only
+    itself.
+    """
+    return any(
+        path.startswith(entry) if entry.endswith("/") else path == entry
+        for entry in TEMPLATE_OWNED
+    )
+
 # Template owned files that *document* what a conflict looks like, in a fenced
 # example. Every copier update rewriting such a file would add those markers to
 # the diff and block the session during the very workflow this hook exists to
@@ -180,7 +195,7 @@ def collect_evidence() -> list[str]:
     # not report the act of taking a new template version as friction with it.
     updating = any(COPIER_UPDATE.match(line) for _, line in pairs)
 
-    touched = sorted({path for _, path in listed if path.startswith(TEMPLATE_OWNED)})
+    touched = sorted({path for _, path in listed if owned(path)})
     if touched and not updating:
         evidence.append(f"template owned files were changed here: {', '.join(touched)}")
 
