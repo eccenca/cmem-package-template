@@ -59,15 +59,21 @@ and report the specific reason; do not attempt to fix it silently.
 6. **The two cmemc pins agree.**
 
    ```bash
-   grep -o 'cmem-cmemc[=@]*[0-9.]*' .github/workflows/check.yml src/.gitlab-ci.yml
+   grep -o 'cmem-cmemc[=@]*[0-9.]*' .github/workflows/check.yml src/.gitlab-ci.yml.jinja
    ```
 
    `.github/workflows/check.yml` pins the cmemc that *this repository's* CI
-   tests with; `src/.gitlab-ci.yml` pins the cmemc that *generated packages*
-   will run. They are independent literals with no coupling and have silently
-   diverged before. If the versions differ, stop: a release in that state ships
-   packages tested against a different cmemc than they use, and a published tag
-   cannot be withdrawn.
+   tests with; `src/.gitlab-ci.yml.jinja` pins the cmemc that *generated
+   packages* will run. They are independent literals with no coupling and
+   have silently diverged before. If the versions differ, stop: a release in
+   that state ships packages tested against a different cmemc than they use,
+   and a published tag cannot be withdrawn.
+
+   If `grep` reports either file as missing, treat that as a failure of this
+   check rather than a reason to skip it — the generated pipeline has been
+   renamed before (it gained the `.jinja` suffix in 1.5.0, when the
+   `marketplace` answer made it a rendered template), and a stale path here
+   silently compares nothing.
 
 7. **Changelog is ready.** `CHANGELOG.md` contains a `## [Unreleased]` heading
    followed by at least one `### Added|Changed|Deprecated|Removed|Fixed|Security`
