@@ -61,16 +61,21 @@ shape catalog or a plain dataset silently registers no prefix.
 
 ## Exporting from an instance leaves files you must not ship
 
-`cmemc graph export` writes two sidecars next to each `.ttl`:
+`cmemc graph export` writes sidecars next to each `.ttl`:
 
-| Sidecar | Holds | Goes into |
-| --- | --- | --- |
-| `<name>.ttl.graph` | the graph IRI | `graph_iri` |
-| `<name>.ttl.imports` | the graphs that import this one | `import_into` |
+| Sidecar | Holds | Goes into | Written |
+| --- | --- | --- | --- |
+| `<name>.ttl.graph` | the graph IRI | `graph_iri` | always |
+| `<name>.ttl.imports` | the graphs that import this one | `import_into` | only with `--include-import-statements` |
 
 Neither extension is legal in a manifest, so **transcribe them into the entry
 and then delete them**. Skipping that step is the single most common way a build
 fails after an export.
+
+Export with `--include-import-statements`, or no `.imports` file appears at all
+and the absence looks exactly like "this graph has no importers". Getting that
+wrong costs nothing at build time and everything at install time: the graph
+ships without being wired into the graph that imports it, and nothing complains.
 
 Read the direction of `.imports` carefully: a file listing
 `https://example.org/integration/` means the integration graph imports *this*

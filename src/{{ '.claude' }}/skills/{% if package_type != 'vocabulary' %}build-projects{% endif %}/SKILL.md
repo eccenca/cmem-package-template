@@ -25,12 +25,19 @@ quickest way to rename something consistently - but it is only real once
 installed back into an instance and exported again.
 
 ```bash
-cmemc project export --extract --without-userdata --output-dir <package_dir>/build <project-id>
+cmemc project export --extract --replace --without-userdata \
+    --output-dir <package_dir>/build <project-id>
 ```
 
 **`--without-userdata` is not optional in practice.** Without it, `config.xml`
 carries timestamps and account IRIs, so every round-trip produces a diff that
 says nothing about what changed.
+
+**`--replace` is not optional either, from the second export onwards.** Without
+it, cmemc finds the directory already there, writes an error to stderr and
+**still exits 0** - so the export silently does nothing and the directory you
+then diff still holds the previous one. Since the whole point is a round trip,
+that is every export but the first.
 
 ## What an export looks like
 
@@ -97,9 +104,12 @@ package ships, so a test fixture inserted beforehand is wiped by the install
 that was supposed to test it.
 
 ```bash
-cmemc project execute <project-id>            # or: workflow execution via the UI
+cmemc workflow execute <project-id>:<workflow-id>
 cmemc query execute <file.sparql> --accept text/csv
 ```
+
+A workflow is addressed as `<project-id>:<workflow-id>`; `cmemc workflow list`
+shows what is there. There is no `cmemc project execute`.
 
 If `cmem-build` is connected as an MCP server it can inspect projects, tasks,
 datasets and workflows directly, which is faster than reading exported XML. Note
