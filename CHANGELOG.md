@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Three authoring skills in the same directory: `package-content` (what `cpa-manifest.json` must declare, the licence rules, and how to check a package without a Corporate Memory connection), `build-projects` (DataIntegration project exports and workflow tasks) and `shapes` (the SHACL/shui shape catalog that drives the Explore UI)
   - vocabulary packages receive `package-content` only, since a build project and a shape catalog are things they do not have
 
+### Changed
+
+- The README now has a *Package Types* section explaining what the `package_type` answer decides - what each type ships, why a vocabulary package is asked no dependency questions, and which authoring skills a project package receives on top
+
 ## [1.5.0] 2026-09-16
 
 ### Added

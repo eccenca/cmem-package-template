@@ -9,6 +9,57 @@
 
 A [Copier](https://copier.readthedocs.io/) template for creating [eccenca Corporate Memory (Marketplace) packages](https://go.eccenca.com/feature/marketplace-packages).
 
+## Package Types
+
+`package_type` is the first question the template asks, and it is more than a
+label: it decides what the generated manifest declares, which further questions
+you are asked, and which authoring skills the package receives.
+
+### Vocabulary Package (`vocabulary`)
+
+A vocabulary package ships a single RDFS/OWL ontology: the classes, properties
+and annotations of one schema. Keeping it on its own is the point of this type -
+other packages can then reuse exactly the ontology they need, instead of pulling
+in a bloated all-in-one project that happens to carry it as well.
+
+Its graph entry is declared with `register_as_vocabulary: true`, so installing
+the package does not only load the graph, it registers it in the vocabulary
+catalog of Corporate Memory, where it becomes available to the tools that build
+on it. This is also why the graph needs an `owl:Ontology` declaration carrying
+VANN namespace metadata, see [Graphs](#graphs).
+
+A marketplace vocabulary package cannot declare dependencies at all, so the
+template does not ask for `python_dependencies` or `vocab_dependencies` - an
+answer would have nowhere to go in the manifest.
+
+### Project Package (`project`)
+
+A project package is the generic type, and the one without limitations: it
+ships everything else a Corporate Memory setup could need, and several of them
+at once - DataIntegration project exports (`.zip`), data and shape graphs,
+images. If a package is not exactly one ontology, it is a project package.
+
+Its graph entries are generated with `register_as_vocabulary: false`, because
+they carry data rather than schema - a package that also wants to register a
+vocabulary can still set the flag on an individual file entry.
+
+A project package may depend on Python packages (typically cmem plugins,
+installed from PyPI) and on other marketplace packages. The template asks for
+both and turns the answers into the `dependencies` entries of the manifest -
+this is where a vocabulary package is named, rather than its ontology copied
+into this one.
+
+### What the answer changes
+
+Everything else is the same for both types - the repository layout, the
+`Taskfile.yaml`, the CI pipeline and the build, install and publish workflow:
+
+| | vocabulary | project |
+|---|---|---|
+| generated graph entry | `register_as_vocabulary: true` | `register_as_vocabulary: false` |
+| dependency questions | not asked | `python_dependencies`, `vocab_dependencies` |
+| shipped [skills](#generated-structure) | `package-content`, `template-feedback` | the same, plus `build-projects` and `shapes` |
+
 ## Prerequisites
 
 - Python 3.10+
@@ -32,12 +83,13 @@ copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-pack
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `package_type` | Type: vocabulary, project | `vocabulary` |
+| `package_type` | Type: vocabulary, project - see [Package Types](#package-types) | `vocabulary` |
 | `package_id` | Package ID (lowercase, hyphens allowed) | - |
 | `package_name` | Human-readable name | - |
 | `package_description` | Short description | - |
-| `python_dependencies` | Comma-separated Python package dependencies | - |
-| `vocab_dependencies` | Comma-separated vocabulary/project dependencies | - |
+| `python_dependencies` | Comma-separated Python package dependencies (project packages only) | - |
+| `vocab_dependencies` | Comma-separated vocabulary/project dependencies (project packages only) | - |
+| `marketplace` | Publish this package to the marketplace? A no leaves the publish job out of `.gitlab-ci.yml` | `true` |
 | `github_page` | Link to GitHub page of the package | - |
 
 ## Generated Structure
