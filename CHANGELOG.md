@@ -20,6 +20,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 - The README now has a *Package Types* section explaining what the `package_type` answer decides - what each type ships, why a vocabulary package is asked no dependency questions, and which authoring skills a project package receives on top
 
+### Fixed
+
+- The header of the generated `Taskfile.yaml` now names `TaskfileCustom.yaml`, the filename it actually includes, instead of `TaskfileCustom.yml`
+
 ## [1.5.0] 2026-09-16
 
 ### Added
