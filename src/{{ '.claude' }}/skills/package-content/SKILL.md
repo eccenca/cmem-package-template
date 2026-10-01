@@ -65,6 +65,41 @@ graph to declare an `owl:Ontology` **at the graph IRI**, carrying
 `vann:preferredNamespacePrefix` and `vann:preferredNamespaceUri`. Registering a
 shape catalog or a plain dataset silently registers no prefix.
 
+## Listing a graph is what makes the package own it
+
+Ownership is what makes uninstall clean. A graph that only a workflow creates
+appears in no manifest, so uninstalling the package leaves it behind as an
+orphan that nothing will ever remove.
+
+**Ship every graph the package writes to**, even one with no content of its
+own - a file holding nothing but the graph's own description is enough. The
+graph is then created at install time and removed again on uninstall.
+
+Two consequences follow, and both belong in `DOCUMENTATION.md` because they
+are things a user has to do:
+
+- installing creates that graph **empty**, so the populating workflow has to
+  be run afterwards;
+- re-installing with `--replace` resets it to the shipped state, so the
+  workflow has to be run again.
+
+For the graph layout a package shipping instance data wants, and what the
+pipeline then has to assert for itself, see
+`references/graph-architecture.md`.
+
+## Dependencies have to cover every namespace the graphs use
+
+A `dependency_type: marketplace-package` entry is needed for **every**
+namespace the shipped graphs mention - `w3c-rdf-vocab`, `w3c-rdfs-vocab`,
+`w3c-owl-vocab`, `w3c-xsd-vocab`, `w3c-sh-vocab`, `w3c-skos-vocab`,
+`foaf-vocab` and so on. Without them the terms do not resolve on a bare
+instance, which is the deployment this package will eventually meet.
+
+**Prefer bundling to depending when the dependency is your own.** A package
+that bundles its vocabulary installs standalone; one that depends on a sibling
+cannot be installed without it, and cannot be uninstalled while anything else
+still needs it. Depend on what somebody else maintains, bundle what you do.
+
 ## Exporting from an instance leaves files you must not ship
 
 `cmemc graph export` writes sidecars next to each `.ttl`:
@@ -124,14 +159,28 @@ marketplace expects that exact name inside the package. The repository's own
 `README.md` faces whoever maintains this repository and is **not** shipped.
 Prose written for users of the package belongs in `DOCUMENTATION.md`.
 
+**Do not open `DOCUMENTATION.md` with the package name or a restatement of its
+description.** The frontend already prints `package_name` and
+`package_description` directly above it, so an opening line that repeats either
+costs the reader the first thing they look at. Open with what the package
+actually gives them.
+
 `CHANGELOG.md` and, where present, `LICENSE` are symlinked the same way. Edit
 the originals at the root, never the links.
 
 ## Checking without a Corporate Memory instance
 
 `task check` needs a live deployment: it installs and uninstalls the package.
-Before reaching for it, a build into a temporary directory catches every
-manifest and content problem offline:
+Two things run offline and catch most of what it would.
+
+`task check:offline` runs the checks in `bin/` over the package directory -
+dangling references, query placeholders, every `shacl:path` against the
+vocabulary, and the shipped queries. It needs no instance and no credentials,
+and `task check` and `task import` both run it first. Two of the mistakes it
+catches are invisible until after an install, and one of them then reports
+success.
+
+A build into a temporary directory catches every manifest and content problem:
 
 ```bash
 cmemc package build <package_dir> --output-dir /tmp/pkg-check --version v0.0.0-test --replace
@@ -139,5 +188,5 @@ cmemc package build <package_dir> --output-dir /tmp/pkg-check --version v0.0.0-t
 
 **A clean build is not a validation pass.** `package build` checks the manifest
 against the directory and ignores RDF syntax errors entirely - a `.ttl` that no
-parser accepts builds happily and fails at install. If this package ships
-graphs, parse them yourself as well, with whatever RDF tooling is at hand.
+parser accepts builds happily and fails at install. `task check:offline` parses
+every graph, so running it covers that gap too.
