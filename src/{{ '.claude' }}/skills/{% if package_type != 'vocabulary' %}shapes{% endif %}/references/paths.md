@@ -69,9 +69,5 @@ shared, which is what keeps one change in one place.
 
 ## Measure the claim before naming the property
 
-Names asserting sufficiency (`implies…`, `triggers…`) or necessity
-(`conditionFor…`, `requires`) are claims the data can contradict. Count first.
-
-Where premises are conjoined, one premise is not *sufficient*; where several
-rules reach the same object, none is *necessary*. What usually survives both
-counts is participation - "contributes to".
+Naming the shortcut is a claim about the data, and the data can contradict it.
+The `vocabulary` skill has the rule and what to count.
