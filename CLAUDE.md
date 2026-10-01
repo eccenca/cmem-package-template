@@ -56,6 +56,8 @@ Adding a `tests/<name>.yml` copier answers file automatically adds a test case �
 
 These are independent literals with no coupling; they have silently diverged before. Always update both together, and note the version in `CHANGELOG.md`.
 
+The same split catches tooling generally: the two pipelines install their tools differently, so a dependency the payload needs has to be checked in both. `uv` is the live example — the generated `task check:offline` runs the checks in `bin/` with `uv run`, which generated packages get for free because their image already installs cmemc with it, while this repository installs cmemc with pip and had to add `astral-sh/setup-uv` to `.github/workflows/check.yml` explicitly. Confirming a tool exists in one pipeline says nothing about the other.
+
 ## Generated package anatomy
 
 - `src/README.md.jinja` → the generated repo's README, **maintainer-facing** only.

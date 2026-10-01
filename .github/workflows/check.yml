@@ -36,6 +36,14 @@ jobs:
         with:
           python-version: '3.13'
 
+      # A generated package's `task check:offline` runs the checks in `bin/`
+      # with `uv run`, which resolves their dependencies from each script's
+      # inline PEP 723 metadata. Generated packages meet uv in their own
+      # pipeline image, which already installs cmemc with it; this repository
+      # installs cmemc with pip, so it has to ask for uv explicitly.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
       - name: install copier
         run: |
           python3 -m pip install --user 'copier>=9.0.0'
