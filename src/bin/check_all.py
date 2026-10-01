@@ -26,6 +26,9 @@ Every check here is driven by a shape catalog, so a package holding none — a v
 package, or one whose catalog is not written yet — passes with a note. This runs as a build
 gate, and a package with nothing to answer for has not failed anything.
 
+A file no parser accepts is the exception: that fails, because `cmemc package build` ignores
+RDF syntax entirely and such a graph installs only as an error.
+
 Exits non-zero if any check fails.
 """
 
@@ -82,7 +85,7 @@ def check(directory, quiet=False):
         print("OK: no .ttl file here, so there is nothing to check")
         return 0
 
-    shapes, vocab, skipped = [], [], []
+    shapes, vocab, skipped, unparseable = [], [], [], []
     print(f"{root}")
     for path in turtle:
         kind = classify(path)
@@ -91,8 +94,21 @@ def check(directory, quiet=False):
             shapes.append(path)
         if kind in ("vocab", "both"):
             vocab.append(path)
-        if kind is None or (kind and kind.startswith("unparseable")):
+        if kind is None:
             skipped.append(path)
+        if kind and kind.startswith("unparseable"):
+            unparseable.append(path)
+
+    # A file no parser accepts is a certain install failure that `package
+    # build` does not catch - it checks the manifest against the directory and
+    # ignores RDF syntax entirely. Fail here, and before the no-catalog pass
+    # below, so a package whose only catalog is unparseable cannot slip through
+    # as "nothing to check".
+    if unparseable:
+        print()
+        names = ", ".join(str(p.relative_to(root)) for p in unparseable)
+        print(f"FAIL: {len(unparseable)} file(s) no parser accepts: {names}")
+        return 1
 
     if not shapes:
         # Every check here is driven by a shape catalog, so a package without
