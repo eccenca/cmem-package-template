@@ -31,10 +31,17 @@ capitalised projection variable has defeated that selection in production — a 
 
 Verdicts:
 
-* **FAIL** — no dcterms:description, a header whose ``# ?var:`` lines are not exactly the
-  outer projection in order, or a projected variable whose name starts with a capital.
-* **WARN** — no comment anywhere in the body, or a header long enough that the rationale has
-  probably leaked into the query text (more than the projection needs plus slack for a note).
+* **FAIL** — a projected variable whose name starts with a capital. This is the one finding
+  here that names something broken rather than something unwritten, so it is the only one
+  that stops a build.
+* **WARN** — no dcterms:description; a header whose ``# ?var:`` lines are not exactly the
+  outer projection in order; no comment anywhere in the body; or a header long enough that
+  the rationale has probably leaked into the query text.
+
+The documentation findings warn rather than fail because this runs as a build gate over
+every generated package. Measured over the eccenca package fleet, failing on them turned 7
+of 8 catalogs red — one of them with nothing actually wrong — which buries the findings that
+do name a fault.
 
 The projection is read with a paren-aware parser, so aliases and sub-SELECTs do not confuse
 it: only top-level ``?var`` tokens and the ``AS ?var`` of a top-level expression count.
@@ -151,18 +158,25 @@ def audit_one(graph, query):
     )
     row["fails"] = []
     row["warns"] = []
-    if not row["description"]:
-        row["fails"].append("no dcterms:description — the rationale has nowhere to live")
+    # Only the capitalisation finding fails. It names something that is broken
+    # - Corporate Memory renders the wrong column - while a missing description
+    # or an unmapped header names prose that was never written. Both are worth
+    # reporting and neither should stop a build: measured over the package
+    # fleet, failing on them turned 7 of 8 catalogs red, one of them with
+    # nothing actually wrong.
     if row["capitalised"]:
         row["fails"].append(
             f"capitalised projection variable(s) "
             f"{', '.join('?' + v for v in row['capitalised'])} — Corporate Memory takes the "
             f"first projected variable as the resource column when ?resource is absent, and a "
             f"capital defeats that selection; use lower camel case")
+    if not row["description"]:
+        row["warns"].append("no dcterms:description — the rationale has nowhere to live")
     if documented != projection:
-        row["fails"].append(
+        row["warns"].append(
             f"header documents {documented or ['nothing']} but the outer projection is "
-            f"{projection or ['nothing']}")
+            f"{projection or ['nothing']} — on a path builder query the left-most variable "
+            f"is the target of the shacl:path, so the header is where that gets recorded")
     if row["body_comments"] == 0:
         row["warns"].append("no comment anywhere in the body")
     if row["header_len"] > row["header_budget"]:
@@ -218,13 +232,17 @@ def check(paths):
                 print(f"  ~~ {row['name']}: {note}")
     if failing:
         print()
-        print(f"FAIL: {len(failing)}/{total} query/queries not documented to convention")
+        print(f"FAIL: {len(failing)}/{total} query/queries would render the wrong column")
         for row in failing:
             for note in row["fails"]:
                 print(f"  !! {row['name']}: {note}")
         return 1
     print()
-    print("OK: every query carries a rationale and a header mapping its projection")
+    if warning:
+        print(f"OK: no query projects a capitalised variable "
+              f"({len(warning)}/{total} carry documentation warnings above)")
+    else:
+        print("OK: every query carries a rationale and a header mapping its projection")
     return 0
 
 

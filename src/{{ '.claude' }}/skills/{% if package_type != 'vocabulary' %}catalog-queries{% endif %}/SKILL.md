@@ -11,8 +11,11 @@ parameter picker. The SPARQL is the smaller half of the job: Corporate Memory
 reads the *shape* of the projection, and a reader of the catalog has only the
 comments to go on.
 
-`task check:offline` enforces most of what follows, so a query that breaks
-these conventions fails the build rather than the form.
+`task check:offline` reports all of what follows, but fails the build only on
+the findings where something is actually broken - a capitalised projection
+variable, a placeholder key written inside a comment, a value query carrying a
+parameter, a query a shape points at that ships no text. The documentation
+conventions print as warnings: worth fixing, not worth stopping a build.
 
 ## Which column carries the value
 

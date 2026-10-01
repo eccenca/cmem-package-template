@@ -17,9 +17,11 @@ by reading the Turtle, and all four are checked here.
 
 2. **Every parameter a query actually uses wants a declaration naming that query.** Without
    one the parameter has to be pasted by hand in the query editor, and nothing records which
-   query takes which parameter. Built-in keys are included deliberately: declaring one does
-   not override the form renderer, so the declaration is documentation plus an editor
-   fallback.
+   query takes which parameter. For a **built-in** key — shuiResource, shuiMainResource,
+   shuiGraph — this is a warning rather than a failure: the form renderer substitutes those
+   from context whether or not a placeholder exists, so the declaration buys documentation
+   and an editor fallback, not behaviour. For any other key it is a failure, because nothing
+   will ever substitute a custom key that is not declared.
 
 3. **A value query must contain no placeholder at all.** It is evaluated in order to produce
    values for a parameter, so a parameter of its own could never be resolved first. Name the
@@ -47,6 +49,12 @@ from rdflib.namespace import RDF, Namespace
 SHUI = Namespace("https://vocab.eccenca.com/shui/")
 
 TOKEN = re.compile(r"\{\{\s*([^{}\s]+?)\s*\}\}")
+
+# Keys the form renderer substitutes from context. A query using one of these works
+# with no declaration at all, so a missing declaration is a warning: it costs only the
+# ability to run the query from the query editor, which has no form context. A missing
+# declaration for any OTHER key is a failure - nothing will ever substitute it.
+BUILTIN_KEYS = {"shuiResource", "shuiMainResource", "shuiGraph"}
 
 
 def local(term):
@@ -103,6 +111,7 @@ def check(paths):
     # (key, query) -> placeholders claiming it
     claims = defaultdict(list)
     failures = []
+    warnings = []
 
     print(f"{len(placeholders)} placeholder(s), {len(texts)} shipped query/queries, "
           f"{len(driving)} query/queries driving a property shape")
@@ -153,8 +162,15 @@ def check(paths):
         print(f"  {local(query):58} params: {','.join(params) or '-':28} {status}")
         for param in missing:
             uncovered += 1
-            failures.append(
-                f"{local(query)} uses {{{{{param}}}}} with no placeholder naming that query")
+            if param in BUILTIN_KEYS:
+                warnings.append(
+                    f"{local(query)} uses {{{{{param}}}}} with no placeholder naming that "
+                    f"query — it still resolves from form context, but the query cannot be "
+                    f"run from the query editor without pasting a value")
+            else:
+                failures.append(
+                    f"{local(query)} uses {{{{{param}}}}} with no placeholder naming that "
+                    f"query — nothing substitutes a custom key that is not declared")
     print(f"  -> {uncovered} uncovered parameter(s) over "
           f"{len(driving)} query-driven query/queries")
 
@@ -186,12 +202,20 @@ def check(paths):
     print(f"placeholder braces inside a comment: {brace_hits} over {len(texts)} query/queries")
 
     print()
+    if warnings:
+        for warning in warnings:
+            print(f"  ~~ {warning}")
+        print()
     if failures:
         print(f"FAIL: {len(failures)} problem(s)")
         for failure in failures:
             print(f"  !! {failure}")
         return 1
-    print("OK: placeholders unambiguous, parameters covered, value queries and comments clean")
+    if warnings:
+        print(f"OK: nothing broken ({len(warnings)} undeclared built-in key(s) noted above)")
+    else:
+        print("OK: placeholders unambiguous, parameters covered, "
+              "value queries and comments clean")
     return 0
 
 

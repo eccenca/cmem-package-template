@@ -43,7 +43,9 @@ unchanged, even with a concrete value query attached.
 
 So declaring a built-in is documentation plus an editor fallback: it records
 which queries take which parameter, and supplies values only where there is no
-form context.
+form context. `task check:offline` warns about an undeclared built-in key for
+that reason and fails on an undeclared custom one, where nothing would ever
+substitute a value.
 
 ## One `shuiResource` placeholder per class
 
