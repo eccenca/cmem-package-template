@@ -14,13 +14,16 @@ import re
 import sys
 from pathlib import Path
 
-# Skills every generated package gets, whatever it answered.
-ALWAYS = ("template-feedback", "package-content")
+# Skills every generated package gets, whatever it answered. A vocabulary
+# package is a vocabulary, and a project package usually ships one too, so
+# `vocabulary` is not conditional.
+ALWAYS = ("template-feedback", "package-content", "vocabulary")
 
 # Skills a vocabulary package must NOT get: a vocabulary package ships one
-# ontology graph and an icon, so a build project and a shape catalog are things
-# it will never have. They are dropped by a conditional directory name.
-PROJECT_ONLY = ("build-projects", "shapes")
+# ontology graph and an icon, so a build project, a shape catalog and the
+# queries inside one are things it will never have. They are dropped by a
+# conditional directory name.
+PROJECT_ONLY = ("build-projects", "shapes", "catalog-queries")
 
 SKILLS = Path(".claude") / "skills"
 

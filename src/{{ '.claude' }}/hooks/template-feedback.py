@@ -49,11 +49,14 @@ TEMPLATE_OWNED = (
     ".claude/rules/",
     ".claude/settings.json",
     ".claude/skills/build-projects/",
+    ".claude/skills/catalog-queries/",
     ".claude/skills/package-content/",
     ".claude/skills/shapes/",
     ".claude/skills/template-feedback/",
+    ".claude/skills/vocabulary/",
     ".gitlab-ci.yml",
     "Taskfile.yaml",
+    "bin/",
 )
 
 # Where a copier update records the version it moved to. A `+_commit:` line
