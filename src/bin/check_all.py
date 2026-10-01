@@ -44,7 +44,13 @@ SHUI = Namespace("https://vocab.eccenca.com/shui/")
 
 BIN = Path(__file__).resolve().parent
 
-SHAPE_MARKERS = (SH.NodeShape, SH.PropertyShape, SHUI.ShapeCatalog)
+# A shui:SparqlQuery counts as a shape catalog here even with no shape beside
+# it. A package can ship nothing but queries, and classifying such a file as
+# neither left audit_queries and check_placeholders - the two checks that are
+# entirely about queries - never running over the one package built to hold
+# them.
+SHAPE_MARKERS = (SH.NodeShape, SH.PropertyShape, SHUI.ShapeCatalog,
+                 SHUI.SparqlQuery, SHUI.SparqlOperation)
 VOCAB_MARKERS = (OWL.Class, OWL.ObjectProperty, OWL.DatatypeProperty, RDF.Property)
 
 

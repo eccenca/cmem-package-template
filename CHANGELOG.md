@@ -14,6 +14,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - two of those mistakes are invisible until after an install and one of them then reports success: a dangling reference makes the SHACL service answer HTTP 500 for **every** graph on the instance, and a `shacl:path` that reaches nothing leaves `shacl:class`, `shacl:nodeKind` and every cardinality on that row with nothing to check
   - `task check` and `task import` both run the checks first - `import` because it is the task that puts a catalog on a live instance
   - **a package whose catalog has findings will go red on the next `copier update`.** The checks use the verdicts they were written with, so an undocumented query or a placeholder path fails the build until it is fixed
+  - a file declaring `shui:SparqlQuery` counts as a catalog even with no shape beside it, so a package shipping nothing but queries is checked rather than skipped
   - they need [uv](https://docs.astral.sh/uv/), which resolves `rdflib` from each script's inline PEP 723 metadata - no install step and no Python project in the generated repository
 - Two authoring skills, bringing the shipped set to six
   - `vocabulary` for every package type: predicate order, the `skos:definition` substitution principle and what belongs in `rdfs:comment` instead, label casing, head-final class names, classifying by intention, and a reference covering the `foaf:depiction` every class wants
