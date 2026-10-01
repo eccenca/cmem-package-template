@@ -71,6 +71,10 @@ shared state on whichever deployment those point at. Know which deployment you
 are aimed at before running it, and do not run it concurrently with a pipeline
 doing the same thing.
 
+**The generated tasks invoke `cmemc` without `-c`**, so they act on the
+default connection. Drop to the bare `cmemc` commands with an explicit `-c`
+when that is not the instance you mean.
+
 `task check:offline` is the exception: it runs the checks in `bin/` over the
 shipped RDF and touches no deployment at all, so it is always safe to run.
 `task check` and `task import` both run it first, because two of the mistakes

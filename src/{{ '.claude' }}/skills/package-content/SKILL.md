@@ -144,6 +144,17 @@ pipeline has a publish job at all depends on how `marketplace` was answered when
 this package was generated; where it exists, publication happens on
 `main`/`master`, so staying on `develop` is the control.
 
+## An interrupted install leaves a lock behind
+
+Once it has happened, every later install fails with "Another process locked
+the package project", and nothing about the message suggests that the cause is
+a previous run rather than the package.
+
+`cmemc` 26.2.1 carries `--ignore-lock` on both `package install` and
+`package uninstall` for exactly this. The manual equivalent is deleting
+`mp-lock.json` from the `marketplace-packages` project over the workspace files
+API.
+
 ## The version is never written by hand
 
 `package_version` in the manifest stays `0.0.0`. The real version comes from

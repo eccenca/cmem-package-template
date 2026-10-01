@@ -20,6 +20,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - `catalog-queries` for project packages: which column Corporate Memory takes as the value, why a projection variable may not be capitalised, how to document a query, and references for query placeholders and the `?graph` column
 - `package-content` gained graph ownership - listing a graph is what makes uninstall clean - with a reference describing the four-graph layout a package shipping instance data wants, and the warning that a dataset writing with `clearGraphBeforeExecution` deletes the shipped graph description on every run
 - `shapes` gained the conventions for cardinalities, slugs, `shacl:name` versus `rdfs:label`, and a reference on why every property shape needs a real `shacl:path`
+- `package-content` also documents the lock an interrupted `package install` leaves behind, which makes every later install fail with a message that does not name the cause, and the rules note that the generated tasks pass no `-c` and so act on the default connection
 
 ### Changed
 
