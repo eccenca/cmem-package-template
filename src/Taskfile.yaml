@@ -38,11 +38,32 @@ tasks:
 
   check:
     desc: Run whole test suite
-    deps:
-      - build
     cmds:
+      - task: check:offline
+      - task: build
       - cmemc package install --replace --input {{.DIST_DIR}}/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa
       - cmemc package uninstall {{.PACKAGE_ID}}
+
+  check:offline:
+    desc: Check shipped RDF without a Corporate Memory connection
+    summary: |
+      Runs the checks in bin/ over the package directory: dangling shape,
+      group and query references, the query placeholder declarations, every
+      property shape's shacl:path against the vocabulary, and the shipped
+      queries against the documenting-a-query convention.
+
+      These need no instance, no credentials and no install - and two of the
+      mistakes they catch stay invisible until after one. A dangling
+      sh:property / sh:node / sh:group / sh:sparql reference makes the SHACL
+      service answer HTTP 500 for every graph, with nothing naming the cause.
+      A shacl:path that reaches nothing leaves shacl:class, shacl:nodeKind and
+      every cardinality on that row with nothing to check, so validation passes
+      and proves nothing.
+
+      A package with no shape catalog passes with a note: every check here is
+      catalog-driven.
+    cmds:
+      - uv run bin/check_all.py {{.PACKAGE_DIR}}
 
   build:
     desc: Build package archive
@@ -59,9 +80,17 @@ tasks:
 
   import:
     desc: Import (install) package to Corporate Memory
+    summary: |
+      Installs straight from the package directory, with no archive in
+      between - the inner loop.
+
+      The offline checks run first, because this is the task that puts a
+      catalog on a live instance, and a dangling reference in it makes the
+      SHACL service answer HTTP 500 for every graph on that deployment.
     deps:
       - delete
     cmds:
+      - task: check:offline
       - cmemc package install --input {{.PACKAGE_DIR}}
 
   export:
