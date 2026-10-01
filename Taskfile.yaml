@@ -83,6 +83,21 @@ tasks:
     cmds:
       - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-skills.py
 
+  check:offline:case:
+    desc: assert the offline RDF checkers a generated package ships still bite
+    summary: |
+      A generated package ships one example.ttl that declares no shapes and no
+      vocabulary terms, so every check is a no-op over it and a checker that
+      had stopped detecting anything would look exactly as healthy as one that
+      works. This drives the rendered package's own bin/ over tests/fixtures
+      instead - a good catalog that must pass, and one planted fault per
+      checker that each must catch by name.
+
+      It needs no Corporate Memory connection, so it is the part of
+      check:validate:case that still runs with no credentials.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-offline.py
+
   check:validate:case:
     desc: validate a project test case
     preconditions:
@@ -98,6 +113,8 @@ tasks:
       - task: check:hook:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - task: check:skills:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:offline:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - cd {{.TEST_CASE}}_dir && task check
 

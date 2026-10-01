@@ -1,0 +1,80 @@
+# A minimal shape catalog that satisfies every offline check, so a regression
+# in a checker shows up as this file failing.
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix shacl:    <http://www.w3.org/ns/shacl#> .
+@prefix shui:     <https://vocab.eccenca.com/shui/> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix example:  <https://example.org/vocab/> .
+@prefix shapes:   <https://example.org/shapes/> .
+
+<https://example.org/shapes/> a shui:ShapeCatalog ;
+  rdfs:label "Fixture shape catalog"@en .
+
+shapes:Band-NodeShape a shacl:NodeShape ;
+  shacl:targetClass example:Band ;
+  rdfs:label "Band node shape"@en ;
+  rdfs:comment "A band. Add one gig per night played."@en ;
+  shacl:name "Band"@en ;
+  shacl:property shapes:Band-bandName, shapes:Band-gigs .
+
+shapes:Band-bandName a shacl:PropertyShape ;
+  rdfs:label "Band: Band name property shape"@en ;
+  shacl:name "Name"@en ;
+  shacl:path example:bandName ;
+  shacl:nodeKind shacl:Literal ;
+  shacl:datatype xsd:string ;
+  shacl:order 10 .
+
+shapes:Band-gigs a shacl:PropertyShape ;
+  rdfs:label "Band: Gigs property shape"@en ;
+  shacl:name "Gigs"@en ;
+  shacl:path example:playedAt ;
+  shacl:nodeKind shacl:IRI ;
+  shacl:order 20 ;
+  shui:valueQuery shapes:Band-gigsQuery .
+
+shapes:Band-gigsQuery a shui:SparqlQuery ;
+  rdfs:label "Band gigs"@en ;
+  dcterms:description "Lists a band's gigs for the Gigs row of the band form. The path is the materialised example:playedAt, so the query adds no hops and the row stays editable."@en ;
+  shui:queryText """# Lists the gigs a band played.
+#
+# ?gig: the gig the band played
+SELECT ?gig
+FROM <https://example.org/data/>
+WHERE {
+
+  # Reach the gigs from the band the form is rendered for
+  <{{shuiResource}}> <https://example.org/vocab/playedAt> ?gig .
+
+}""" .
+
+shapes:Band-shuiResourcePlaceholder a shui:QueryPlaceholder ;
+  rdfs:label "Band resource" ;
+  rdfs:comment "Offers the bands, so the gigs query is runnable from the query editor." ;
+  shui:isSystemResource false ;
+  shui:QueryPlaceholder_key "shuiResource" ;
+  shui:QueryPlaceholder_valueQuery shapes:Band-shuiResourceValueQuery ;
+  shui:QueryPlaceholder_usedInQuery shapes:Band-gigsQuery .
+
+shapes:Band-shuiResourceValueQuery a shui:SparqlQuery ;
+  rdfs:label "Band resource values"@en ;
+  dcterms:description "Supplies the bands offered in the picker of the band resource placeholder. It names its graph literally, because a value query can carry no parameter of its own."@en ;
+  shui:queryText """# Offers every band as a value for the band resource parameter.
+#
+# ?value: the band IRI substituted into the consuming query
+# ?description: the band's name, shown beside it in the picker
+SELECT ?value ?description
+FROM <https://example.org/data/>
+WHERE {
+
+  # Every band is offered
+  ?value a <https://example.org/vocab/Band> .
+
+  # The name is optional, and an untagged literal counts
+  OPTIONAL {
+    ?value <https://example.org/vocab/bandName> ?description .
+    FILTER(LANG(?description) IN ("en", ""))
+  }
+
+}""" .

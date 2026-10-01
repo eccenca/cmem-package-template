@@ -1,0 +1,27 @@
+# A minimal, correct vocabulary for the offline checkers to judge paths against.
+@prefix owl:     <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix vann:    <http://purl.org/vocab/vann/> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix example: <https://example.org/vocab/> .
+
+<https://example.org/vocab/> a owl:Ontology ;
+  rdfs:label "Fixture vocabulary"@en ;
+  vann:preferredNamespacePrefix "example" ;
+  vann:preferredNamespaceUri "https://example.org/vocab/" .
+
+example:Band a owl:Class ;
+  rdfs:label "Band"@en .
+
+example:Gig a owl:Class ;
+  rdfs:label "Gig"@en .
+
+example:playedAt a owl:ObjectProperty ;
+  rdfs:domain example:Band ;
+  rdfs:range example:Gig ;
+  rdfs:label "played at"@en .
+
+example:bandName a owl:DatatypeProperty ;
+  rdfs:domain example:Band ;
+  rdfs:range xsd:string ;
+  rdfs:label "band name"@en .
