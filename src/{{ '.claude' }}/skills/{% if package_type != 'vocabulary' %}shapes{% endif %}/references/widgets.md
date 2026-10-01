@@ -41,9 +41,16 @@ search and a column title would only repeat the widget's label.
 
 ## The query
 
-The query takes `{{shuiMainResource}}`, the resource whose page is open, and may
-be a plain `SELECT … GROUP BY` returning aggregate literals - which is why a
-widget needs no invented property to hang on.
+The query takes `{{shuiMainResource}}` and may be a plain `SELECT … GROUP BY`
+returning aggregate literals - which is why a widget needs no invented property
+to hang on.
+
+**It is `shuiMainResource` here, not `shuiResource`.** The two usually resolve
+to the same IRI, which is what makes the wrong one survive: `shuiResource`
+follows the nesting and names the resource of the immediate sub-shape, while
+`shuiMainResource` stays pinned to the top-level resource whose page is open. A
+widget reports on the page, so it wants the stable one. Everywhere else,
+`shuiResource` is the default - see the `catalog-queries` skill.
 
 Other widget types exist - `shui:ComplexResourceViewerWidget`,
 `shui:SimpleResourceViewerWidget`, `shui:ChartVisualization`,

@@ -1,5 +1,32 @@
 # Validating a shape catalog
 
+## Run the offline checks first
+
+`task check:offline` needs no instance and no credentials, and it catches two
+things that are invisible until after an install:
+
+- **A dangling `sh:property` / `sh:node` / `sh:group` / `sh:sparql` reference
+  makes the SHACL service answer HTTP 500 for every graph**, with nothing in
+  the response naming the cause. Audit for these after any edit that removes or
+  renames a shape.
+- **A `shacl:path` that reaches nothing leaves every constraint on its row with
+  nothing to check**, so validation passes and proves nothing. See
+  `paths.md`.
+
+## Validating against the instance
+
+```sh
+cmemc -c <connection> graph validation execute <graph-iri> --wait --inspect
+```
+
+Run this over every graph the change could touch after any edit to the
+vocabulary or the catalog.
+
+**Take counts from `violationsCount` in `graph validation list --raw`.** The
+`inspect` endpoint *streams* its results, so calling it twice on the same
+finished run can return different lengths - which looks like the data changing
+underneath you.
+
 ## A plain SHACL engine misreads a shui catalog
 
 `shui:inversePath` and `shui:valueQuery` are Corporate Memory UI extensions. A
@@ -16,7 +43,8 @@ data problem.
 
 A clean build proves the manifest matches the directory. It **ignores RDF syntax
 errors entirely**, so a `.ttl` no parser accepts builds happily and fails at
-install. Parse every graph yourself as a separate step.
+install. `task check:offline` parses every graph and fails on one that no
+parser accepts, which is the cheapest way to cover that gap.
 
 ## Property coverage is worth checking
 
