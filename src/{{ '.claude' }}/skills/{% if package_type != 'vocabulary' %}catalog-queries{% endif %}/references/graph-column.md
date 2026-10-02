@@ -58,8 +58,10 @@ hop.
   splits into one row per graph.
 - **Keep the echo where no hop is defining.** On a derived multi-hop relation
   no single stored triple underlies the value, so the choice of hop to wrap is
-  itself a claim. Record in the query's `dcterms:description` which hop was
-  wrapped and why.
+  itself a claim.
+- **Where a hop is wrapped on a derived relation, say so.** Record in the
+  query's `dcterms:description` which hop was wrapped and why, because the
+  column's attribution is then a decision rather than a reading.
 
 A row marked `shui:readOnly true` cannot have values removed through the form
 at all, so the deletion half of the column does nothing there - the chip is the
