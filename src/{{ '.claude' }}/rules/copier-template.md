@@ -6,9 +6,9 @@ copier template and stays connected to it through `copier update`.
 
 ## Some files belong to the template
 
-`Taskfile.yaml`, `.gitlab-ci.yml` and everything under `.claude/` are rendered
-from the template. Edits there are not preserved: the next `copier update`
-either reverts them or turns them into a merge conflict.
+`Taskfile.yaml`, `.gitlab-ci.yml`, `bin/` and everything under `.claude/` are
+rendered from the template. Edits there are not preserved: the next
+`copier update` either reverts them or turns them into a merge conflict.
 
 Add project specific build steps to `TaskfileCustom.yaml` instead - note the
 `.yaml` spelling, since only that one is included. Project specific agent
@@ -39,14 +39,18 @@ generated with:
 - `package-content` - the manifest contract, adding or removing shipped files,
   the licence rules, and how to check a package without a Corporate Memory
   connection
+- `vocabulary` - the ontology: predicate order, definitions and comments,
+  naming, and the icon every class wants
 - `build-projects` - DataIntegration project exports, their layout, which
   workflow task to reach for, and how to test one
 - `shapes` - the shape catalog: node and property shapes, groups, URI
   templates, widgets, navigation and validation
+- `catalog-queries` - the SPARQL a catalog ships: the header comment, the
+  projection, placeholders and the `?graph` column
 - `template-feedback` - reporting a finding back to the template
 
 A vocabulary package ships fewer of them, because a build project and a shape
-catalog are things it does not have.
+catalog - and so the queries inside one - are things it does not have.
 
 ## Two files carry the documentation, and they face different readers
 
@@ -66,6 +70,16 @@ way. Edit the originals at the top level, never the links.
 shared state on whichever deployment those point at. Know which deployment you
 are aimed at before running it, and do not run it concurrently with a pipeline
 doing the same thing.
+
+**The generated tasks invoke `cmemc` without `-c`**, so they act on the
+default connection. Drop to the bare `cmemc` commands with an explicit `-c`
+when that is not the instance you mean.
+
+`task check:offline` is the exception: it runs the checks in `bin/` over the
+shipped RDF and touches no deployment at all, so it is always safe to run.
+`task check` and `task import` both run it first, because two of the mistakes
+it catches are invisible until after an install - a dangling shape reference
+takes the SHACL service down for every graph on the instance.
 
 `task build` has a precondition on `git describe`, because the package version
 is derived from it. In a repository without a tag the version becomes

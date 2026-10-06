@@ -57,9 +57,10 @@ one uses the other. It is shown while someone creates or edits a resource of
 that type, so write what the thing is and what to do with it, not a restatement
 of the class comment.
 
-**An abstract class gets no node shape.** Without one the UI offers no way to
-create a bare instance, which is exactly what abstract means. Give the concrete
-subclasses their own shapes.
+**An abstract class gets no node shape** where its subclasses already cover
+every instance. Without one the UI offers no way to create a bare instance,
+which is exactly what abstract means. Each subclass carries the shape; the
+superclass carries none.
 
 ## Property shapes
 
@@ -81,13 +82,36 @@ gigos:Festival-startDate a shacl:PropertyShape ;
 `shui:readOnly` forbids editing, `shui:markdown` and `shui:textarea` change the
 input widget, `shui:languageIn` restricts language tags.
 
-Reusing one property shape across many node shapes is normal and keeps a change
-in one place - a shared `comment` or `editorialNote` field is the usual case.
+**Measure before asserting a cardinality.** Derive every `shacl:minCount` and
+`shacl:maxCount` from a SPARQL count over the real data rather than guessing.
+Every property shape also needs a `shacl:nodeKind`, and a `shacl:datatype` has
+to point at something typed `rdfs:Datatype`, so declare the datatypes the
+catalog uses at the top of the file.
+
+**When a shape and the data disagree, fix the data or the model - not the
+shape.** Relaxing a constraint to make a validation run pass turns the catalog
+into a description of whatever the data happens to be. Where the choice is
+between a looser shape and a stricter one that still holds, take the stricter
+one: it is the only part of the package that can catch a regression.
+
+Reusing one property shape across many node shapes is normal where the path is
+a domain-free annotation - a shared `comment` or `editorialNote` field is the
+usual case - and it keeps a change in one place. Do **not** share a row whose
+path is typed or whose values come from a query: one `shacl:path` cannot be
+type-correct for two target classes, and the query ends up serving both through
+an alternation. See `references/paths.md`.
 
 ## Derived fields
 
 A field computed by a query carries `shui:valueQuery`, and often
-`shui:inversePath` for a back-link.
+`shui:inversePath` for a back-link. **Multi-hop relations are
+`shui:valueQuery` path builder queries** - standard SHACL sequence paths are
+not used anywhere in Corporate Memory, and 0 of the 236 paths in eccenca's own
+system catalog are blank nodes.
+
+Derived is not the same as query-driven. A row whose query returns exactly what
+its `shacl:path` reaches is query-driven but not derived, and it may stay
+editable; `references/paths.md` has the test and what each outcome means.
 
 **A derived field takes `shui:readOnly` and neither `shacl:minCount` nor
 `shui:showAlways`.** Both of those address a user who is expected to act, and
@@ -119,6 +143,55 @@ the graph IRI and without the segment.
 enumerated in the documentation; query `?t shui:templateString ?s` across all
 graphs to see what exists.
 
+## Readable slugs, never UUIDs
+
+Corporate Memory mints UUID local names when a shape, group or query is created
+through the UI. Replace them. A UUID tells a reader nothing, forces a lookup on
+every cross-reference, and a local name starting with a digit - which two
+thirds of them do - is legal Turtle that breaks syntax highlighting. The
+platform's own built-in queries use slugs such as `total-number-of-triples`.
+
+The scheme, by how widely the resource is shared:
+
+| resource | slug |
+|---|---|
+| property shape on one class | `<Class>-<camelCased row name>` |
+| shape shared by subclasses of one class | `<Superclass>-<row>` |
+| shape shared by unrelated classes | `<row>` |
+| property group | the same, plus `Group` |
+| path builder query | the using shape's slug, plus `Query` |
+
+Naming a query after the shape that uses it keeps the pair adjacent when the
+file is sorted, and a query with no matching shape then stands out as an
+orphan.
+
+Renaming exposes duplicates that UUIDs hide - but **duplicate group labels are
+often correct, not redundant**. `shacl:order` belongs to the group, not to the
+form, so placing one block at a different height on several forms requires one
+group per form, and merging them would force a single position everywhere. Give
+every group an explicit `shacl:order`; without one its position is undefined.
+
+## `shacl:name` is the form, `rdfs:label` is the catalog
+
+The two serve different readers and therefore follow different conventions.
+
+- **`shacl:name`** renders the UI element built from the shape - a form row's
+  caption, a form's title. It is what an end user reads, so it says
+  "Condition", never "hasCondition", and **must never contain "node shape" or
+  "property shape"**. Putting `"Product Node Shape"` in `shacl:name` and hiding
+  the plain name in `rdfs:label` is the wrong way round.
+- **`rdfs:label`** is how the shape itself appears in a catalog listing, so it
+  must **distinguish one shape from another**. Many `shacl:name`s repeat by
+  design, so a bare label identifies nothing.
+
+Derive `rdfs:label` from the slug, which is unique by construction:
+`<Class>-NodeShape` → `"<Class> node shape"`; `<Class>-<row>` →
+`"<Class>: <Row> property shape"`; a shared `<row>` → `"<Row> property shape"`.
+
+Property **groups** are the exception: SHACL renders a group's `rdfs:label` as
+the block heading, so there it *is* the UI text and stays short
+("Constraints", "Metadata").
+
 ## Queries live in this catalog
 
 **Every query a shape references belongs in the shape catalog beside the shapes
@@ -126,6 +199,14 @@ that use it**, as a `shui:SparqlQuery` / `shui:SparqlOperation` with its
 `shui:queryText`. A catalog pointing at a query in another graph is half a
 deliverable: install the catalog somewhere that lacks the other graph and the
 field silently renders nothing.
+
+**Mint them in the package's own namespace**, not in
+`https://ns.eccenca.com/data/queries/`. That is Corporate Memory's system query
+catalog, and putting your IRIs there claims a namespace the package does not
+own.
+
+How to write and document the query itself - the header comment, the
+projection, placeholders, the `?graph` column - is the `catalog-queries` skill.
 
 ## House style
 
@@ -145,6 +226,8 @@ recommended defaults - a package with a good reason may depart from them.
 
 ## Going further
 
+- `references/paths.md` - why every row needs a real `shacl:path`, and how to
+  diagnose a query-driven row that has the wrong one
 - `references/widgets.md` - aggregates, table reports, and the integration chain
 - `references/navigation.md` - `shui:managedClasses` and navigation lists
 - `references/validation.md` - validating a catalog without lying to yourself

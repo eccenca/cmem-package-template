@@ -64,6 +64,8 @@ Everything else is the same for both types - the repository layout, the
 
 - Python 3.10+
 - Copier >= 9.0.0: `pip install copier` or `uv tool install copier`
+- [uv](https://docs.astral.sh/uv/), which the generated package's offline
+  checks use to resolve their own dependencies
 
 ## Usage
 
@@ -101,6 +103,7 @@ your-new-vocabulary-package/
 ├── .copier-answers.yml
 ├── .gitignore
 ├── .gitlab-ci.yml
+├── bin/                (offline RDF checks, run by `task check:offline`)
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── DOCUMENTATION.md   (shipped with the package, shown in the marketplace)
@@ -117,11 +120,23 @@ your-new-vocabulary-package/
 
 `.claude/` holds what an agent working in the generated package reads: rules
 describing which files the template owns, a `settings.json` that registers a
-session end check and pre-approves `task build`, `task check` and `task clean`,
-and skills covering package content, build projects, the shape catalog and how
-to report a finding back to this template. A vocabulary package receives fewer
-skills than a project package, because a build project and a shape catalog are
-things it does not have.
+session end check and pre-approves the tasks that touch nothing irreversible,
+and skills covering package content, the vocabulary, build projects, the shape
+catalog, the queries inside it, and how to report a finding back to this
+template. A vocabulary package receives fewer skills than a project package,
+because a build project and a shape catalog - and so the queries inside one -
+are things it does not have.
+
+`bin/` holds the offline checks, which need no Corporate Memory connection and
+no credentials: dangling shape, group and query references, the query
+placeholder declarations, every property shape's `shacl:path` against the
+vocabulary, and the shipped queries against the documenting-a-query convention.
+Two of the mistakes they catch are invisible until after an install, and one of
+them then reports success - a dangling `sh:property` reference makes the SHACL
+service answer HTTP 500 for every graph, and a `shacl:path` that reaches
+nothing leaves every constraint on its row with nothing to check. `task check`
+and `task import` both run them first. They need [uv](https://docs.astral.sh/uv/),
+which resolves `rdflib` from each script's inline metadata.
 
 The default license we add is _Apache License 2.0 ([`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html))_, see <https://spdx.org/licenses/> if you need a different.
 
@@ -133,6 +148,7 @@ After generating the package, use [Task](https://taskfile.dev/) to run common op
 task              # List available tasks
 task build        # Build package archive
 task check        # Run test suite
+task check:offline # Check shipped RDF without a Corporate Memory connection
 task import       # Import package to Corporate Memory
 task export       # Export package from Corporate Memory
 task publish      # Publish to marketplace

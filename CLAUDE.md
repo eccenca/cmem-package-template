@@ -13,7 +13,7 @@ The repository contains two distinct projects that share a directory tree:
 | Level | Files | Audience |
 |---|---|---|
 | **Template project** | `Taskfile.yaml`, `CHANGELOG.md`, `README.md`, `.github/`, `tests/`, `copier.yaml` | maintainers of *this* repo |
-| **Template payload** | everything under `src/` | rendered into *generated* packages |
+| **Template payload** | everything under `src/`, including `src/bin/` | rendered into *generated* packages |
 
 `copier.yaml` sets `_subdirectory: src`, so only `src/` is rendered. A change under `src/` alters what every future generated package gets; a change at root level only affects this repo's own tooling. Never conflate the two `Taskfile.yaml` / `CHANGELOG.md` / `README.md` pairs.
 
@@ -56,6 +56,8 @@ Adding a `tests/<name>.yml` copier answers file automatically adds a test case �
 
 These are independent literals with no coupling; they have silently diverged before. Always update both together, and note the version in `CHANGELOG.md`.
 
+The same split catches tooling generally: the two pipelines install their tools differently, so a dependency the payload needs has to be checked in both. `uv` is the live example — the generated `task check:offline` runs the checks in `bin/` with `uv run`, which generated packages get for free because their image already installs cmemc with it, while this repository installs cmemc with pip and had to add `astral-sh/setup-uv` to `.github/workflows/check.yml` explicitly. Confirming a tool exists in one pipeline says nothing about the other.
+
 ## Generated package anatomy
 
 - `src/README.md.jinja` → the generated repo's README, **maintainer-facing** only.
@@ -64,6 +66,7 @@ These are independent literals with no coupling; they have silently diverged bef
 - `src/.gitlab-ci.yml.jinja` is Jinja-rendered rather than copied verbatim, because the `marketplace` answer gates the `publish` stage entry and the `publish` job — an internal package gets a pipeline with no trace of publishing. Literal `{{` or `{%` in that file now needs escaping.
 - `src/Taskfile.yaml` reads `dotenv: ['.copier-answers.env', '.env']` — `package_dir` / `package_id` come from `.copier-answers.env.jinja`, not from Jinja substitution into the Taskfile. Users extend it via an optional `TaskfileCustom.yaml` (included with `flatten: true`); the generated Taskfile itself is marked not-to-be-edited.
 - `src/{{ '.claude' }}/` ships agent support into every generated package — rules, the `template-feedback` skill, the `Stop` hook and `settings.json`. The quoted-expression directory name is deliberate; see *Feedback from generated packages*.
+- `src/bin/` ships the offline RDF checks into every generated package, as plain Python with PEP 723 inline metadata and a `#!/usr/bin/env -S uv run --script` shebang, so they need no install and no Python project in the generated repository. They are template owned — listed in the hook's `TEMPLATE_OWNED`, named in the shipped rules. `task check:offline` runs them, and both `task check` and `task import` run that first; `import` because it is the task that puts a catalog on a live instance, where a dangling reference takes the SHACL service down for every graph.
 
 ## Feedback from generated packages
 
@@ -105,17 +108,23 @@ is what stops them coming back.
 
 ## Skills shipped into generated packages
 
-Beyond `template-feedback`, `src/{{ '.claude' }}/skills/` holds three authoring
-skills: `package-content` (the manifest contract, licence rules, offline
-checking), `build-projects` (DataIntegration exports) and `shapes` (the shape
-catalog). They exist because four packages in the fleet had each written the
-same knowledge into their own `CLAUDE.md` - the survey behind them is in
-`docs/superpowers/specs/2026-09-16-package-authoring-skills-design.md`.
+Beyond `template-feedback`, `src/{{ '.claude' }}/skills/` holds five authoring
+skills: `package-content` (the manifest contract, graph ownership, licence
+rules, offline checking), `vocabulary` (the ontology and its class icons),
+`build-projects` (DataIntegration exports), `shapes` (the shape catalog) and
+`catalog-queries` (the SPARQL inside one). The first three exist because four
+packages in the fleet had each written the same knowledge into their own
+`CLAUDE.md` - the survey behind them is in
+`docs/superpowers/specs/2026-09-16-package-authoring-skills-design.md`. The
+vocabulary and query material arrived later, from a companion conventions
+repository a colleague maintained alongside this template.
 
-`build-projects` and `shapes` are dropped for vocabulary packages by a
-conditional directory name,
+`build-projects`, `shapes` and `catalog-queries` are dropped for vocabulary
+packages by a conditional directory name,
 `skills/{% if package_type != 'vocabulary' %}shapes{% endif %}/`. Copier removes
-such a directory entirely rather than leaving an empty one.
+such a directory entirely rather than leaving an empty one. `vocabulary` is
+**not** conditional: a vocabulary package is one, and a project package usually
+ships one too.
 
 Two rules keep them honest. They state general truths as fact and eccenca house
 style as overridable defaults, marked as such. And they never restate the
@@ -125,9 +134,17 @@ the fallback, so there is no second copy to drift - the failure this repository
 already has with the cmemc pin.
 
 `check:skills:case` asserts that the right skills ship, with parseable
-frontmatter and a `name` matching the directory, and that the conditional two
+frontmatter and a `name` matching the directory, and that the conditional three
 are absent from a vocabulary package. It cannot assess what a skill *says*;
 that is a hand read.
+
+`check:offline:case` is the equivalent for `src/bin/`. It drives the *rendered*
+package's own `bin/check_all.py` over `tests/fixtures/good` and
+`tests/fixtures/bad` and requires each checker to catch its own planted fault
+**by name** - an exit code alone would be satisfied by one checker failing
+while the other three had gone blind, which is exactly what a blinded-checker
+run produces. A generated package's own `example.ttl` declares no shapes and no
+vocabulary terms, so the package cannot test this about itself.
 
 `task check` covers exactly one part of the feedback cycle: `check:hook:case`
 asserts that the shipped hook stays silent on a clean tree and respects
@@ -164,6 +181,25 @@ The following look like oversights during a review, but are intentional. They
 have each been considered and left as they are. This is the section the shipped
 `template-feedback` skill sends every would-be reporter to, and the section
 `/template-triage` writes a declined finding into.
+
+### One package's measurements do not ship
+
+The conventions under `src/{{ '.claude' }}/skills/` came from a companion
+repository written while diagnosing specific packages, and they arrived
+carrying the evidence that proved them: a `FROM` / `FROM NAMED` measurement
+table taken against one package's 1526-triple data graph, counts such as "19
+features and 200 materials", a colour pair that was tried and rejected, and two
+findings whose cause was explicitly never established.
+
+None of that migrated, and it should not be restored. The test for what ships
+is whether a reader can reproduce it in *their* package. Evidence about the
+platform stays, because any package can check it against its own instance -
+"0 of 236 paths in eccenca's own system catalog are blank nodes" is the same
+category as the existing "21 of its node shapes use `rdfs:comment` and one uses
+the other". Evidence about one package's data does not, because in a package
+about something else it is unverifiable residue rather than proof. Unresolved
+questions were dropped outright: shipping an open debate as guidance asks every
+future reader to carry somebody else's uncertainty.
 
 ### Vocabulary packages are asked no dependency questions
 

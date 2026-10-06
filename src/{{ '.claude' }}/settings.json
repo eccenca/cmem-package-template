@@ -3,6 +3,7 @@
         "allow": [
             "Bash(task build)",
             "Bash(task check)",
+            "Bash(task check:offline)",
             "Bash(task clean)",
             "Bash(gh issue list:*)",
             "Bash(gh search issues:*)"

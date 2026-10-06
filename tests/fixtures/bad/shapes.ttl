@@ -1,0 +1,91 @@
+# A shape catalog carrying one fault per checker, so a checker that stops
+# detecting its fault shows up as this file passing. Every fault is commented
+# with the check it is there to trip.
+@prefix dcterms:  <http://purl.org/dc/terms/> .
+@prefix rdfs:     <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix shacl:    <http://www.w3.org/ns/shacl#> .
+@prefix shui:     <https://vocab.eccenca.com/shui/> .
+@prefix xsd:      <http://www.w3.org/2001/XMLSchema#> .
+@prefix example:  <https://example.org/vocab/> .
+@prefix shapes:   <https://example.org/shapes/> .
+
+<https://example.org/shapes/> a shui:ShapeCatalog ;
+  rdfs:label "Broken fixture shape catalog"@en .
+
+shapes:Band-NodeShape a shacl:NodeShape ;
+  shacl:targetClass example:Band ;
+  rdfs:label "Band node shape"@en ;
+  # check_dangling: shapes:Band-missing is defined nowhere in this catalog.
+  shacl:property shapes:Band-bandName, shapes:Band-gigs, shapes:Band-missing .
+
+# check_paths: a path pointing at the wrong end - example:playedAt has
+# rdfs:domain example:Band, so it cannot be reached forwards from a Gig.
+shapes:Gig-NodeShape a shacl:NodeShape ;
+  shacl:targetClass example:Gig ;
+  rdfs:label "Gig node shape"@en ;
+  shacl:property shapes:Gig-band .
+
+shapes:Gig-band a shacl:PropertyShape ;
+  shacl:name "Band"@en ;
+  shacl:path example:playedAt ;
+  shacl:nodeKind shacl:IRI .
+
+shapes:Band-bandName a shacl:PropertyShape ;
+  shacl:name "Name"@en ;
+  # check_paths: a stand-in path that reaches nothing and so silently
+  # disables every constraint on this row.
+  shacl:path <urn:path> ;
+  shacl:nodeKind shacl:Literal ;
+  shacl:datatype xsd:string .
+
+shapes:Band-gigs a shacl:PropertyShape ;
+  shacl:name "Gigs"@en ;
+  shacl:path example:playedAt ;
+  shacl:nodeKind shacl:IRI ;
+  shui:valueQuery shapes:Band-gigsQuery .
+
+# audit_queries: no dcterms:description, a capitalised projection variable,
+# a header whose variable lines do not match the projection, no body comment.
+shapes:Band-gigsQuery a shui:SparqlQuery ;
+  rdfs:label "Band gigs"@en ;
+  shui:queryText """# Lists the gigs a band played.
+#
+# ?gig: the gig the band played
+SELECT ?Gig
+FROM <https://example.org/data/>
+WHERE {
+  <{{shuiResource}}> <https://example.org/vocab/playedAt> ?Gig .
+  FILTER(?venue != "{{venue}}")
+}""" .
+
+# check_placeholders: two placeholders claim the same key on the same query,
+# leaving it ambiguous with nothing to break the tie. The {{venue}} parameter
+# above is covered by neither.
+shapes:Band-shuiResourcePlaceholder a shui:QueryPlaceholder ;
+  rdfs:label "Band resource" ;
+  shui:QueryPlaceholder_key "shuiResource" ;
+  shui:QueryPlaceholder_valueQuery shapes:Band-shuiResourceValueQuery ;
+  shui:QueryPlaceholder_usedInQuery shapes:Band-gigsQuery .
+
+shapes:Band-otherResourcePlaceholder a shui:QueryPlaceholder ;
+  rdfs:label "Band resource, again" ;
+  shui:QueryPlaceholder_key "shuiResource" ;
+  shui:QueryPlaceholder_valueQuery shapes:Band-shuiResourceValueQuery ;
+  shui:QueryPlaceholder_usedInQuery shapes:Band-gigsQuery .
+
+# check_placeholders: a value query must carry no parameter of its own, and
+# must not name a placeholder key in braces inside a comment either.
+shapes:Band-shuiResourceValueQuery a shui:SparqlQuery ;
+  rdfs:label "Band resource values"@en ;
+  dcterms:description "Supplies the bands offered in the picker."@en ;
+  shui:queryText """# Offers every band, filtered by {{venue}}.
+#
+# ?value: the band IRI substituted into the consuming query
+SELECT ?value
+FROM <{{shuiGraph}}>
+WHERE {
+
+  # Every band is offered
+  ?value a <https://example.org/vocab/Band> .
+
+}""" .

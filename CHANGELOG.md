@@ -7,7 +7,29 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- Generated packages now ship `bin/`, a set of offline RDF checks that need no Corporate Memory connection and no credentials, and a `task check:offline` that runs them
+  - they report dangling `sh:property` / `sh:node` / `sh:group` / `sh:sparql` references, the `shui:QueryPlaceholder` declarations, every property shape's `shacl:path` against the vocabulary, the shipped queries against the documenting-a-query convention, and any graph no parser accepts
+  - two of those mistakes are invisible until after an install and one of them then reports success: a dangling reference makes the SHACL service answer HTTP 500 for **every** graph on the instance, and a `shacl:path` that reaches nothing leaves `shacl:class`, `shacl:nodeKind` and every cardinality on that row with nothing to check
+  - `task check` and `task import` both run the checks first - `import` because it is the task that puts a catalog on a live instance
+  - the build fails only where something is actually broken: a dangling reference, a `shacl:path` that is a placeholder or not type-correct, a capitalised projection variable, a placeholder key written inside a comment, a value query carrying a parameter, an undeclared custom placeholder key, or a graph no parser accepts
+  - the documentation conventions - a missing `dcterms:description`, a header that does not list the projection, an undeclared *built-in* placeholder key - print as warnings. Run over the 35 packages of the eccenca fleet, failing on those turned 7 of the 8 catalogs red, one of them with nothing actually wrong, which buried the 58 findings that do name a fault
+  - **a package whose catalog has a real fault will still go red on the next `copier update`.** Six of the eight catalogs in the fleet do
+  - a file declaring `shui:SparqlQuery` counts as a catalog even with no shape beside it, so a package shipping nothing but queries is checked rather than skipped
+  - they need [uv](https://docs.astral.sh/uv/), which resolves `rdflib` from each script's inline PEP 723 metadata - no install step and no Python project in the generated repository
+- Two authoring skills, bringing the shipped set to six
+  - `vocabulary` for every package type: predicate order, the `skos:definition` substitution principle and what belongs in `rdfs:comment` instead, label casing, head-final class names, classifying by intention, and a reference covering the `foaf:depiction` every class wants
+  - `catalog-queries` for project packages: which column Corporate Memory takes as the value, why a projection variable may not be capitalised, how to document a query, and references for query placeholders and the `?graph` column
+- `package-content` gained graph ownership - listing a graph is what makes uninstall clean - with a reference describing the four-graph layout a package shipping instance data wants, and the warning that a dataset writing with `clearGraphBeforeExecution` deletes the shipped graph description on every run
+- `shapes` gained the conventions for cardinalities, slugs, `shacl:name` versus `rdfs:label`, and a reference on why every property shape needs a real `shacl:path`
+- `package-content` also documents the lock an interrupted `package install` leaves behind, which makes every later install fail with a message that does not name the cause, and the rules note that the generated tasks pass no `-c` and so act on the default connection
+- `package-content` also says to commit before `task build`, because a dirty tree names the archive for a state that lives on no commit, and scopes the namespace-dependency rule to project packages, because `cmemc` rejects a vocabulary manifest carrying any dependency
+
+### Changed
+
+- `bin/` is template owned, like `Taskfile.yaml`, `.gitlab-ci.yml` and `.claude/`: the session end check reports an edit there, and the shipped rules say so
+- Reusing one property shape across node shapes is now scoped. It stays the right call for a domain-free annotation row such as `comment`, and is called out as wrong where the path is typed or the values come from a query, because one `shacl:path` cannot be type-correct for two target classes
 
 ## [1.6.0] 2026-09-24
 

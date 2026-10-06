@@ -35,11 +35,6 @@ cmemc project export --extract --replace --without-userdata \
     --output-dir <package_dir>/build <project-id>                   # the result comes back
 ```
 
-```bash
-cmemc project export --extract --replace --without-userdata \
-    --output-dir <package_dir>/build <project-id>
-```
-
 **`--without-userdata` is not optional in practice.** Without it, `config.xml`
 carries timestamps and account IRIs, so every round-trip produces a diff that
 says nothing about what changed.
