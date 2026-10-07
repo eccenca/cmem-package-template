@@ -39,7 +39,7 @@ rather than the current level, and say so in its `dcterms:description`.
 `{{shuiGraph}}`, `{{shuiResource}}` and `{{shuiMainResource}}` are substituted
 by the form renderer from context. Declaring a placeholder of the same key does
 not override that - both were verified on a running instance to keep working
-unchanged, even with a concrete value query attached.
+unchanged, even with a concrete placeholder values query attached.
 
 So declaring a built-in is documentation plus an editor fallback: it records
 which queries take which parameter, and supplies values only where there is no
@@ -73,7 +73,7 @@ Measure the branches per class before splitting rather than assuming which
 belongs where; they are usually disjoint, and if they are not, the row means
 something other than it claims.
 
-## A value query has three constraints of its own
+## A placeholder values query has three constraints of its own
 
 Each was found by breaking it:
 
@@ -91,7 +91,7 @@ Each was found by breaking it:
 ## Never write a key in braces inside a comment
 
 Substitution is a plain text replace over the whole query text, **comments
-included**. A value query that mentions its own key in prose therefore becomes
+included**. A placeholder values query that mentions its own key in prose therefore becomes
 circular - Corporate Memory needs a value for the key in order to compute the
 list of values for it - and the picker cannot be filled.
 

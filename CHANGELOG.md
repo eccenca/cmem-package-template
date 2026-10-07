@@ -7,7 +7,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- `shapes` gained `references/path-builder-queries.md`: the seven uses of a path builder query (subclass split, enriched stored relation, derived shortcut, back-link listing, read-only split, and the catalogued anti-patterns computed link and embedded widget), each with its row, query, validation treatment and `?graph` handling
+  - the **subclass split** in full - one property, one editable row per leaf class of its range, `shacl:class` at the range, one group per split property, a path builder query and a selectable resources query per row, no inline creation, curated links kept in a graph the build does not clear - grilled and measured on the product data demo (2026-10-07)
+- `bin/check_path_builder_queries.py`, run by `check_all.py`: classifies every path builder query row into the seven uses and fails a subclass split whose rows drift from their queries - a missing query, a query not mentioning the path, the leaf as `shacl:class`, `?graph` not bound through `FROM NAMED`/`GRAPH`, rows not sharing one group of their own, or a leaf of the range without a row; warns on inline creation, on a selectable resources query that offers held values, and on the two anti-patterns
+
+### Changed
+
+- the strip rule in `shapes/references/validation.md` keeps the subclass split and the enriched stored relation: their path is honest, and a split row's qualified value shape counts would otherwise never be checked
+- `shapes/references/paths.md` names the subclass split as the intended subset, not the "they differ" fault
+- `catalog-queries` names the three query roles - path builder query, selectable resources query, placeholder values query - and drops "value query", which meant two things; `check_placeholders.py` reports in the same terms
+- `scripts/check-offline.py` matches a checker's verdict by name, not by column width (the summary pads names to the longest checker)
 
 ## [1.7.0] 2026-10-06
 

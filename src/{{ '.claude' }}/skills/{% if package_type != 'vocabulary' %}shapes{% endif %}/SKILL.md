@@ -103,6 +103,13 @@ an alternation. See `references/paths.md`.
 
 ## Derived fields
 
+**Path builder queries have seven uses** - a subclass split, an enriched stored
+relation, a derived shortcut, a back-link listing, a read-only split, and two
+catalogued anti-patterns (computed link, embedded widget) - each with its own
+row, query and validation treatment: `references/path-builder-queries.md`.
+Read it before adding a query-driven row, and before splitting one property
+into several rows.
+
 A field computed by a query carries `shui:valueQuery`, and often
 `shui:inversePath` for a back-link. **Multi-hop relations are
 `shui:valueQuery` path builder queries** - standard SHACL sequence paths are
@@ -226,6 +233,9 @@ recommended defaults - a package with a good reason may depart from them.
 
 ## Going further
 
+- `references/path-builder-queries.md` - the seven uses of a path builder
+  query, and the subclass split (one row per leaf class of a property's range)
+  in full
 - `references/paths.md` - why every row needs a real `shacl:path`, and how to
   diagnose a query-driven row that has the wrong one
 - `references/widgets.md` - aggregates, table reports, and the integration chain

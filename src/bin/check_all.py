@@ -5,7 +5,7 @@
 # ///
 """Run every offline check in this toolkit over a Corporate Memory package directory.
 
-The four checks answer questions that a SHACL validation run cannot, because the catalog has
+The five checks answer questions that a SHACL validation run cannot, because the catalog has
 to be installed before validation can say anything — and two of these mistakes make the
 install itself useless: a dangling reference turns every graph's validation into an HTTP 500,
 and a path that matches nothing turns every constraint on its row into a no-op that reports
@@ -129,6 +129,7 @@ def check(directory, quiet=False):
         ("check_placeholders.py", shapes),
         ("check_paths.py", shapes + vocab),
         ("audit_queries.py", shapes),
+        ("check_path_builder_queries.py", shapes + vocab),
     ]
 
     results = []

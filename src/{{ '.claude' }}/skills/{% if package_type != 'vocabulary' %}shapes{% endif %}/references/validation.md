@@ -34,10 +34,13 @@ standard SHACL processor does not know them, so it evaluates the **forward**
 path instead and invents violations - "venues in this city" gets checked as
 "this city's `withinLocation` must be a Venue".
 
-**Strip every property shape carrying `shui:inversePath` or `shui:valueQuery`
-before validating.** What remains is exactly the set of real constraints. A
-report full of violations that all name derived fields is this problem, not a
-data problem.
+**Strip every property shape carrying `shui:inversePath`, and every row whose
+path builder query returns anything but stored values of its path, before
+validating** - use cases 3 to 7 of `path-builder-queries.md`. Keep the subclass
+split (1) and the enriched stored relation (2): their path is honest, and a
+split row's qualified value shape counts would otherwise never be checked. What
+remains is exactly the set of real constraints. A report full of violations
+that all name derived fields is this problem, not a data problem.
 
 ## What `cmemc package build` does not check
 

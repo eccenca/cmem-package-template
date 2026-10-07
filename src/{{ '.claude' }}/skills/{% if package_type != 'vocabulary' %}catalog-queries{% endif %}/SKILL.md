@@ -1,19 +1,26 @@
 ---
 name: catalog-queries
-description: Write and document the SPARQL queries a shape catalog ships - path builder queries behind a form row, value queries behind a picker, and the header comment, projection and placeholders each one needs. Use when a query is added to or edited in the catalog, when a form row shows the wrong column, or when a picker does not fill.
+description: Write and document the SPARQL queries a shape catalog ships - path builder queries behind a form row, selectable resources queries behind a row's picker, placeholder values queries behind a parameter picker, and the header comment, projection and placeholders each one needs. Use when a query is added to or edited in the catalog, when a form row shows the wrong column, or when a picker does not fill.
 ---
 
 # Queries inside a shape catalog
 
 A shipped query is a `shui:SparqlQuery` in the shape catalog, carrying its
-`shui:queryText`. It drives a form row (`shui:valueQuery`), a widget, or a
-parameter picker. The SPARQL is the smaller half of the job: Corporate Memory
-reads the *shape* of the projection, and a reader of the catalog has only the
+`shui:queryText`. It drives a form row (a **path builder query**,
+`shui:valueQuery`), the picker of a row (a **selectable resources query**,
+`shui:uiQuery`), a widget, or a parameter picker (a **placeholder values
+query**, `shui:QueryPlaceholder_valueQuery`). Name them by role, never "value
+query" - the word would mean two things. Slug suffixes: `…Query`,
+`…ChoiceQuery`, `…PlaceholderValuesQuery`.
+
+The SPARQL is the smaller half of the job: Corporate Memory reads the *shape*
+of the projection, and a reader of the catalog has only the
 comments to go on.
 
 `task check:offline` reports all of what follows, but fails the build only on
 the findings where something is actually broken - a capitalised projection
-variable, a placeholder key written inside a comment, a value query carrying a
+variable, a placeholder key written inside a comment, a placeholder values query
+carrying a
 parameter, a query a shape points at that ships no text. The documentation
 conventions print as warnings: worth fixing, not worth stopping a build.
 
@@ -110,6 +117,6 @@ mislead the next reader:
 ## Going further
 
 - `references/placeholders.md` - `shui:QueryPlaceholder`, the built-in keys,
-  value queries and the traps in each
+  placeholder values queries and the traps in each
 - `references/graph-column.md` - the `?graph` column of a path builder query,
   and when to compute it rather than echo the context graph back

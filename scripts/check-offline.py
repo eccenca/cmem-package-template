@@ -16,11 +16,12 @@ package's own `bin/` over two fixtures instead:
 
 Both run through `bin/check_all.py` exactly as `task check:offline` does,
 which also exercises the `uv run --script` header and the subprocess hand-off
-to the four individual checkers.
+to the five individual checkers.
 
 Exits non-zero with a one-line reason on the first failure.
 """
 
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -33,6 +34,7 @@ CHECKERS = (
     "check_dangling.py",
     "check_paths.py",
     "check_placeholders.py",
+    "check_path_builder_queries.py",
 )
 
 # tests/ lives beside scripts/ in the template repository, not in the rendered
@@ -84,8 +86,10 @@ def main():
     # single checker failing on all four would satisfy the exit code above
     # while three others had quietly gone blind.
     for name in ("check_dangling.py", "check_placeholders.py", "check_paths.py",
-                 "audit_queries.py"):
-        if f"  {name:21}  FAIL" not in output and f"{name}  FAIL" not in output:
+                 "audit_queries.py", "check_path_builder_queries.py"):
+        # The summary pads names to the longest checker name, so match the
+        # line by name and verdict rather than by column width.
+        if not re.search(rf"^\s+{re.escape(name)}\s+FAIL\s*$", output, re.MULTILINE):
             fail(f"{name} did not report its planted fault in the bad fixture:\n{output}")
 
     # The package as generated has no catalog, which is a pass with a note

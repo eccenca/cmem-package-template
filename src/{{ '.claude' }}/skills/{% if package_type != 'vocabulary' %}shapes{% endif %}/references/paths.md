@@ -51,6 +51,13 @@ subject. Three outcomes, three different faults:
   form lists one set while a deletion through it would remove a triple from
   another.
 
+**One subset is meant: the subclass split.** Where several editable rows share
+one path and each query keeps only the values of one leaf class of the range,
+the rows *should* differ from the path - each shows a typed part of it, every
+value it shows is stored, and a removal deletes exactly that triple. That is
+use case 1 of `path-builder-queries.md`, not this fault; keep the rows editable
+and their `shacl:class` at the range.
+
 Do not bend the query to match the path. The query usually states the row's
 intent correctly and the *path* is the thing misnamed: name the derived
 relation, make it an `rdfs:subPropertyOf` the materialised one where every

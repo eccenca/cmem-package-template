@@ -25,3 +25,21 @@ example:bandName a owl:DatatypeProperty ;
   rdfs:domain example:Band ;
   rdfs:range xsd:string ;
   rdfs:label "band name"@en .
+
+# Subclass split: an abstract range with two leaves (check_path_builder_queries).
+example:Venue a owl:Class ;
+  rdfs:label "Venue"@en ;
+  rdfs:comment "Abstract: never instantiated directly; every venue is a club or a festival."@en .
+
+example:Club a owl:Class ;
+  rdfs:subClassOf example:Venue ;
+  rdfs:label "Club"@en .
+
+example:Festival a owl:Class ;
+  rdfs:subClassOf example:Venue ;
+  rdfs:label "Festival"@en .
+
+example:bookedAt a owl:ObjectProperty ;
+  rdfs:domain example:Band ;
+  rdfs:range example:Venue ;
+  rdfs:label "booked at"@en .
