@@ -16,7 +16,7 @@ shapes:Band-NodeShape a shacl:NodeShape ;
   rdfs:label "Band node shape"@en ;
   rdfs:comment "A band. Add one gig per night played."@en ;
   shacl:name "Band"@en ;
-  shacl:property shapes:Band-bandName, shapes:Band-gigs .
+  shacl:property shapes:Band-bandName, shapes:Band-gigs, shapes:Band-bookedAtClub, shapes:Band-bookedAtFestival .
 
 shapes:Band-bandName a shacl:PropertyShape ;
   rdfs:label "Band: Band name property shape"@en ;
@@ -59,7 +59,7 @@ shapes:Band-shuiResourcePlaceholder a shui:QueryPlaceholder ;
 
 shapes:Band-shuiResourceValueQuery a shui:SparqlQuery ;
   rdfs:label "Band resource values"@en ;
-  dcterms:description "Supplies the bands offered in the picker of the band resource placeholder. It names its graph literally, because a value query can carry no parameter of its own."@en ;
+  dcterms:description "Supplies the bands offered in the picker of the band resource placeholder. It names its graph literally, because a placeholder values query can carry no parameter of its own."@en ;
   shui:queryText """# Offers every band as a value for the band resource parameter.
 #
 # ?value: the band IRI substituted into the consuming query
@@ -76,5 +76,109 @@ WHERE {
     ?value <https://example.org/vocab/bandName> ?description .
     FILTER(LANG(?description) IN ("en", ""))
   }
+
+}""" .
+
+shapes:bookingsGroup a shacl:PropertyGroup ;
+  rdfs:label "Booked at" ;
+  shacl:order 30 .
+
+shapes:Band-bookedAtClub a shacl:PropertyShape ;
+  rdfs:label "Band: Booked at club property shape"@en ;
+  shacl:name "Clubs"@en ;
+  shacl:path example:bookedAt ;
+  shacl:nodeKind shacl:IRI ;
+  shacl:class example:Venue ;
+  shacl:group shapes:bookingsGroup ;
+  shacl:order 1 ;
+  shui:valueQuery shapes:Band-bookedAtClubQuery ;
+  shui:uiQuery shapes:Band-bookedAtClubChoiceQuery ;
+  shui:denyNewResources true .
+
+shapes:Band-bookedAtClubQuery a shui:SparqlQuery ;
+  rdfs:label "Band booked at clubs"@en ;
+  dcterms:description "Path builder query of a subclass split row: the stored example:bookedAt values typed example:Club."@en ;
+  shui:queryText """# The clubs a band is booked at.
+#
+# ?resource: a venue typed example:Club the band is booked at
+# ?graph: the graph holding the example:bookedAt triple
+SELECT ?resource ?graph
+FROM <https://example.org/data/>
+FROM NAMED <https://example.org/data/>
+WHERE {
+
+  # The stored link, and the graph it is stored in
+  GRAPH ?graph { <{{shuiResource}}> <https://example.org/vocab/bookedAt> ?resource }
+
+  # Only the leaf this row shows
+  ?resource a <https://example.org/vocab/Club> .
+
+}""" .
+
+shapes:Band-bookedAtClubChoiceQuery a shui:SparqlQuery ;
+  rdfs:label "Band booked at clubs - choices"@en ;
+  dcterms:description "Selectable resources query of a subclass split row: every example:Club the band is not booked at yet."@en ;
+  shui:queryText """# The clubs a band can be booked at.
+#
+# ?resource: a venue typed example:Club the band is not booked at yet
+SELECT DISTINCT ?resource
+FROM <https://example.org/data/>
+WHERE {
+
+  # Every venue of the row's leaf
+  ?resource a <https://example.org/vocab/Club> .
+
+  # minus the ones the band already holds
+  FILTER NOT EXISTS { <{{shuiResource}}> <https://example.org/vocab/bookedAt> ?resource }
+
+}""" .
+
+shapes:Band-bookedAtFestival a shacl:PropertyShape ;
+  rdfs:label "Band: Booked at festival property shape"@en ;
+  shacl:name "Festivals"@en ;
+  shacl:path example:bookedAt ;
+  shacl:nodeKind shacl:IRI ;
+  shacl:class example:Venue ;
+  shacl:group shapes:bookingsGroup ;
+  shacl:order 2 ;
+  shui:valueQuery shapes:Band-bookedAtFestivalQuery ;
+  shui:uiQuery shapes:Band-bookedAtFestivalChoiceQuery ;
+  shui:denyNewResources true .
+
+shapes:Band-bookedAtFestivalQuery a shui:SparqlQuery ;
+  rdfs:label "Band booked at festivals"@en ;
+  dcterms:description "Path builder query of a subclass split row: the stored example:bookedAt values typed example:Festival."@en ;
+  shui:queryText """# The festivals a band is booked at.
+#
+# ?resource: a venue typed example:Festival the band is booked at
+# ?graph: the graph holding the example:bookedAt triple
+SELECT ?resource ?graph
+FROM <https://example.org/data/>
+FROM NAMED <https://example.org/data/>
+WHERE {
+
+  # The stored link, and the graph it is stored in
+  GRAPH ?graph { <{{shuiResource}}> <https://example.org/vocab/bookedAt> ?resource }
+
+  # Only the leaf this row shows
+  ?resource a <https://example.org/vocab/Festival> .
+
+}""" .
+
+shapes:Band-bookedAtFestivalChoiceQuery a shui:SparqlQuery ;
+  rdfs:label "Band booked at festivals - choices"@en ;
+  dcterms:description "Selectable resources query of a subclass split row: every example:Festival the band is not booked at yet."@en ;
+  shui:queryText """# The festivals a band can be booked at.
+#
+# ?resource: a venue typed example:Festival the band is not booked at yet
+SELECT DISTINCT ?resource
+FROM <https://example.org/data/>
+WHERE {
+
+  # Every venue of the row's leaf
+  ?resource a <https://example.org/vocab/Festival> .
+
+  # minus the ones the band already holds
+  FILTER NOT EXISTS { <{{shuiResource}}> <https://example.org/vocab/bookedAt> ?resource }
 
 }""" .
