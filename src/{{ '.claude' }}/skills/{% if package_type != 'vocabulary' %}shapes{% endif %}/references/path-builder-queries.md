@@ -82,6 +82,7 @@ ex-shapes:Department-responsibleForHardware a shacl:PropertyShape ;
   shacl:order 1 ;
   shui:valueQuery ex-shapes:Department-responsibleForHardwareQuery ;
   shui:uiQuery ex-shapes:Department-responsibleForHardwareChoiceQuery ;
+  shui:targetGraphTemplate ex-shapes:ResponsibilitiesGraphTemplate ;
   shui:denyNewResources true ;
   shui:showAlways true .
 ```
@@ -92,12 +93,18 @@ ex-shapes:Department-responsibleForHardware a shacl:PropertyShape ;
 - **One `shacl:group` per split property**, holding only its rows, named after
   the property; the rows are named by the leaf ("Hardware", "Services") and
   ordered within it.
-- **No inline creation (`shui:denyNewResources`).** A form save writes into the
-  graph the form is open in; a `shui:targetGraphTemplate` - on the property or
-  node shape - only decides whether the row is offered as writable, not where a
-  created resource goes (Explore source, `ResourceEditContainer.getTargetGraph`,
-  read 2026-10-07). A resource created from the row would land in the wrong
-  graph; create it on its own form.
+- **Send the row's values to the graph that holds the link** with a
+  `shui:targetGraphTemplate` on the row. The backend writes a form value into
+  the property shape's template when the node shape has a template too, else
+  into the node shape's template, and into the form's graph only when the node
+  shape has none (Explore source, `ResourcePropertyInsert`; measured
+  2026-10-07: a value set on a form whose node shape names a build graph landed
+  in that build graph, whatever graph the form was open in). The frontend uses
+  the same templates only to decide whether the row is offered as writable.
+- **No inline creation (`shui:denyNewResources`)** where the leaf instances
+  belong to graphs a build rewrites: a resource created from the row goes to
+  its own node shape's template graph and is gone after the next build. Create
+  it where it is maintained.
 - **Counts per leaf only where the domain has them**, as a qualified value
   shape - `shacl:qualifiedValueShape [ shacl:class ex:Service ]`,
   `shacl:qualifiedMinCount`/`MaxCount`, `shacl:qualifiedValueShapesDisjoint
@@ -160,12 +167,13 @@ WHERE {
 
 ### Where the rows are edited
 
-A split row is edited **in the graph that holds the link**, and that graph
-`owl:imports` what the row's queries need (the vocabulary, the graphs holding
-the leaf instances) - the same rule as for a classification graph (`thesauri`).
-Opened in an integration graph, a save lands in the integration graph. Keep
-curated links in a graph the build does not clear, or every build overwrites
-what users edited; seed it from the build while it is empty.
+Keep curated links in a graph the build does not clear, or every build
+overwrites what users edited; seed it from the build while it is empty, and
+let that graph `owl:imports` what the row's queries need (the vocabulary, the
+graphs holding the leaf instances), as for a classification graph (`thesauri`).
+The row's `shui:targetGraphTemplate` sends every edit there, whichever graph
+the form is open in - provided the node shape has a template as well; without
+one, a save lands in the graph the form is open in.
 
 ### The inverse side
 
