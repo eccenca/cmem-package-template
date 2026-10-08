@@ -78,3 +78,17 @@ WHERE {
   }
 
 }""" .
+
+# A row added to one of Corporate Memory's own forms: the catalog attaches its property shape to the
+# system node shape and puts it in a system group. Both are defined in Corporate Memory's bootstrap
+# catalog, not here, so neither is dangling - binding a prefix to that namespace must not make it
+# the catalog's own.
+@prefix cmem-shapes: <https://vocab.eccenca.com/shacl/> .
+
+cmem-shapes:OwlObjectPropertyNodeShape shacl:property shapes:ObjectProperty-seeAlso .
+
+shapes:ObjectProperty-seeAlso a shacl:PropertyShape ;
+  shacl:name "See also"@en ;
+  shacl:path rdfs:seeAlso ;
+  shacl:nodeKind shacl:IRI ;
+  shacl:group cmem-shapes:BasicInfo .
