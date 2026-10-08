@@ -92,9 +92,15 @@ a plain text replace over the whole query text, comments included - see
 
 ## Extra columns are plain strings
 
-**The form renderer honours no markup datatype.** Typing a column with
-`STRDT(…, rdf:HTML)` or `STRDT(…, sysont:Markdown)` does nothing: the value is
-rendered as text either way. Project the plain string.
+**The form renderer honours no markup datatype in an extra column.** Typing an
+extra column with `STRDT(…, rdf:HTML)` or `STRDT(…, sysont:Markdown)` does
+nothing: the value is rendered as text either way. Project the plain string.
+
+The value column behaves differently: a path builder query whose `?resource`
+is typed `sysont:Markdown` is rendered as markup - the product data demo's map
+preview embeds the map-service page that way (checked in the browser,
+2026-10-08). Such a row stands on a stand-in path, so it is still use case 7 of
+the shapes skill's `path-builder-queries.md`, an embedded widget.
 
 The tell that this has been believed is a separator that only makes sense as
 markup - a `SEPARATOR=' <br> '` was never a line break and shows as a literal

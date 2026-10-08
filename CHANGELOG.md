@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - the strip rule in `shapes/references/validation.md` keeps the subclass split and the enriched stored relation: their path is honest, and a split row's qualified value shape counts would otherwise never be checked
 - `shapes/references/paths.md` names the subclass split as the intended subset, not the "they differ" fault
 - `catalog-queries` names the three query roles - path builder query, selectable resources query, placeholder values query - and drops "value query", which meant two things; `check_placeholders.py` reports in the same terms
+- `catalog-queries` limits "no markup datatype is honoured" to extra columns: a value column typed `sysont:Markdown` renders as markup (checked in the browser)
 - `scripts/check-offline.py` matches a checker's verdict by name, not by column width (the summary pads names to the longest checker)
 
 ## [1.7.0] 2026-10-06
