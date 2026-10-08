@@ -31,7 +31,9 @@ even though nobody edits them (`paths.md`).
 
 **6 and 7 are catalogued, not recommended.** `paths.md` forbids a stand-in path
 and `widgets.md` puts what is not a property of the resource into a widget. They
-are listed so that existing rows can be classified; write no new ones. A
+are listed so that existing rows can be classified; write no new ones. They do
+work: a value column typed `sysont:Markdown` renders as markup, so an embedded
+page shows (checked 2026-10-08); the objection is the stand-in path. A
 computed link becomes a widget, or a real property where the URL is a stable
 fact; an embedded page becomes a widget integration. Whether every existing
 case has a widget to move to is unverified.
