@@ -75,7 +75,8 @@ def classify(path):
 
 def run(script, files, quiet):
     """Run one check as a subprocess; return (exit code, output)."""
-    command = [sys.executable, str(BIN / script), *[str(f) for f in files]]
+    # by path: each checker resolves its own dependencies through its uv shebang
+    command = [str(BIN / script), *[str(f) for f in files]]
     result = subprocess.run(command, capture_output=True, text=True)
     output = result.stdout + result.stderr
     if not quiet:

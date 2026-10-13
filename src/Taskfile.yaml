@@ -63,7 +63,7 @@ tasks:
       A package with no shape catalog passes with a note: every check here is
       catalog-driven.
     cmds:
-      - uv run bin/check_all.py {{.PACKAGE_DIR}}
+      - bin/check_all.py {{.PACKAGE_DIR}}
 
   build:
     desc: Build package archive
