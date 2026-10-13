@@ -140,7 +140,7 @@ nothing leaves every constraint on its row with nothing to check. `task check`
 and `task import` both run them first. They need [uv](https://docs.astral.sh/uv/),
 which resolves `rdflib` from each script's inline metadata.
 
-The default license we add is _Apache License 2.0 ([`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html))_, see <https://spdx.org/licenses/> if you need a different.
+The `license` question picks the package licence, and the `LICENSE` text and the manifest's `metadata.license` follow it. A vocabulary package defaults to _Creative Commons Attribution 4.0 ([`CC-BY-4.0`](https://spdx.org/licenses/CC-BY-4.0.html))_, because an ontology is content rather than software; a project package defaults to _Apache License 2.0 ([`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html))_, because it bundles workflows and shapes with its data. The marketplace accepts exactly one identifier from a fixed list - an expression such as `Apache-2.0 AND CC-BY-4.0` is rejected by `cmemc package build` - so data bundled under another licence is declared in `DOCUMENTATION.md`, not in the manifest.
 
 ## Development Tasks
 

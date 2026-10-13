@@ -52,6 +52,22 @@ package_description:
       Package description must be at most 150 characters
     {% endif %}
 
+# An ontology is content rather than software, so a vocabulary package
+# defaults to a licence written for content; a project package bundles
+# workflows and shapes with its data and keeps the software licence. Only two
+# choices, because the template has to ship the matching LICENSE text - and
+# the marketplace takes exactly one identifier from a fixed list, never an
+# expression like "Apache-2.0 AND CC-BY-4.0".
+license:
+  type: str
+  default: "{{ 'CC-BY-4.0' if package_type == 'vocabulary' else 'Apache-2.0' }}"
+  choices:
+    "Apache License 2.0": "Apache-2.0"
+    "Creative Commons Attribution 4.0": "CC-BY-4.0"
+  help: >-
+    license: The package licence. CC-BY-4.0 suits a vocabulary (content),
+    Apache-2.0 a project package (workflows and shapes with their data).
+
 # Vocabulary packages cannot have dependencies at all, so both dependency
 # questions below are asked for project packages only.
 python_dependencies:

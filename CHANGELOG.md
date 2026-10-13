@@ -35,6 +35,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - `build-projects` names `projects/<project-id>.zip` and exports into `projects/`; `shapes` wires the catalog as `graphs/shapes.ttl`
   - `package-content` and the README say where a file goes and that a vocabulary package may stay flat; the README states the marketplace's path rule
   - the layout is a recommendation: a package laid out otherwise still builds, and `.claude/skill-map.json` maps both `*/projects/**` and `*/build/**` to `build-projects`, so a package that has not moved keeps its reminders
+### Changed
+
+- Generated packages are asked for their licence, and a vocabulary package now defaults to `CC-BY-4.0` instead of `Apache-2.0`
+  - an ontology is content rather than software, and CC BY is what vocabularies are usually published under; a project package bundles workflows and shapes with its data and keeps `Apache-2.0`
+  - the `LICENSE` file and `metadata.license` in `cpa-manifest.json` both follow the answer
+  - **a `copier update` of an existing vocabulary package asks the new question**, and accepting the default switches its licence; answer `Apache-2.0` to keep the old one
 
 ## [1.8.0] 2026-10-18
 
