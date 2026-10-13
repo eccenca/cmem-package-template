@@ -146,6 +146,24 @@ while the other three had gone blind, which is exactly what a blinded-checker
 run produces. A generated package's own `example.ttl` declares no shapes and no
 vocabulary terms, so the package cannot test this about itself.
 
+### The skill check hook
+
+`src/{{ '.claude' }}/hooks/skill-check.py` makes a generated package load the
+skill that covers a file before changing it. On `PreToolUse` it denies an edit
+of a file that `skill-map.json` (template owned, the shipped skills) or
+`skill-map.custom.json` (project owned, never written by the template) maps to
+a skill the session has not invoked or read, and it denies hand edits through
+the shell so that no edit bypasses the check; on `Stop` it names, once, the
+files the session changed without their skill. It follows the same three rules
+as `template-feedback.py` - silent unless there is something to say, always
+exit 0, and pass when a fact cannot be established - because a false refusal
+stalls a session while a missed one is still caught at `Stop`. A mapped skill
+the package does not have is skipped, which is what keeps the shared map valid
+for vocabulary packages. It came from a personal hook that found, in one
+package, that twenty sessions had never loaded any of the shipped skills.
+`check:skillhook:case` asserts both directions; whether the map covers the
+right files of a real package is a hand read.
+
 `task check` covers exactly one part of the feedback cycle: `check:hook:case`
 asserts that the shipped hook stays silent on a clean tree and respects
 `stop_hook_active`. It

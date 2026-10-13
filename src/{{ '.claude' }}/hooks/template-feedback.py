@@ -48,6 +48,7 @@ TEMPLATE_OWNED = (
     ".claude/hooks/",
     ".claude/rules/",
     ".claude/settings.json",
+    ".claude/skill-map.json",
     ".claude/skills/build-projects/",
     ".claude/skills/catalog-queries/",
     ".claude/skills/package-content/",

@@ -1,0 +1,10 @@
+{
+  "comment": "Which shipped skill must be loaded before a file of this project is changed. Read by .claude/hooks/skill-check.py. 'paths' are globs relative to the project root; 'content' are regular expressions matched against the text being written; a rule applies when any path or any content pattern matches. A skill counts as loaded once the session invoked it or read its SKILL.md; a skill the project does not have is skipped. This file belongs to the template - add project specific rules, and rules for skills of your own, to .claude/skill-map.custom.json in the same format.",
+  "rules": [
+    {"skill": "package-content", "paths": ["*/cpa-manifest.json", "DOCUMENTATION.md", "CHANGELOG.md", "LICENSE", "*/README.md"]},
+    {"skill": "vocabulary", "paths": ["*/*vocab*.ttl"], "content": ["owl:Ontology", "owl:Class", "owl:ObjectProperty", "owl:DatatypeProperty"]},
+    {"skill": "shapes", "paths": ["*/*shapes*.ttl", "*/*shacl*.ttl"], "content": ["shacl:NodeShape", "shacl:PropertyShape", "sh:NodeShape", "sh:PropertyShape"]},
+    {"skill": "catalog-queries", "content": ["shui:queryText", "shui:SparqlQuery", "shui:valueQuery"]},
+    {"skill": "build-projects", "paths": ["*/build/**", "*/*/workflow/*.xml", "*/*/custom/*.xml", "*/*/dataset/*.xml", "*/*/transform/**", "*/*/linking/**"]}
+  ]
+}

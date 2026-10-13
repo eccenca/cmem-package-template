@@ -7,7 +7,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- Generated packages now ship a skill check hook, `.claude/hooks/skill-check.py`, so that the skill covering a file is loaded before the file is changed
+  - an edit of a file that `.claude/skill-map.json` maps to a skill is denied until the session has invoked that skill or read its `SKILL.md`, with a reason naming the skill
+  - changing project files through the shell - `sed -i`, a redirect or `tee` into the repository, an inline script that writes files - is denied too, so every edit passes the check; writing into `data/`, `dist/` or a temporary directory, and running the project's own scripts and tasks, stay allowed
+  - at the end of a session, files changed without their skill - also through a script - are named once
+  - `.claude/skill-map.json` maps the shipped skills and belongs to the template; a project adds its own rules in `.claude/skill-map.custom.json`, which the template never writes
+  - `task check` smoke tests the hook in every test case (`check:skillhook:case`)
 
 ## [1.7.0] 2026-10-06
 

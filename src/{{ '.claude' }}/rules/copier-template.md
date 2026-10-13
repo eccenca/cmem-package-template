@@ -52,6 +52,23 @@ generated with:
 A vocabulary package ships fewer of them, because a build project and a shape
 catalog - and so the queries inside one - are things it does not have.
 
+## A file is changed only with its skill loaded
+
+Load the skill that covers a file before changing it. A hook enforces this:
+`.claude/hooks/skill-check.py` denies an edit of a file that
+`.claude/skill-map.json` maps to a skill the session has not loaded yet, and
+names the skill - load it, apply it, retry. It also denies changing project
+files through the shell (`sed -i`, a redirect or `tee` into the repository, an
+inline script that writes files), so every edit passes the check; writing into
+`data/`, `dist/` or a temporary directory, and running the project's own
+scripts and tasks, stay allowed. When the session ends, files it changed
+without their skill - also through a script - are named once.
+
+`.claude/skill-map.json` belongs to the template. Rules for this project - for
+skills of your own, or for files only this project has - go into
+`.claude/skill-map.custom.json`, in the same format; the template never writes
+it.
+
 ## Two files carry the documentation, and they face different readers
 
 `DOCUMENTATION.md` is shipped inside the package and is what the marketplace
