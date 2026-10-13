@@ -70,7 +70,7 @@ tasks:
       This cannot tell you the hook fires on the right evidence in a real
       repository. That is still a hand run in a rendered case - see CLAUDE.md.
     cmds:
-      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-hook.py
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-hook.py
 
   check:skillhook:case:
     desc: smoke test the skill check hook a generated package ships
@@ -81,7 +81,7 @@ tasks:
       loaded, harmless shell commands pass, and the Stop part respects the loop
       guard.
     cmds:
-      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-skill-hook.py
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-skill-hook.py
 
   check:skills:case:
     desc: assert the skills a generated package ships are present and well formed
@@ -92,7 +92,7 @@ tasks:
       are conditional on package_type are present for a project package and
       absent for a vocabulary one.
     cmds:
-      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-skills.py
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-skills.py
 
   check:offline:case:
     desc: assert the offline RDF checkers a generated package ships still bite
@@ -107,7 +107,7 @@ tasks:
       It needs no Corporate Memory connection, so it is the part of
       check:validate:case that still runs with no credentials.
     cmds:
-      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-offline.py
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-offline.py
 
   check:validate:case:
     desc: validate a project test case

@@ -162,7 +162,11 @@ the package does not have is skipped, which is what keeps the shared map valid
 for vocabulary packages. It came from a personal hook that found, in one
 package, that twenty sessions had never loaded any of the shipped skills.
 `check:skillhook:case` asserts both directions; whether the map covers the
-right files of a real package is a hand read.
+right files of a real package is a hand read. The shipped hooks are called with
+`python3` from `settings.json`, because they run in every package session and a
+missing uv must not break every edit (their PEP 723 block is documentation), while
+this repository's own test scripts run by path through their `uv run --script`
+shebang, which CI provides with `astral-sh/setup-uv`.
 
 `task check` covers exactly one part of the feedback cycle: `check:hook:case`
 asserts that the shipped hook stays silent on a clean tree and respects
