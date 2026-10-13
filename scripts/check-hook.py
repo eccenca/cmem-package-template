@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Smoke test the Stop hook a generated package ships.
 
 Run from inside a generated package directory; `check:hook:case` does that.

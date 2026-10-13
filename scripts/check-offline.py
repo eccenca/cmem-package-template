@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Assert that the offline RDF checkers a generated package ships still bite.
 
 Run from inside a generated package directory; `check:offline:case` does that.
