@@ -49,6 +49,7 @@ import shlex
 import subprocess
 import sys
 import tempfile
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -60,6 +61,10 @@ WRITABLE = ("data/", "dist/", ".git/")
 TEMP = (tempfile.gettempdir(), "/tmp", "/private/tmp", "/private/var/folders", "/var/folders", "/dev")
 
 FILE_TOOLS = ("Edit", "Write", "NotebookEdit")
+
+# How long to wait before reading the transcript a second time, only when a skill seems missing: the
+# Skill call that loaded it can still be on its way into the transcript file.
+RETRY_SECONDS = 0.5
 
 
 def project_root(event: dict) -> Path:
@@ -155,11 +160,17 @@ def check_file_edit(event: dict, root: Path) -> None:
     if relative is None:
         return
     text = "\n".join(str(tool_input.get(k, "")) for k in ("content", "new_string", "new_source"))
-    missing = [s for s in required(root, relative, text) if s not in loaded(transcript_entries(event))]
+    needed = required(root, relative, text)
+    missing = [s for s in needed if s not in loaded(transcript_entries(event))]
+    if missing:
+        # A skill loaded a moment ago may not have reached the transcript yet: look once more before denying.
+        time.sleep(RETRY_SECONDS)
+        missing = [s for s in needed if s not in loaded(transcript_entries(event))]
     if missing:
         deny(f"{relative} is covered by the skill(s) {', '.join(missing)}, which this session has not "
              f"loaded. Load {' and '.join(missing)} with the Skill tool, apply what they say to this edit, "
-             "then retry it. (Rules: .claude/skill-map.json and .claude/skill-map.custom.json)")
+             "then retry it - if you just loaded it, simply retry. "
+             "(Rules: .claude/skill-map.json and .claude/skill-map.custom.json)")
 
 
 def inside_project(target: str, cwd: Path, root: Path) -> bool:
