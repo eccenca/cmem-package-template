@@ -34,7 +34,10 @@ def fail(message: str) -> None:
 
 def run(payload: dict, tmpdir: str) -> str:
     environment = dict(os.environ, TMPDIR=tmpdir, CLAUDE_PROJECT_DIR=str(Path.cwd()))
-    result = subprocess.run([sys.executable, str(HOOK)], input=json.dumps(payload), capture_output=True,
+    # by path, as settings.json runs it: through its uv shebang
+    if not os.access(HOOK, os.X_OK):
+        fail(f"{HOOK} is not executable in the rendered package; settings.json runs it by path")
+    result = subprocess.run([str(HOOK)], input=json.dumps(payload), capture_output=True,
                             text=True, check=False, env=environment)
     if result.returncode != 0:
         fail(f"the hook exited {result.returncode}; it must always exit 0\n{result.stderr}")

@@ -64,8 +64,8 @@ Everything else is the same for both types - the repository layout, the
 
 - Python 3.10+
 - Copier >= 9.0.0: `pip install copier` or `uv tool install copier`
-- [uv](https://docs.astral.sh/uv/), which the generated package's offline
-  checks use to resolve their own dependencies
+- [uv](https://docs.astral.sh/uv/), which runs the generated package's offline
+  checks and its Claude Code hooks through their script headers
 
 ## Usage
 

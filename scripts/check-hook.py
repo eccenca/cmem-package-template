@@ -45,8 +45,10 @@ def run(session: str, *, stop_hook_active: bool, tmpdir: str) -> str:
         }
     )
     environment = dict(os.environ, TMPDIR=tmpdir)
+    if not os.access(HOOK, os.X_OK):
+        fail(f"{HOOK} is not executable in the rendered package; settings.json runs it by path")
     result = subprocess.run(
-        [sys.executable, str(HOOK)],
+        [str(HOOK)],  # by path, as settings.json runs it: through its uv shebang
         input=payload,
         capture_output=True,
         text=True,

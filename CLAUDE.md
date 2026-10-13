@@ -162,11 +162,13 @@ the package does not have is skipped, which is what keeps the shared map valid
 for vocabulary packages. It came from a personal hook that found, in one
 package, that twenty sessions had never loaded any of the shipped skills.
 `check:skillhook:case` asserts both directions; whether the map covers the
-right files of a real package is a hand read. The shipped hooks are called with
-`python3` from `settings.json`, because they run in every package session and a
-missing uv must not break every edit (their PEP 723 block is documentation), while
-this repository's own test scripts run by path through their `uv run --script`
-shebang, which CI provides with `astral-sh/setup-uv`.
+right files of a real package is a hand read. Every script runs by path through its
+`uv run --script` shebang: the shipped hooks from `settings.json`, this
+repository's test scripts from the root Taskfile, and `check:hook:case` and
+`check:skillhook:case` call the hooks by path too, so they exercise the shebang
+and the executable bit of the rendered files. uv is therefore a prerequisite for
+working in a generated package with Claude Code; CI installs it with
+`astral-sh/setup-uv`.
 
 `task check` covers exactly one part of the feedback cycle: `check:hook:case`
 asserts that the shipped hook stays silent on a clean tree and respects
