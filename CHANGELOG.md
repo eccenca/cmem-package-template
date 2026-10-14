@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - `.claude/skill-map.json` maps the shipped skills and belongs to the template; a project adds its own rules in `.claude/skill-map.custom.json`, which the template never writes
   - `task check` smoke tests the hook in every test case (`check:skillhook:case`)
 
+### Changed
+
+- Every Python script a generated package ships - the hooks in `.claude/hooks/` and the checkers in `bin/` - is a PEP 723 script with a `uv run --script` shebang and is run by path, so [uv](https://docs.astral.sh/uv/) is now a prerequisite for working in a generated package with Claude Code; `task check:offline` calls `bin/check_all.py` by path, and `check_all.py` calls each checker the same way
+
 ## [1.7.0] 2026-10-06
 
 ### Added
