@@ -256,8 +256,12 @@ def reminder(package: Package, files: list[tuple[str, list[str]]]) -> str:
             path = package.skill_file(skill)
             named.append(f"{skill} ({path.relative_to(package.root).as_posix()})" if path else skill)
         lines.append(f"{name} is covered by the skill(s) {', '.join(named)}.")
-    lines.append("If this session has not loaded them yet, load them with the Skill tool and apply what they "
-                 f"say to this change. (Rules: {' and '.join(package.sources)})")
+    # The note reaches the session with the tool's result, after an edit has already been made, so it asks for a
+    # check of that change rather than for care before it (fresh-agent test, 2026-10-16: a CHANGELOG line written
+    # first, the skill loaded after, the line never looked at again).
+    lines.append("If this session has not loaded them yet, load them now with the Skill tool, check the change "
+                 "this note comes with against them, and fix what departs. "
+                 f"(Rules: {' and '.join(package.sources)})")
     return " ".join(lines)
 
 

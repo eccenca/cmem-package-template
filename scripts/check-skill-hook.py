@@ -126,6 +126,8 @@ def check_edits(tmpdir: str) -> None:
     reminder = context(case.edit(manifest))
     expect("package-content" in reminder and ".claude/skills/package-content/SKILL.md" in reminder,
            f"did not remind of package-content on {manifest}", reminder)
+    # the note arrives after the edit is made, so it must ask for a check of that change
+    expect("check the change" in reminder, "the reminder does not ask to check the change it comes with", reminder)
     expect("package-content" in context(case.edit(manifest, tool="MultiEdit")), "said nothing on a MultiEdit")
     expect("vocabulary" in context(case.edit("my-pkg/data.ttl")),
            "did not remind of vocabulary on a .ttl whose text declares an owl:Ontology")
