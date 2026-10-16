@@ -46,13 +46,13 @@ def fail(message: str) -> None:
 class Case:
     """A throwaway package holding the rendered skill map and skills."""
 
-    def __init__(self, tmpdir: str, name: str, with_map: bool = True) -> None:
+    def __init__(self, tmpdir: str, name: str, with_map: bool = True, answers: str = ANSWERS) -> None:
         self.root = Path(tmpdir) / name
         (self.root / ".claude").mkdir(parents=True)
         if with_map:
             shutil.copy(Path(".claude") / "skill-map.json", self.root / ".claude" / "skill-map.json")
         shutil.copytree(Path(".claude") / "skills", self.root / ".claude" / "skills")
-        self.write(".copier-answers.yml", ANSWERS)
+        self.write(".copier-answers.yml", answers)
         self.write("my-pkg/cpa-manifest.json", "{}\n")
         self.write("my-pkg/demo-vocab.ttl", VOCAB)
         self.write("my-pkg/data.ttl", VOCAB)
@@ -141,7 +141,7 @@ def check_edits(tmpdir: str) -> None:
 
     (case.root / ".claude" / "skill-map.custom.json").write_text('{"rules": [{"skill": "x",}]}', encoding="utf-8")
     reminder = context(case.edit(manifest))
-    expect("package-content" in reminder and "skill-map.custom.json" in reminder,
+    expect("package-content" in reminder and "skill-map.custom.json does not parse" in reminder,
            "a broken custom map switched the template's rules off, or went unnamed", reminder)
     (case.root / ".claude" / "no-skill-check").touch()
     expect(not case.edit(manifest), "spoke despite .claude/no-skill-check")
@@ -153,10 +153,40 @@ def check_shell(tmpdir: str) -> None:
     expect("package-content" in reminder, "did not remind on a command naming a mapped file", reminder)
     expect("vocabulary" in context(case.shell(f"cat > {case.root}/my-pkg/demo-vocab.ttl <<'EOF'\nx\nEOF")),
            "did not remind on a heredoc into a mapped file")
-    expect("package-content" in context(case.shell("cd /elsewhere && cp x my-pkg/cpa-manifest.json", cwd=case.root)),
+    expect("package-content" in context(case.shell("cp /elsewhere/x my-pkg/cpa-manifest.json")),
            "did not remind on a cp into a mapped file")
+    expect(not case.shell("cd /elsewhere && cp x my-pkg/cpa-manifest.json"),
+           "reminded on a path that, after the cd, lies outside the package")
+    expect("vocabulary" in context(case.shell("cd my-pkg && rm demo-vocab.ttl")),
+           "did not follow a cd to the mapped file it names")
     expect(not case.shell("git status && task check:offline"), "spoke on a command naming no mapped file")
     expect(not case.shell("grep -rn 'owl:Class' bin/"), "spoke on a grep through code")
+
+
+def check_rendered() -> None:
+    """The rendered case itself, with the answers copier wrote - not a synthetic answers file.
+
+    A case rendered from a local checkout records its source as ".", so the answers do
+    not name the template; the skill map is what marks the package.
+    """
+    root = Path(".").resolve()
+    manifest = sorted(root.glob("*/cpa-manifest.json"))[0]
+    payload = {"hook_event_name": "PreToolUse", "tool_name": "Edit", "cwd": str(root),
+               "tool_input": {"file_path": str(manifest), "old_string": "a", "new_string": "b"}}
+    result = subprocess.run([str(HOOK)], input=json.dumps(payload), capture_output=True, text=True,
+                            check=False, env=dict(os.environ, CLAUDE_PROJECT_DIR=str(root)))
+    expect("package-content" in context(result.stdout.strip()),
+           "the rendered package got no reminder - the hook does not recognise it as a package", result.stdout)
+
+
+def check_mirror(tmpdir: str) -> None:
+    """A package rendered from a checkout or a mirror: the skill map marks it, answers alone do not."""
+    local = Case(tmpdir, "from-checkout", answers="_commit: v1.0.0\n_src_path: .\npackage_type: project\n")
+    expect("package-content" in context(local.edit("my-pkg/cpa-manifest.json")),
+           "a package rendered from a local checkout got no reminder")
+    other = Case(tmpdir, "other-copier-project", with_map=False,
+                 answers="_commit: v2.0.0\n_src_path: gh:someone/another-template\n")
+    expect(not other.edit("my-pkg/cpa-manifest.json"), "spoke in a copier project of another template")
 
 
 def check_user_level(tmpdir: str) -> None:
@@ -193,9 +223,11 @@ def main() -> None:
     if not os.access(HOOK, os.X_OK):
         fail(f"{HOOK} is not executable in the rendered package; settings.json runs it by path")
     check_settings()
+    check_rendered()
     with tempfile.TemporaryDirectory() as tmpdir:
         check_edits(tmpdir)
         check_shell(tmpdir)
+        check_mirror(tmpdir)
         check_user_level(tmpdir)
     print("check-skill-hook: ok (reminds on mapped files and commands naming them, quiet elsewhere, "
           "never decides on a tool call; the user-level copy reads its own map and stands down)")

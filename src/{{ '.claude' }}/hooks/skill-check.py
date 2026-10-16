@@ -76,11 +76,18 @@ NOT_A_PATH = re.compile(r"^-|[*?$`{}\[\]]|^\w+://")
 
 
 def package_root(path: Path) -> Path | None:
-    """The generated package a path belongs to: the nearest folder with its copier answers."""
+    """The generated package a path belongs to: the nearest folder with copier answers that are this template's.
+
+    A package rendered by this template has the skill map; one generated before the map
+    shipped is known by its answers naming the template. Neither alone: the answers' source
+    is "." or a mirror's path when the package was rendered from a local checkout, and any
+    copier project has answers.
+    """
     for folder in (path, *path.parents):
         answers = folder / ".copier-answers.yml"
         try:
-            if answers.is_file() and "cmem-package-template" in answers.read_text(errors="ignore"):
+            if answers.is_file() and ((folder / MAP).is_file()
+                                      or "cmem-package-template" in answers.read_text(errors="ignore")):
                 return folder
         except OSError:
             continue
@@ -222,10 +229,20 @@ def touched_by_command(event: dict, cwd: Path) -> list[tuple[Path, str]]:
     """Every path a shell command names, read or written - the hook cannot tell which, and needs not."""
     command = str((event.get("tool_input") or {}).get("command", ""))
     paths: list[tuple[Path, str]] = []
+    base, after_cd = cwd, False
     for word in re.findall(r"[^\s'\"`;&|<>()=,]+", command):
-        if NOT_A_PATH.search(word) or ("/" not in word and "." not in word and not (cwd / word).exists()):
+        if after_cd:
+            # a later word is relative to where the command went, as the shell resolves it
+            after_cd = False
+            if not NOT_A_PATH.search(word):
+                base = Path(os.path.abspath(base / os.path.expanduser(word)))
+                continue
+        if word == "cd":
+            after_cd = True
             continue
-        path = Path(os.path.abspath(cwd / os.path.expanduser(word)))
+        if NOT_A_PATH.search(word) or ("/" not in word and "." not in word and not (base / word).exists()):
+            continue
+        path = Path(os.path.abspath(base / os.path.expanduser(word)))
         if path not in [p for p, _ in paths]:
             paths.append((path, file_text(path) if path.name.endswith(RDF_SUFFIXES) else ""))
     return paths
