@@ -12,11 +12,11 @@
     "hooks": {
         "PreToolUse": [
             {
-                "matcher": "Edit|Write|NotebookEdit|Bash",
+                "matcher": "Edit|MultiEdit|Write|NotebookEdit|Bash",
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/skill-check.py",
+                        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/skill-check.py || true",
                         "timeout": 10
                     }
                 ]
@@ -27,12 +27,7 @@
                 "hooks": [
                     {
                         "type": "command",
-                        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/template-feedback.py",
-                        "timeout": 30
-                    },
-                    {
-                        "type": "command",
-                        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/skill-check.py",
+                        "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/template-feedback.py || true",
                         "timeout": 30
                     }
                 ]

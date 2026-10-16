@@ -75,11 +75,13 @@ tasks:
   check:skillhook:case:
     desc: smoke test the skill check hook a generated package ships
     summary: |
-      The hook denies edits, so a broken one would stall every session in every
-      generated package, and a mute one would enforce nothing. Both directions
-      are asserted: an edit of a mapped file is denied until its skill is
-      loaded, harmless shell commands pass, and the Stop part respects the loop
-      guard.
+      The hook runs on every edit and shell command in every generated package,
+      so one that decided on a tool call would stall sessions, and a mute one
+      would remind of nothing. Both directions are asserted: an edit of a
+      mapped file, and a command naming one, get a reminder naming the skill;
+      unmapped files, prose and code get none; the output is never more than
+      context; and a user-level copy reads its own map for a package without
+      one and stands down where the package's own copy runs.
     cmds:
       - cd {{.TEST_CASE}}_dir && ../scripts/check-skill-hook.py
 
