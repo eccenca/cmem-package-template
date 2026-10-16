@@ -56,7 +56,7 @@ Adding a `tests/<name>.yml` copier answers file automatically adds a test case �
 
 These are independent literals with no coupling; they have silently diverged before. Always update both together, and note the version in `CHANGELOG.md`.
 
-The same split catches tooling generally: the two pipelines install their tools differently, so a dependency the payload needs has to be checked in both. `uv` is the live example — the generated `task check:offline` runs the checks in `bin/` with `uv run`, which generated packages get for free because their image already installs cmemc with it, while this repository installs cmemc with pip and had to add `astral-sh/setup-uv` to `.github/workflows/check.yml` explicitly. Confirming a tool exists in one pipeline says nothing about the other.
+The same split catches tooling generally: the two pipelines install their tools differently, so a dependency the payload needs has to be checked in both. `uv` is the live example — the generated `task check:offline` runs the checks in `bin/` by path through their `uv run --script` shebang, which generated packages get for free because their image already installs cmemc with it, while this repository installs cmemc with pip and had to add `astral-sh/setup-uv` to `.github/workflows/check.yml` explicitly. Confirming a tool exists in one pipeline says nothing about the other.
 
 ## Generated package anatomy
 
@@ -148,21 +148,28 @@ vocabulary terms, so the package cannot test this about itself.
 
 ### The skill check hook
 
-`src/{{ '.claude' }}/hooks/skill-check.py` makes a generated package load the
-skill that covers a file before changing it. On `PreToolUse` it denies an edit
-of a file that `skill-map.json` (template owned, the shipped skills) or
-`skill-map.custom.json` (project owned, never written by the template) maps to
-a skill the session has not invoked or read, and it denies hand edits through
-the shell so that no edit bypasses the check; on `Stop` it names, once, the
-files the session changed without their skill. It follows the same three rules
-as `template-feedback.py` - silent unless there is something to say, always
-exit 0, and pass when a fact cannot be established - because a false refusal
-stalls a session while a missed one is still caught at `Stop`. A mapped skill
-the package does not have is skipped, which is what keeps the shared map valid
-for vocabulary packages. It came from a personal hook that found, in one
+`src/{{ '.claude' }}/hooks/skill-check.py` makes a generated package read the
+skill that covers a file when it changes the file. On `PreToolUse` (the file
+tools and Bash) it adds context naming the skill and its `SKILL.md` whenever the
+file being edited, or a path a shell command names, is mapped by
+`skill-map.json` (template owned, the shipped skills) or `skill-map.custom.json`
+(project owned, never written by the template). It reminds and never denies:
+whether a skill is "loaded" cannot be proven from inside a hook - a subagent's
+transcript is not the one in the payload, a resumed session carries no marker,
+a plugin's skill can share the name - and an earlier version that denied on
+such a proof locked sessions out of their own package (review of PR #18). There
+is no `Stop` half for the same reason. `content` patterns match RDF files only.
+A broken custom rule is dropped on its own and named in the reminder, and
+`bin/check_skill_map.py` fails `check:offline` on it. A mapped skill the package
+does not have is skipped, which is what keeps the shared map valid for
+vocabulary packages. The same file works as a user-level hook (a symlink in
+`~/.claude/hooks`): it finds the package from the path, reads the map beside
+itself for packages generated before the hook shipped, and stands down where
+the package's own copy runs. It came from a personal hook that found, in one
 package, that twenty sessions had never loaded any of the shipped skills.
-`check:skillhook:case` asserts both directions; whether the map covers the
-right files of a real package is a hand read. Every script runs by path through its
+`check:skillhook:case` asserts that it reminds where it should, stays quiet
+elsewhere and never decides on a tool call; whether the map covers the right
+files of a real package is a hand read. Every script runs by path through its
 `uv run --script` shebang: the shipped hooks from `settings.json`, this
 repository's test scripts from the root Taskfile, and `check:hook:case` and
 `check:skillhook:case` call the hooks by path too, so they exercise the shebang

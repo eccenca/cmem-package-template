@@ -9,16 +9,18 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Added
 
-- Generated packages now ship a skill check hook, `.claude/hooks/skill-check.py`, so that the skill covering a file is loaded before the file is changed
-  - an edit of a file that `.claude/skill-map.json` maps to a skill is denied until the session has invoked that skill or read its `SKILL.md`, with a reason naming the skill
-  - changing project files through the shell - `sed -i`, a redirect or `tee` into the repository, an inline script that writes files - is denied too, so every edit passes the check; writing into `data/`, `dist/` or a temporary directory, and running the project's own scripts and tasks, stay allowed
-  - at the end of a session, files changed without their skill - also through a script - are named once
-  - `.claude/skill-map.json` maps the shipped skills and belongs to the template; a project adds its own rules in `.claude/skill-map.custom.json`, which the template never writes
+- Generated packages now ship a skill check hook, `.claude/hooks/skill-check.py`, so that the session reads the skill covering a file at the moment it changes the file
+  - an edit of a file that `.claude/skill-map.json` maps to a skill, and a shell command that names such a file, get a reminder naming the skill and its `SKILL.md`; the hook never denies anything, so no session, subagent or resumed session is locked out of its package
+  - `content` patterns match RDF files only (`.ttl`, `.trig`, `.nt`, `.ttl.graph`, `.ttl.imports`), so prose, code and the skill map itself get no reminder for mentioning an RDF term
+  - `.claude/skill-map.json` maps the shipped skills and belongs to the template; a project adds its own rules in `.claude/skill-map.custom.json`, which the template never writes, and switches the reminders off with an empty `.claude/no-skill-check`
+  - a broken rule in `.claude/skill-map.custom.json` is dropped on its own and named in the reminder, and `task check:offline` fails on it by name (`bin/check_skill_map.py`), so a project rule never goes quiet unnoticed
   - `task check` smoke tests the hook in every test case (`check:skillhook:case`)
 
 ### Changed
 
 - Every Python script a generated package ships - the hooks in `.claude/hooks/` and the checkers in `bin/` - is a PEP 723 script with a `uv run --script` shebang and is run by path, so [uv](https://docs.astral.sh/uv/) is now a prerequisite for working in a generated package with Claude Code; `task check:offline` calls `bin/check_all.py` by path, and `check_all.py` calls each checker the same way
+- `task check:offline` stops with an install hint when uv is missing, and a checker that cannot be run fails with one line instead of a traceback
+- `task import` runs the offline checks before it uninstalls the installed package, so a failed check leaves the instance as it was
 
 ## [1.7.0] 2026-10-06
 

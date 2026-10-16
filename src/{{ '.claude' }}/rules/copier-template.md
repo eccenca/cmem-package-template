@@ -6,8 +6,10 @@ copier template and stays connected to it through `copier update`.
 
 ## Some files belong to the template
 
-`Taskfile.yaml`, `.gitlab-ci.yml`, `bin/` and everything under `.claude/` are
-rendered from the template. Edits there are not preserved: the next
+`Taskfile.yaml`, `.gitlab-ci.yml`, `bin/` and the template's part of `.claude/` -
+its hooks, rules, `settings.json`, `skill-map.json` and the shipped skills - are
+rendered from the template; a skill of your own, `skill-map.custom.json` and the
+two opt-out files are the project's. Edits there are not preserved: the next
 `copier update` either reverts them or turns them into a merge conflict.
 
 Add project specific build steps to `TaskfileCustom.yaml` instead - note the
@@ -54,20 +56,18 @@ catalog - and so the queries inside one - are things it does not have.
 
 ## A file is changed only with its skill loaded
 
-Load the skill that covers a file before changing it. A hook enforces this:
-`.claude/hooks/skill-check.py` denies an edit of a file that
-`.claude/skill-map.json` maps to a skill the session has not loaded yet, and
-names the skill - load it, apply it, retry. It also denies changing project
-files through the shell (`sed -i`, a redirect or `tee` into the repository, an
-inline script that writes files), so every edit passes the check; writing into
-`data/`, `dist/` or a temporary directory, and running the project's own
-scripts and tasks, stay allowed. When the session ends, files it changed
-without their skill - also through a script - are named once.
+Load the skill that covers a file before changing it. A hook reminds you:
+`.claude/hooks/skill-check.py` adds a note to every edit of a file that
+`.claude/skill-map.json` maps to a skill, and to every shell command that names
+one, naming the skill and its `SKILL.md`. If this session has not loaded that
+skill yet, load it and apply it to the change. The hook never refuses a tool
+call; the reminder is the whole mechanism, so act on it.
 
 `.claude/skill-map.json` belongs to the template. Rules for this project - for
 skills of your own, or for files only this project has - go into
 `.claude/skill-map.custom.json`, in the same format; the template never writes
-it.
+it, and `task check:offline` fails on a rule it cannot use. An empty
+`.claude/no-skill-check` switches the reminders off.
 
 ## Two files carry the documentation, and they face different readers
 
