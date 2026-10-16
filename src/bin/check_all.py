@@ -29,6 +29,10 @@ gate, and a package with nothing to answer for has not failed anything.
 A file no parser accepts is the exception: that fails, because `cmemc package build` ignores
 RDF syntax entirely and such a graph installs only as an error.
 
+It also validates the project's own skill map, `.claude/skill-map.custom.json`, with
+`check_skill_map.py`, and names it in the combined summary: a broken rule there takes
+the skill check hook's reminders away without a word in the session.
+
 Exits non-zero if any check fails.
 """
 
@@ -77,20 +81,55 @@ def run(script, files, quiet):
     """Run one check as a subprocess; return (exit code, output)."""
     # by path: each checker resolves its own dependencies through its uv shebang
     command = [str(BIN / script), *[str(f) for f in files]]
-    result = subprocess.run(command, capture_output=True, text=True)
+    try:
+        result = subprocess.run(command, capture_output=True, text=True)
+    except OSError as error:
+        # a checker that lost its executable bit, or a missing uv: one FAIL line, not a traceback
+        output = f"FAIL: cannot run {script} ({error})"
+        if not quiet:
+            print(output)
+        return 126, output
     output = result.stdout + result.stderr
     if not quiet:
         print(output.rstrip())
     return result.returncode, output
 
 
+def check_skill_map(root):
+    """Run check_skill_map.py over the project the package directory lies in; None outside one.
+
+    It is not about RDF, but it belongs to the same gate: a broken project rule takes
+    the skill check hook's reminders away without a word in the session. Silent on
+    success, so it prints only what is wrong.
+    """
+    for folder in (root.resolve(), *root.resolve().parents):
+        if (folder / ".copier-answers.yml").is_file():
+            code, output = run("check_skill_map.py", [folder], quiet=True)
+            if code != 0:
+                print(output.rstrip())
+            return "check_skill_map.py", code
+    return None
+
+
+def passed_early(extra, message):
+    """The end of a run with no catalog checks: the other checks' verdict decides."""
+    failed = [s for s, code in extra if code != 0]
+    print()
+    if failed:
+        print(f"FAIL: {', '.join(failed)} failed ({message.lower()})")
+        return 1
+    print(f"OK: {message}")
+    return 0
+
+
 def check(directory, quiet=False):
     root = Path(directory)
+    skill_map = check_skill_map(root)
+    extra = [skill_map] if skill_map else []
     turtle = sorted(p for p in root.rglob("*.ttl") if p.is_file())
     if not turtle:
         print(f"{root}")
-        print("OK: no .ttl file here, so there is nothing to check")
-        return 0
+        return passed_early(extra, "no .ttl file here, so there is nothing to check")
 
     shapes, vocab, skipped, unparseable = [], [], [], []
     print(f"{root}")
@@ -121,9 +160,7 @@ def check(directory, quiet=False):
         # Every check here is driven by a shape catalog, so a package without
         # one - a plain vocabulary package, or one not yet written - has
         # nothing to answer for. This runs as a build gate, so that is a pass.
-        print()
-        print("OK: no shape catalog found, so there is nothing to check")
-        return 0
+        return passed_early(extra, "no shape catalog found, so there is nothing to check")
 
     plan = [
         ("check_dangling.py", shapes),
@@ -132,7 +169,7 @@ def check(directory, quiet=False):
         ("audit_queries.py", shapes),
     ]
 
-    results = []
+    results = list(extra)
     for script, files in plan:
         if not quiet:
             print()
