@@ -54,7 +54,7 @@ generated with:
 A vocabulary package ships fewer of them, because a build project and a shape
 catalog - and so the queries inside one - are things it does not have.
 
-## A file is changed only with its skill loaded
+## Load the skill that covers a file before changing it
 
 Load the skill that covers a file before changing it. A hook reminds you:
 `.claude/hooks/skill-check.py` adds a note to every edit of a file that

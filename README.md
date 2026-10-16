@@ -119,11 +119,11 @@ your-new-vocabulary-package/
 ```
 
 `.claude/` holds what an agent working in the generated package reads: rules
-describing which files the template owns, a `settings.json` that registers a
-session end check and a hook that reminds the agent of the skill covering a
-file it edits (`skill-map.json`, extended per project in
-`skill-map.custom.json`), and pre-approves the tasks that touch nothing
-irreversible, and skills covering package content, the vocabulary, build projects, the shape
+describing which files the template owns; a `settings.json` that registers a
+session end check, pre-approves the tasks that touch nothing irreversible and
+runs a hook reminding the agent of the skill that covers a file it edits
+(`skill-map.json`, extended per project in `skill-map.custom.json`); and skills
+covering package content, the vocabulary, build projects, the shape
 catalog, the queries inside it, and how to report a finding back to this
 template. A vocabulary package receives fewer skills than a project package,
 because a build project and a shape catalog - and so the queries inside one -

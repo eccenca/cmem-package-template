@@ -18,7 +18,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
-- Every Python script a generated package ships - the hooks in `.claude/hooks/` and the checkers in `bin/` - is a PEP 723 script with a `uv run --script` shebang and is run by path, so [uv](https://docs.astral.sh/uv/) is now a prerequisite for working in a generated package with Claude Code; `task check:offline` calls `bin/check_all.py` by path, and `check_all.py` calls each checker the same way
+- Every Python script a generated package ships - the hooks in `.claude/hooks/` and the checkers in `bin/` - is a PEP 723 script with a `uv run --script` shebang and is run by path, so [uv](https://docs.astral.sh/uv/) is now a prerequisite for working in a generated package with Claude Code - without it the hooks stay silent rather than block, so the skill reminders and the template feedback are simply missing; `task check:offline` calls `bin/check_all.py` by path, and `check_all.py` calls each checker the same way
 - `task check:offline` stops with an install hint when uv is missing, and a checker that cannot be run fails with one line instead of a traceback
 - `task import` runs the offline checks before it uninstalls the installed package, so a failed check leaves the instance as it was
 
