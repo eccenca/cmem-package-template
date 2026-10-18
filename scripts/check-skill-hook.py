@@ -186,9 +186,6 @@ def check_mirror(tmpdir: str) -> None:
     local = Case(tmpdir, "from-checkout", answers="_commit: v1.0.0\n_src_path: .\npackage_type: project\n")
     expect("package-content" in context(local.edit("my-pkg/cpa-manifest.json")),
            "a package rendered from a local checkout got no reminder")
-    other = Case(tmpdir, "other-copier-project", with_map=False,
-                 answers="_commit: v2.0.0\n_src_path: gh:someone/another-template\n")
-    expect(not other.edit("my-pkg/cpa-manifest.json"), "spoke in a copier project of another template")
 
 
 def check_user_level(tmpdir: str) -> None:
@@ -209,6 +206,12 @@ def check_user_level(tmpdir: str) -> None:
     expect("my-own-skill" in context(old.edit("setup/view.json", hook=linked, project=elsewhere)),
            "the user-level map's own skills were dropped")
     expect(not old.edit("my-pkg/cpa-manifest.json"), "the package's own copy read a map from outside the package")
+    # Through the user-level copy, whose map would supply rules: a copier project of another template is no
+    # package. Through a package's own hook it would be quiet for want of rules - right for the wrong reason.
+    other = Case(tmpdir, "other-copier-project", with_map=False,
+                 answers="_commit: v2.0.0\n_src_path: gh:someone/another-template\n")
+    expect(not other.edit("my-pkg/cpa-manifest.json", hook=linked, project=elsewhere),
+           "the user-level copy spoke in a copier project of another template")
 
     new = Case(tmpdir, "new-package")
     (new.root / ".claude" / "hooks").mkdir()
