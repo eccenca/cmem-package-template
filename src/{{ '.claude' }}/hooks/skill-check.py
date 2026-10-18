@@ -279,7 +279,8 @@ def main() -> None:
         return
 
     project = Path(os.environ.get("CLAUDE_PROJECT_DIR") or cwd).resolve()
-    hook = Path(os.path.abspath(__file__))
+    # Where the hook was run from, not where a symlink points: a user-level link may point at a package's own copy.
+    hook_folder = Path(os.path.abspath(__file__)).parent.resolve()
     packages: dict[Path, Package] = {}
     found: dict[Path, list[tuple[str, list[str]]]] = {}
     for path, text in touched:
@@ -287,7 +288,8 @@ def main() -> None:
         if root is None or (root / OPT_OUT).exists():
             continue
         # A user-level copy stands down where the package's own hook runs as well.
-        if not spellings(hook, root) and root.resolve() == project and (root / OWN_HOOK).is_file():
+        own_folder = (root / OWN_HOOK).parent.resolve()
+        if hook_folder != own_folder and root.resolve() == project and (root / OWN_HOOK).is_file():
             continue
         package = packages.setdefault(root, Package(root))
         names = spellings(path, root)

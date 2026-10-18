@@ -218,6 +218,11 @@ def check_user_level(tmpdir: str) -> None:
     shutil.copy(HOOK, new.root / ".claude" / "hooks" / "skill-check.py")
     expect(not new.edit("my-pkg/cpa-manifest.json", hook=linked),
            "the user-level copy spoke where the package's own hook runs as well")
+    # A user-level link may point at a package's own copy; it is still the user-level one there.
+    into_package = home / "into-package.py"
+    into_package.symlink_to(new.root / ".claude" / "hooks" / "skill-check.py")
+    expect(not new.edit("my-pkg/cpa-manifest.json", hook=into_package),
+           "a user-level link pointing at the package's own hook spoke as well, so the session got the reminder twice")
     expect("package-content" in context(new.edit("my-pkg/cpa-manifest.json", hook=linked, project=elsewhere)),
            "the user-level copy stayed quiet in a session outside the package")
 
