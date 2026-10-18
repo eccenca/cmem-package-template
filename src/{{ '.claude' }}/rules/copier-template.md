@@ -56,12 +56,13 @@ catalog - and so the queries inside one - are things it does not have.
 
 ## Load the skill that covers a file before changing it
 
-Load the skill that covers a file before changing it. A hook reminds you:
-`.claude/hooks/skill-check.py` adds a note to every edit of a file that
-`.claude/skill-map.json` maps to a skill, and to every shell command that names
-one, naming the skill and its `SKILL.md`. If this session has not loaded that
-skill yet, load it and apply it to the change. The hook never refuses a tool
-call; the reminder is the whole mechanism, so act on it.
+`.claude/skill-map.json` maps files to the skills that cover them; read the
+skill before the first edit. `.claude/hooks/skill-check.py` adds a note
+naming the skill and its `SKILL.md` to every edit of a mapped file and to
+every shell command that names one. The note arrives with the tool's result,
+after the change is made: if this session had not loaded that skill yet, load
+it now, check the change against it and fix what departs. The hook never
+refuses a tool call, so the note is all there is; act on it.
 
 `.claude/skill-map.json` belongs to the template. Rules for this project - for
 skills of your own, or for files only this project has - go into
