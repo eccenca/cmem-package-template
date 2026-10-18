@@ -234,7 +234,10 @@ def main() -> None:
         fail(f"{HOOK} is not executable in the rendered package; settings.json runs it by path")
     check_settings()
     check_rendered()
-    with tempfile.TemporaryDirectory() as tmpdir:
+    with tempfile.TemporaryDirectory() as raw:
+        # Resolved, because macOS reaches its temp directory through the /var -> /private/var link, and a
+        # hook that resolved its own link would then stand down by accident and pass the stand-down test.
+        tmpdir = os.path.realpath(raw)
         check_edits(tmpdir)
         check_shell(tmpdir)
         check_mirror(tmpdir)
