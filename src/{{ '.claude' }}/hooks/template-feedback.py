@@ -1,4 +1,8 @@
-#!/usr/bin/env python3
+#!/usr/bin/env -S uv run --script
+# /// script
+# requires-python = ">=3.10"
+# dependencies = []
+# ///
 """Notice friction with the cmem-package-template at the end of a session.
 
 This is a Claude Code ``Stop`` hook. ``.claude/settings.json`` runs it
@@ -48,6 +52,7 @@ TEMPLATE_OWNED = (
     ".claude/hooks/",
     ".claude/rules/",
     ".claude/settings.json",
+    ".claude/skill-map.json",
     ".claude/skills/build-projects/",
     ".claude/skills/catalog-queries/",
     ".claude/skills/package-content/",

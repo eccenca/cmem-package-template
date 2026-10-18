@@ -64,8 +64,8 @@ Everything else is the same for both types - the repository layout, the
 
 - Python 3.10+
 - Copier >= 9.0.0: `pip install copier` or `uv tool install copier`
-- [uv](https://docs.astral.sh/uv/), which the generated package's offline
-  checks use to resolve their own dependencies
+- [uv](https://docs.astral.sh/uv/), which runs the generated package's offline
+  checks and its Claude Code hooks through their script headers
 
 ## Usage
 
@@ -98,7 +98,7 @@ copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-pack
 
 ```text
 your-new-vocabulary-package/
-├── .claude/            (agent support: rules, skills and a session end check)
+├── .claude/            (agent support: rules, skills, a skill reminder and a session end check)
 ├── .copier-answers.env
 ├── .copier-answers.yml
 ├── .gitignore
@@ -119,9 +119,11 @@ your-new-vocabulary-package/
 ```
 
 `.claude/` holds what an agent working in the generated package reads: rules
-describing which files the template owns, a `settings.json` that registers a
-session end check and pre-approves the tasks that touch nothing irreversible,
-and skills covering package content, the vocabulary, build projects, the shape
+describing which files the template owns; a `settings.json` that registers a
+session end check, pre-approves the tasks that touch nothing irreversible and
+runs a hook reminding the agent of the skill that covers a file it edits
+(`skill-map.json`, extended per project in `skill-map.custom.json`); and skills
+covering package content, the vocabulary, build projects, the shape
 catalog, the queries inside it, and how to report a finding back to this
 template. A vocabulary package receives fewer skills than a project package,
 because a build project and a shape catalog - and so the queries inside one -

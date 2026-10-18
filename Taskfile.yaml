@@ -70,7 +70,20 @@ tasks:
       This cannot tell you the hook fires on the right evidence in a real
       repository. That is still a hand run in a rendered case - see CLAUDE.md.
     cmds:
-      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-hook.py
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-hook.py
+
+  check:skillhook:case:
+    desc: smoke test the skill check hook a generated package ships
+    summary: |
+      The hook runs on every edit and shell command in every generated package,
+      so one that decided on a tool call would stall sessions, and a mute one
+      would remind of nothing. Both directions are asserted: an edit of a
+      mapped file, and a command naming one, get a reminder naming the skill;
+      unmapped files, prose and code get none; the output is never more than
+      context; and a user-level copy reads its own map for a package without
+      one and stands down where the package's own copy runs.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-skill-hook.py
 
   check:skills:case:
     desc: assert the skills a generated package ships are present and well formed
@@ -81,7 +94,7 @@ tasks:
       are conditional on package_type are present for a project package and
       absent for a vocabulary one.
     cmds:
-      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-skills.py
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-skills.py
 
   check:offline:case:
     desc: assert the offline RDF checkers a generated package ships still bite
@@ -96,7 +109,7 @@ tasks:
       It needs no Corporate Memory connection, so it is the part of
       check:validate:case that still runs with no credentials.
     cmds:
-      - cd {{.TEST_CASE}}_dir && python3 ../scripts/check-offline.py
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-offline.py
 
   check:validate:case:
     desc: validate a project test case
@@ -111,6 +124,8 @@ tasks:
           Please use check:generate* tasks to create directories.
     cmds:
       - task: check:hook:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:skillhook:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - task: check:skills:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}

@@ -61,9 +61,13 @@ tasks:
       and proves nothing.
 
       A package with no shape catalog passes with a note: every check here is
-      catalog-driven.
+      catalog-driven. The project's own skill map, .claude/skill-map.custom.json,
+      is validated too, so a broken rule cannot switch its reminders off unseen.
+    preconditions:
+      - sh: command -v uv
+        msg: "The checks in bin/ run through uv (PEP 723 scripts). Install it: https://docs.astral.sh/uv/"
     cmds:
-      - uv run bin/check_all.py {{.PACKAGE_DIR}}
+      - bin/check_all.py {{.PACKAGE_DIR}}
 
   build:
     desc: Build package archive
@@ -86,11 +90,12 @@ tasks:
 
       The offline checks run first, because this is the task that puts a
       catalog on a live instance, and a dangling reference in it makes the
-      SHACL service answer HTTP 500 for every graph on that deployment.
-    deps:
-      - delete
+      SHACL service answer HTTP 500 for every graph on that deployment. They
+      run before the installed package is deleted, so a failed check leaves
+      the instance as it was.
     cmds:
       - task: check:offline
+      - task: delete
       - cmemc package install --input {{.PACKAGE_DIR}}
 
   export:

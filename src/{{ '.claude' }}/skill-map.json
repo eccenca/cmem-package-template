@@ -1,0 +1,10 @@
+{
+  "comment": "Which shipped skill covers a file of this project, so that .claude/hooks/skill-check.py can remind the session of it when the file is edited or a shell command names it. 'paths' are globs relative to the project root; 'content' are regular expressions matched against the text of an RDF file (.ttl, .trig, .nt, .ttl.graph, .ttl.imports), as it will be after the edit; 'exclude' are globs that take a file out of the rule again, because * in a glob also crosses '/'. A rule applies when any path or content pattern matches and no exclude does. A skill the project does not have in .claude/skills/ is skipped. A project switches the reminders off with an empty .claude/no-skill-check. This file belongs to the template - add project specific rules, and rules for skills of your own, to .claude/skill-map.custom.json in the same format; task check:offline validates it.",
+  "rules": [
+    {"skill": "package-content", "paths": ["*/cpa-manifest.json", "DOCUMENTATION.md", "CHANGELOG.md", "LICENSE", "NOTICE", "*/README.md", "*/*.ttl.graph", "*/*.ttl.imports"]},
+    {"skill": "vocabulary", "paths": ["*/*vocab*.ttl"], "content": ["owl:Ontology", "owl:Class", "owl:ObjectProperty", "owl:DatatypeProperty"]},
+    {"skill": "shapes", "paths": ["*/*shapes*.ttl", "*/*shacl*.ttl"], "content": ["shacl:NodeShape", "shacl:PropertyShape", "sh:NodeShape", "sh:PropertyShape"]},
+    {"skill": "catalog-queries", "content": ["shui:queryText", "shui:SparqlQuery", "shui:valueQuery"]},
+    {"skill": "build-projects", "paths": ["*/build/**", "*/*/workflow/*.xml", "*/*/custom/*.xml", "*/*/dataset/*.xml", "*/*/transform/**", "*/*/linking/**"], "exclude": ["scripts/**"]}
+  ]
+}

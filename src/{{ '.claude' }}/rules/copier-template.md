@@ -6,8 +6,10 @@ copier template and stays connected to it through `copier update`.
 
 ## Some files belong to the template
 
-`Taskfile.yaml`, `.gitlab-ci.yml`, `bin/` and everything under `.claude/` are
-rendered from the template. Edits there are not preserved: the next
+`Taskfile.yaml`, `.gitlab-ci.yml`, `bin/` and the template's part of `.claude/` -
+its hooks, rules, `settings.json`, `skill-map.json` and the shipped skills - are
+rendered from the template; a skill of your own, `skill-map.custom.json` and the
+two opt-out files are the project's. Edits there are not preserved: the next
 `copier update` either reverts them or turns them into a merge conflict.
 
 Add project specific build steps to `TaskfileCustom.yaml` instead - note the
@@ -51,6 +53,22 @@ generated with:
 
 A vocabulary package ships fewer of them, because a build project and a shape
 catalog - and so the queries inside one - are things it does not have.
+
+## Load the skill that covers a file before changing it
+
+`.claude/skill-map.json` maps files to the skills that cover them; read the
+skill before the first edit. `.claude/hooks/skill-check.py` adds a note
+naming the skill and its `SKILL.md` to every edit of a mapped file and to
+every shell command that names one. The note arrives with the tool's result,
+after the change is made: if this session had not loaded that skill yet, load
+it now, check the change against it and fix what departs. The hook never
+refuses a tool call, so the note is all there is; act on it.
+
+`.claude/skill-map.json` belongs to the template. Rules for this project - for
+skills of your own, or for files only this project has - go into
+`.claude/skill-map.custom.json`, in the same format; the template never writes
+it, and `task check:offline` fails on a rule it cannot use. An empty
+`.claude/no-skill-check` switches the reminders off.
 
 ## Two files carry the documentation, and they face different readers
 
