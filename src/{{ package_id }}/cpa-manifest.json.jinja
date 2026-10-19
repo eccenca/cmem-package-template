@@ -67,12 +67,12 @@
       "file_path": "README.md",
       "file_type": "text",
       "file_role": "readme"
-    },
+    }{% if license != 'LicenseRef-scancode-unknown' %},
     {
       "file_path": "LICENSE",
       "file_type": "text",
       "file_role": "license"
-    }
+    }{% endif %}
   ],
   "package_type": "{{ package_type }}"
 }

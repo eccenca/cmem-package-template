@@ -1,4 +1,7 @@
-{% if license == 'CC-BY-4.0' %}Attribution 4.0 International
+{% if license not in ['Apache-2.0', 'CC-BY-4.0'] %}Replace this file with the full text of {{ license }}, the licence of the content
+this package redistributes. The template carries no text for it and never
+writes over this file once it exists.
+{% elif license == 'CC-BY-4.0' %}Attribution 4.0 International
 
 =======================================================================
 
