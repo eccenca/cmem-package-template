@@ -47,6 +47,12 @@ everything else the invariants, the measured counts and the pointers to related
 terms. Name related terms with the vocabulary's own prefix, in the comment
 rather than the definition.
 
+**German definitions** follow the same principle and keep German noun capitals:
+"no initial capital" applies only where the definition starts with an adjective
+or a participle. Where the head noun and the agent are both feminine, a relative
+clause can be read the wrong way round (*die Bedingung, die die Regel prüft*) -
+write it passive (*die von der Regel geprüft wird*).
+
 ## Naming
 
 - Class labels are sentence case (`"Feature value"`, not `"FeatureValue"`);
@@ -54,6 +60,10 @@ rather than the definition.
 - Class names are **head-final**: the last word says what the thing *is*.
   `ValuePrecondition` is a precondition; `ConditionValue` would wrongly name a
   value.
+- **A term's IRI and its label always match.** Renaming a term renames its IRI,
+  and with it every slug, query, task id and instance IRI built from it, so a
+  reader never has to translate between the two. The former name, and an expert
+  name users search for, stay as `skos:altLabel` or `skos:hiddenLabel`.
 - Bump `dcterms:modified` whenever a term's definition changes.
 
 ## Classify by intention, not by content
@@ -61,6 +71,17 @@ rather than the definition.
 A class is what its role in the model makes it, not what its instances happen
 to contain. A content-based rule silently reclassifies things when the data
 changes, which is how a vocabulary stops describing anything stable.
+
+## Link to an upper ontology, do not bridge into it
+
+A class that corresponds to a term of an upper or external ontology (gist, for
+instance) links to it with `rdfs:seeAlso`; the ontology becomes a package
+dependency that no graph imports. Do not state `rdfs:subClassOf` or
+`rdfs:subPropertyOf` across: the axioms would pull the other ontology's
+inferences and constraints into the package's data. And never make a class a
+subclass of `owl:Class` or another meta-ontology term - that turns its instances
+into classes. Subclassing `skos:Concept` for a domain's concepts is different
+and fine: it is a domain class, not a meta term.
 
 ## Measure the claim before naming a property
 
