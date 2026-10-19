@@ -3,6 +3,10 @@
 Give every class a `foaf:depiction`: an inline `data:image/svg+xml;base64` SVG
 on a `viewBox="0 0 24 24"`.
 
+Only a class the package owns gets one. For a class from a vocabulary the
+package does not own, the icon goes on the node shape of a project package's
+shape catalog - see its `shapes` skill.
+
 ## Drawing them
 
 - **Classes are filled. Node shapes are stroked** (`fill="none" stroke="…"
