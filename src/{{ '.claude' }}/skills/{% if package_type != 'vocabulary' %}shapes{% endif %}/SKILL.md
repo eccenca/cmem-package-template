@@ -178,11 +178,41 @@ Naming a query after the shape that uses it keeps the pair adjacent when the
 file is sorted, and a query with no matching shape then stands out as an
 orphan.
 
-Renaming exposes duplicates that UUIDs hide - but **duplicate group labels are
-often correct, not redundant**. `shacl:order` belongs to the group, not to the
-form, so placing one block at a different height on several forms requires one
-group per form, and merging them would force a single position everywhere. Give
-every group an explicit `shacl:order`; without one its position is undefined.
+
+## Sections: one set per package, the same on every form
+
+A form's sections are its property groups. **A package defines one set of
+sections and uses it on all its forms**: each section has a one-sentence
+`rdfs:comment`, its `shacl:order` is the same on every form, in steps of 100,
+and a form shows only the sections it has rows for. Someone who has learned
+where a section sits on one form then finds it there on the next. `shacl:order`
+belongs to the group, not to the form, so one shared group per section is what
+keeps its height fixed; give every group an explicit order, since without one
+its position is undefined.
+
+- **Sections follow meaning, never link direction.** A row reached through an
+  inverse path goes into the section its meaning belongs to; there is no
+  "Related" section collecting back-links, which would split one topic across
+  two places.
+- **At most one status section comes first** - findings or status widgets (a
+  table report, an action button), no charts.
+- **The overview with charts goes last**, after everything that is edited.
+
+Packages stay alike through these recommended sections. Use them where they
+fit and put the package's own sections between them, in the range 400-700:
+
+| order | section | holds |
+|---|---|---|
+| 50 | Findings | the rule check's results for this resource |
+| 100 | Identity | name, type, identifiers, notation |
+| 200 | Description | definition, comment, notes |
+| 300 | Classification | concepts, categories, kinds |
+| 400-700 | the package's own | e.g. *Edition*, *Usage*, *Constraints* |
+| 800 | External sources | links out: `rdfs:seeAlso`, `skos:closeMatch`, a source's page |
+| 900 | Overview | widgets, charts, table reports |
+
+A user who knows one package then finds *Identity* at the top and *Overview* at
+the bottom of the next one, while each domain keeps its own sections.
 
 ## `shacl:name` is the form, `rdfs:label` is the catalog
 
@@ -226,10 +256,6 @@ projection, placeholders, the `?graph` column - is the `catalog-queries` skill.
 The conventions below are what the eccenca packages converged on. They are
 recommended defaults - a package with a good reason may depart from them.
 
-- Fixed property groups with stable orders, the resource's name at order 1 of
-  the first group: **Basics** (10), **When** (20), **Where** (30), then
-  domain-specific groups, **Stats** (60) for counted figures, **Related** (90)
-  for read-only back-links, always last.
 - Design reasoning lives on the term it concerns as `skos:editorialNote`, in
   English only, even where labels and comments are bilingual: it is for whoever
   maintains the vocabulary, and a translated argument drifts.
