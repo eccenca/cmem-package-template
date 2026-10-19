@@ -145,6 +145,12 @@ itself or stays empty regardless. Put the expectation on the editable inputs the
 derivation reads from. An empty derived field simply reads as "not computed
 yet".
 
+**A computed *Type* row shows only the most specific classes**: its query leaves
+out every class that is a superclass of another listed one. A resource typed
+twice - its own class and, say, `skos:Concept` - would otherwise show *Concept*
+next to its own class on every form, and badges aggregated over all concepts
+with it.
+
 ## URI templates
 
 ```turtle
