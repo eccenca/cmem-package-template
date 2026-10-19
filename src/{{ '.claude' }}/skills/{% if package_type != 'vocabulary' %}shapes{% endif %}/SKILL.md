@@ -91,6 +91,11 @@ gigos:Festival-startDate a shacl:PropertyShape ;
 ```
 
 `shacl:group` points at a `shacl:PropertyGroup`; `shacl:order` sorts within it.
+**Number the rows of a section in steps of 10, without ties, and give every
+visible row an explicit order**: editable stored rows first, then read-only
+stored rows, then rows computed by a query. Ties and gaps in the numbering let
+the renderer decide, and a reader then meets the things to fill in after the
+things to look at.
 `shui:` adds the UI behaviour: `shui:showAlways` holds an empty row open,
 `shui:readOnly` forbids editing, `shui:markdown` and `shui:textarea` change the
 input widget, `shui:languageIn` restricts language tags.
@@ -106,6 +111,12 @@ shape.** Relaxing a constraint to make a validation run pass turns the catalog
 into a description of whatever the data happens to be. Where the choice is
 between a looser shape and a stricter one that still holds, take the stricter
 one: it is the only part of the package that can catch a regression.
+
+**A row that embeds a sub-shape (`shacl:node`) gets no group**, and neither do
+the embedded node shapes nor a hidden `shacl:maxCount 0` guard row. Ungrouped
+rows sort together with the groups by `shacl:order`, so give an embedding row
+an order between two sections (250, 260). An embedded node shape carries no
+description: the renderer repeats it under every embedded section.
 
 Reusing one property shape across many node shapes is normal where the path is
 a domain-free annotation - a shared `comment` or `editorialNote` field is the
@@ -178,6 +189,11 @@ Naming a query after the shape that uses it keeps the pair adjacent when the
 file is sorted, and a query with no matching shape then stands out as an
 orphan.
 
+**A renamed row takes its slug, its `rdfs:label` and the query named after it
+along**, so the three stay findable from each other. A role in parentheses goes
+into the slug camel-cased: *Consistency constraints (if part)* becomes
+`Feature-consistencyConstraintsIfPart`.
+
 
 ## Sections: one set per package, the same on every form
 
@@ -223,6 +239,12 @@ The two serve different readers and therefore follow different conventions.
   "Condition", never "hasCondition", and **must never contain "node shape" or
   "property shape"**. Putting `"Product Node Shape"` in `shacl:name` and hiding
   the plain name in `rdfs:label` is the wrong way round.
+
+  Row names are **sentence case, without acronyms, and plural for a row that can
+  hold several values**. Name a row after the class it lists where that reads
+  well ("Materials"), otherwise by its relation read from the form's resource
+  ("Used in"). Two rows on one form that would get the same name are told apart
+  by a role in parentheses ("Constraints (if part)").
 - **`rdfs:label`** is how the shape itself appears in a catalog listing, so it
   must **distinguish one shape from another**. Many `shacl:name`s repeat by
   design, so a bare label identifies nothing.
@@ -256,6 +278,11 @@ projection, placeholders, the `?graph` column - is the `catalog-queries` skill.
 The conventions below are what the eccenca packages converged on. They are
 recommended defaults - a package with a good reason may depart from them.
 
+- **Everything a form shows exists in every language the vocabulary has**:
+  section titles and descriptions, row names and descriptions, node shape
+  descriptions and messages. A user switching the UI language otherwise meets a
+  form in two languages. The shapes' own `rdfs:label` stays English - it names
+  the shape in the catalog, not on the form.
 - Design reasoning lives on the term it concerns as `skos:editorialNote`, in
   English only, even where labels and comments are bilingual: it is for whoever
   maintains the vocabulary, and a translated argument drifts.
