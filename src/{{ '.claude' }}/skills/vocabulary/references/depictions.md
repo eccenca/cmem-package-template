@@ -32,9 +32,11 @@ shape catalog - see its `shapes` skill.
 ## Colour
 
 **Colours come from a fixed palette** - for eccenca packages the layout colours
-of the eccenca palette - so packages installed side by side look like one
-product. The palette's semantic colours (error, warning, success and the like)
-are reserved for badges and marks, and a class hue keeps at least 26° away from
+of the eccenca palette, defined in `@eccenca/gui-elements`
+(`src/configuration/_palettes.scss`, five tones per hue) - so packages installed
+side by side look like one product. Take the values from there rather than
+copying them. The palette's semantic colours (success, info, warning, danger, a
+separate group in the same file) are reserved for badges and marks, and a class hue keeps at least 26° away from
 them: a class drawn in the warning colour reads as a warning.
 
 **Hue carries the family.** A family is an independent top-level class, a class
