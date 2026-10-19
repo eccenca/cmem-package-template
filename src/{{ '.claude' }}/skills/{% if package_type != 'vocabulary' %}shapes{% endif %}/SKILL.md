@@ -227,8 +227,8 @@ orphan.
 
 **A renamed row takes its slug, its `rdfs:label` and the query named after it
 along**, so the three stay findable from each other. A role in parentheses goes
-into the slug camel-cased: *Consistency constraints (if part)* becomes
-`Feature-consistencyConstraintsIfPart`.
+into the slug camel-cased: *Acts (headliner)* becomes
+`Festival-actsHeadliner`.
 
 
 ## Sections: one set per package, the same on every form
@@ -259,7 +259,7 @@ fit and put the package's own sections between them, in the range 400-700:
 | 100 | Identity | name, type, identifiers, notation |
 | 200 | Description | definition, comment, notes |
 | 300 | Classification | concepts, categories, kinds |
-| 400-700 | the package's own | e.g. *Edition*, *Usage*, *Constraints* |
+| 400-700 | the package's own | e.g. *Line-up*, *Tickets* |
 | 800 | External sources | links out: `rdfs:seeAlso`, `skos:closeMatch`, a source's page |
 | 900 | Overview | widgets, charts, table reports |
 
@@ -278,9 +278,9 @@ The two serve different readers and therefore follow different conventions.
 
   Row names are **sentence case, without acronyms, and plural for a row that can
   hold several values**. Name a row after the class it lists where that reads
-  well ("Materials"), otherwise by its relation read from the form's resource
-  ("Used in"). Two rows on one form that would get the same name are told apart
-  by a role in parentheses ("Constraints (if part)").
+  well ("Venues"), otherwise by its relation read from the form's resource
+  ("Played at"). Two rows on one form that would get the same name are told
+  apart by a role in parentheses ("Acts (headliner)", "Acts (support)").
 - **`rdfs:label`** is how the shape itself appears in a catalog listing, so it
   must **distinguish one shape from another**. Many `shacl:name`s repeat by
   design, so a bare label identifies nothing.
