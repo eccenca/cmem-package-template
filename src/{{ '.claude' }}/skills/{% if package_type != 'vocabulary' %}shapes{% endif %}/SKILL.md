@@ -74,6 +74,36 @@ added to the source's class instead, the package would change a vocabulary it
 does not own, and the next update of the source would drop it. The depiction
 uses the FOAF namespace, so the manifest needs the `foaf-vocab` dependency (see
 the `package-content` skill on dependencies).
+**A resource is edited only where it lives.** When other graphs import a
+resource, its node shape carries `shui:askIfEditableQuery`, so the form offers
+editing only in the graph that holds the resource's statements; opened through
+an importing graph, the same form is read-only and nobody writes a copy into
+the wrong graph. Explore offers the edit control only when that query answers
+true; `{{shuiGraph}}` is the graph the form is opened in, `{{shuiResource}}` the
+resource. `shui:askIfRemovableQuery` takes the same query, so nobody removes the
+resource through an importing graph. `shui:askIfCloneableQuery` and
+`shui:askIfCreatableQuery` decide by graph alone and answer true only in the
+graphs that may hold the class: Explore fills `{{shuiResource}}` with an empty
+value for them, so the guarded query below would always hide Clone. A purely
+aggregating resource's form gets `ASK { FILTER(false) }` and keeps its widgets.
+
+```sparql
+ASK { FILTER("{{shuiGraph}}" = "https://example.org/library/") }
+```
+
+**Pass the placeholders as strings and guard the empty value.** Explore also
+runs the edit and remove queries without a resource; `<{{shuiResource}}>` then becomes `<>`,
+the request fails with HTTP 400 and the form shows "Validation completed with
+Unknown Error". An empty value has to answer false instead:
+
+```sparql
+ASK {
+  BIND(IRI("{{shuiResource}}") AS ?resource)
+  BIND(IRI("{{shuiGraph}}") AS ?graph)
+  FILTER("{{shuiResource}}" != "" && "{{shuiGraph}}" != "")
+  GRAPH ?graph { ?resource ?p ?o }
+}
+```
 
 ## Property shapes
 
