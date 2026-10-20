@@ -69,6 +69,36 @@ tasks:
     cmds:
       - bin/check_all.py {{.PACKAGE_DIR}}
 
+  layout:
+    desc: Lay out the workflows of the build projects as a waterfall
+    summary: |
+      Rewrites only posX/posY in the exported workflow XML of every project
+      under projects/ (and build/, for a package that has not moved), so a
+      workflow reads left to right and top to bottom: order as columns, then
+      input, working and one lane per graph written. The workflows skill
+      describes the layout.
+
+      Not part of check:offline, and task export does not run it: run it after
+      an export in which nodes were moved, and review the diff - a deliberate
+      arrangement is yours to keep.
+    preconditions:
+      - sh: command -v uv
+        msg: "bin/layout_workflows.py runs through uv (PEP 723). Install it: https://docs.astral.sh/uv/"
+    cmds:
+      - for p in {{.PACKAGE_DIR}}/projects/*/ {{.PACKAGE_DIR}}/build/*/; do [ -d "$p" ] || continue; bin/layout_workflows.py --write "$p" || exit 1; done
+
+  layout:check:
+    desc: Report workflows that depart from the waterfall layout
+    summary: |
+      The same layout as task layout, without writing: exits non-zero and names
+      each workflow whose positions differ. A package that wants the layout as a
+      gate adds this task to its check:custom.
+    preconditions:
+      - sh: command -v uv
+        msg: "bin/layout_workflows.py runs through uv (PEP 723). Install it: https://docs.astral.sh/uv/"
+    cmds:
+      - for p in {{.PACKAGE_DIR}}/projects/*/ {{.PACKAGE_DIR}}/build/*/; do [ -d "$p" ] || continue; bin/layout_workflows.py --check "$p" || exit 1; done
+
   build:
     desc: Build package archive
     preconditions:

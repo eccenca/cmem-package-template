@@ -22,6 +22,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - `askIf…` queries edit and remove a resource only in the graph that holds it, with string placeholders and an empty guard because Explore also runs them without a resource; clone and create decide by graph alone, since Explore passes them no resource
   - validate through the graph that imports what the shapes need, data must satisfy the system shapes, no managed class in a shipped graph users create in, table reports set both flags and carry counts of marks
 - The `vocabulary` skill: a term's IRI and label always match; a property links to an upper ontology's property with `rdfs:seeAlso`, never `rdfs:subPropertyOf`, while a class may extend an upper ontology's class; German definitions; class colours from a fixed palette with families spaced 360°/n apart, one neutral class in black and dependents in their owner's hue
+- `task layout` lays out every workflow as a waterfall (`bin/layout_workflows.py`, rewriting only node positions) and `task layout:check` reports the ones that depart from it; neither runs in `check:offline` or `task export`, so a deliberate arrangement is never overwritten and a package adds `layout:check` to its `check:custom` when it wants the gate
+
+### Changed
+
 - The skills show the marketplace's package layout: a project package keeps its graphs in `graphs/`, its project exports in `projects/` and its images in `images/` (#32)
   - `build-projects` names `projects/<project-id>.zip` and exports into `projects/`; `shapes` wires the catalog as `graphs/shapes.ttl`
   - `package-content` and the README say where a file goes and that a vocabulary package may stay flat; the README states the marketplace's path rule
