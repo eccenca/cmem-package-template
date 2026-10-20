@@ -237,7 +237,7 @@ Custom tasks are `<CustomTask id="…" type="…">`. The types worth knowing:
 
 | `type` | Use it for |
 | --- | --- |
-| `sparqlCopyOperator` | a CONSTRUCT from one graph into another - the workhorse |
+| `sparqlCopyOperator` | a CONSTRUCT from one graph into another, where no construct does the job |
 | `sparqlUpdateOperator` | an INSERT/DELETE against a graph |
 | `tripleRequestOperator` | piping an RDF file or endpoint straight into a graph |
 | `clearDataset` | emptying a target before a rebuild |
@@ -247,11 +247,19 @@ A plugin contributes its own type (`cmem_plugin_nextcloud-List` and so on); the
 package must then declare that plugin as a `python-package` dependency in the
 manifest.
 
-**Avoid hand-authoring a transform.** A `transform/<rule-id>/rules.xml` mapping
-tree is the one part of DataIntegration authoring that is genuinely painful to
-write by hand. If the source can be produced as RDF - generated Turtle, an
-endpoint - `tripleRequestOperator` reaches the same result without a mapping
-tree. Build transforms in the UI and export them.
+**Constructs first** (the `workflows` skill): a transform, a linking task, a
+dataset and the Clear dataset operator before a SPARQL task, so a reader can
+follow and change the workflow in the workbench without code. A SPARQL task's
+description says why no construct does the job.
+
+**Build tasks in the UI and export them.** A `transform/<rule-id>/rules.xml`
+mapping tree is painful to write by hand. A script may generate a task only when
+the task is a construct and its source is a master in the repository that
+something else needs too - one mapping feeding several tasks, a catalog query
+copied into a workflow. The script uploads through the REST API, the export
+stays the copy, and the script's `--check` fails when the export drifts from the
+master. *The repository keeps one source for what two places use, and the
+export stays what ships.*
 
 ## A SPARQL finding worth not rediscovering
 
