@@ -23,6 +23,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - validate through the graph that imports what the shapes need, data must satisfy the system shapes, no managed class in a shipped graph users create in, table reports set both flags and carry counts of marks
 - The `vocabulary` skill: a term's IRI and label always match; a property links to an upper ontology's property with `rdfs:seeAlso`, never `rdfs:subPropertyOf`, while a class may extend an upper ontology's class; German definitions; class colours from a fixed palette with families spaced 360°/n apart, one neutral class in black and dependents in their owner's hue
 - `task layout` lays out every workflow as a waterfall (`bin/layout_workflows.py`, rewriting only node positions) and `task layout:check` reports the ones that depart from it; neither runs in `check:offline` or `task export`, so a deliberate arrangement is never overwritten and a package adds `layout:check` to its `check:custom` when it wants the gate
+- Project packages ship a `workflows` skill for the design of a build project's workflows, so an agent builds a workflow a person can follow and change in the workbench
+  - constructs before SPARQL, the minimal input per task, linking natively, optimising a build, phases with in-memory hand-off, responsibilities between tasks and graphs, sticky notes, testing, and the DataIntegration mechanics four packages found on the way
+  - `task layout` lays out every workflow as a waterfall (`bin/layout_workflows.py`, rewriting only node positions) and `task layout:check` reports the ones that depart from it; neither runs in `check:offline` or `task export`, so a deliberate arrangement is never overwritten and a package adds `layout:check` to its `check:custom` when it wants the gate
+  - `.claude/skill-map.json` reminds of `workflows` on workflow, custom task, transform and linking files, and still of `build-projects` too, since the same file carries a task's tags and description
 
 ### Changed
 

@@ -58,7 +58,7 @@ Everything else is the same for both types - the repository layout, the
 |---|---|---|
 | generated graph entry | `register_as_vocabulary: true` | `register_as_vocabulary: false` |
 | dependency questions | not asked | `python_dependencies`, `vocab_dependencies` |
-| shipped [skills](#generated-structure) | `package-content`, `template-feedback` | the same, plus `build-projects` and `shapes` |
+| shipped [skills](#generated-structure) | `package-content`, `template-feedback` | the same, plus `build-projects`, `workflows` and `shapes` |
 
 ## Prerequisites
 
