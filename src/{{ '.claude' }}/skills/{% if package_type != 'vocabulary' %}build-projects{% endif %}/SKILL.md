@@ -173,7 +173,12 @@ axis exists because someone searches by it, across all packages of a workspace.
   DataIntegration's `readOnly="true"`, never a `read-only` tag. *The workbench
   search filters on the flag, and the flag also refuses a write; a tag next to
   it is a second source that drifts.*
-- The project itself carries the package's tag and `from-repository` (above).
+- **The project carries its own tags**: the package's tag (the package id's
+  infix, as in the project prefix), its role - `bootstrap`, `demo` or
+  `operational`, after the lifecycle split above - and `from-repository`.
+  *In a workspace with several packages, the workbench groups a package's
+  projects by the package tag and tells set-up, demo and operations apart by the
+  role, without opening a project.*
 - Create, assign and delete tags with the DataIntegration MCP server's tag
   tools, or in the UI, and export afterwards.
 
