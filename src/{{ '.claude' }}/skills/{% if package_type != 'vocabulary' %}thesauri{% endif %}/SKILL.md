@@ -158,13 +158,19 @@ data (ODbL, CC BY-SA) stays in its own graph, marked as such.
   of your own for this.
 - **Never give a node shape to all of `skos:Concept`**: with order 0 it replaces
   the concept form of every taxonomy on the instance.
-- **A concept form whose thesaurus has another master refuses editing**: its
-  node shape carries `shui:askIfEditableQuery`, `askIfCreatableQuery`,
-  `askIfRemovableQuery` and `askIfCloneableQuery` as `ASK { FILTER(false) }`
-  (the `shapes` skill, *A resource is edited only where it lives*), plus the
-  read-only link row to the editor (below). Read-only rows alone are not enough:
-  Explore still offers *Edit*, and a save in an application view would land in
-  the graph that is open, never in the thesaurus.
+- **The package's concept form refuses editing when the thesaurus has another
+  master**: its node shape carries `shui:askIfEditableQuery`,
+  `askIfCreatableQuery`, `askIfRemovableQuery` and `askIfCloneableQuery` as
+  `ASK { FILTER(false) }` (the `shapes` skill, *A resource is edited only where
+  it lives*), plus the read-only link row to the editor (below). Read-only rows
+  alone are not enough: Explore still offers *Edit*, and a save in an
+  application view would land in the graph that is open, never in the
+  thesaurus.
+- **The taxonomy editor is not reached by those queries**: it draws Corporate
+  Memory's own concept forms, so the concepts stay editable there. Protect the
+  term graph with an access condition that makes it read-only for everyone but
+  its producer (the table under *Who maintains a taxonomy*) - that is the only
+  lever in the editor.
 
 ## Icons for the scheme and its concepts
 
