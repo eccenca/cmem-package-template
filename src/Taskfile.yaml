@@ -99,6 +99,35 @@ tasks:
     cmds:
       - for p in {{.PACKAGE_DIR}}/projects/*/ {{.PACKAGE_DIR}}/build/*/; do [ -d "$p" ] || continue; bin/layout_workflows.py --check "$p" || exit 1; done
 
+  tags:
+    desc: Write the tags of task-tags.json into the build projects' exports
+    summary: |
+      task-tags.json at the repository root lists the tags of every task per
+      build project, the projects' own tags and the external systems. This
+      writes them into the exports under projects/ (and build/), after the
+      register passed the tag axes of the build-projects skill. Run it after
+      every export: a task created through the API often loses its tags there.
+
+      A package without task-tags.json keeps its tags in the exports only;
+      bin/task_tags.py --from-exports <package dir> writes a first register.
+    preconditions:
+      - sh: command -v uv
+        msg: "bin/task_tags.py runs through uv (PEP 723). Install it: https://docs.astral.sh/uv/"
+    cmds:
+      - bin/task_tags.py --write {{.PACKAGE_DIR}}
+
+  tags:check:
+    desc: Report exports whose tags differ from task-tags.json, or a register that breaks the tag axes
+    summary: |
+      Writes nothing. Tags are a set, so an export that only reorders them
+      passes. Passes with a note when the package has no task-tags.json. A
+      package that wants it as a gate adds this task to its check:custom.
+    preconditions:
+      - sh: command -v uv
+        msg: "bin/task_tags.py runs through uv (PEP 723). Install it: https://docs.astral.sh/uv/"
+    cmds:
+      - bin/task_tags.py --check {{.PACKAGE_DIR}}
+
   build:
     desc: Build package archive
     preconditions:

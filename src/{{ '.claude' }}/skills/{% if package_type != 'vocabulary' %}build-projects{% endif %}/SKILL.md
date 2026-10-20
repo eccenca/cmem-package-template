@@ -179,8 +179,18 @@ axis exists because someone searches by it, across all packages of a workspace.
   *In a workspace with several packages, the workbench groups a package's
   projects by the package tag and tells set-up, demo and operations apart by the
   role, without opening a project.*
-- Create, assign and delete tags with the DataIntegration MCP server's tag
-  tools, or in the UI, and export afterwards.
+- **Keep the tags in one register**, `task-tags.json` at the repository root:
+  the tags of every task per project, the projects' own tags, and under
+  `systems` the names of the external systems. `task tags` writes them into the
+  exports and `task tags:check` reports drift; both first check the register
+  against the axes above and refuse a tag on no axis, two tags on one axis, a
+  persistent dataset without a position, a `read-only` tag, and a project
+  without exactly one role or without `from-repository`. Run `task tags` after
+  every export. *A task created through the API often loses its tags on export,
+  and a tag edited in forty task files drifts; the register is the one place a
+  reviewer reads, and one command repairs an export.* A package that has no
+  register yet writes a first one from its exports with `bin/task_tags.py
+  --from-exports <package dir>` and fixes what the check then reports.
 
 ## Namespaces in one place
 
