@@ -368,7 +368,7 @@ inside - put `skos:` into `fallbackPrefixes`):
 SELECT ?resource WHERE {
   {{VALUES}}
   ?resource skos:topConceptOf <scheme> .
-  FILTER EXISTS { ?item <prop>/skos:broader* ?resource }
+  FILTER EXISTS { ?item a <ListedClass> ; <prop>/skos:broader* ?resource }
 }
 
 # conceptParentChildQuery - projects ?topResource ?resource ?parentResource
@@ -377,7 +377,7 @@ SELECT ?topResource ?resource ?parentResource WHERE {
   ?resource skos:broader ?parentResource .
   ?resource skos:broader+ ?topResource .
   ?topResource skos:topConceptOf <scheme> .
-  FILTER EXISTS { ?item <prop>/skos:broader* ?resource }
+  FILTER EXISTS { ?item a <ListedClass> ; <prop>/skos:broader* ?resource }
 }
 ```
 
@@ -401,10 +401,15 @@ class branch and adds the taxonomy:
 ```sparql
 SELECT DISTINCT ?resource {{FROM}} WHERE {
   { ?resource a {{RESOURCE}} } UNION { ?resource a/rdfs:subClassOf+ {{RESOURCE}} }
-  UNION { ?resource <prop>/skos:broader* {{RESOURCE}} }
+  UNION { ?resource a <ListedClass> ; <prop>/skos:broader* {{RESOURCE}} }
 }
 ```
 
+- **Name the listed class in the taxonomy branch** (`<ListedClass>`, the same
+  in the list and both tree queries): another class may point to the same
+  concepts through the same property - QUDT's physical constants share
+  `qudt:hasQuantityKind` with its units - and its instances would otherwise
+  turn up in the list, keep concepts in the tree and add to the badges.
 - Label views "<application>: <aspect>" in every package language and share an
   id prefix so they sort together.
 
