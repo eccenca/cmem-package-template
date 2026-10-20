@@ -27,6 +27,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - constructs before SPARQL, the minimal input per task, linking natively, optimising a build, phases with in-memory hand-off, responsibilities between tasks and graphs, sticky notes, testing, and the DataIntegration mechanics four packages found on the way
   - `task layout` lays out every workflow as a waterfall (`bin/layout_workflows.py`, rewriting only node positions) and `task layout:check` reports the ones that depart from it; neither runs in `check:offline` or `task export`, so a deliberate arrangement is never overwritten and a package adds `layout:check` to its `check:custom` when it wants the gate
   - `.claude/skill-map.json` reminds of `workflows` on workflow, custom task, transform and linking files, and still of `build-projects` too, since the same file carries a task's tags and description
+- `build-projects` holds the project around the workflows: build projects by lifecycle (bootstrap, demo, operational), ids and labels, descriptions, task tags on fixed axes, namespaces as project variables, and migrations as workflows
+  - every build project carries the project tag `from-repository` and says in its description that the next `task import` replaces it, so people sharing a workspace with an agent see which projects an import overwrites
 
 ### Changed
 
