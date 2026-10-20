@@ -72,16 +72,21 @@ A class is what its role in the model makes it, not what its instances happen
 to contain. A content-based rule silently reclassifies things when the data
 changes, which is how a vocabulary stops describing anything stable.
 
-## Link to an upper ontology, do not bridge into it
+## Upper ontologies: properties link, classes may extend
 
-A class that corresponds to a term of an upper or external ontology (gist, for
-instance) links to it with `rdfs:seeAlso`; the ontology becomes a package
-dependency that no graph imports. Do not state `rdfs:subClassOf` or
-`rdfs:subPropertyOf` across: the axioms would pull the other ontology's
-inferences and constraints into the package's data. And never make a class a
-subclass of `owl:Class` or another meta-ontology term - that turns its instances
-into classes. Subclassing `skos:Concept` for a domain's concepts is different
-and fine: it is a domain class, not a meta term.
+A property that corresponds to a property of an upper or external ontology
+(gist's `isCategorizedBy`, for instance) links to it with `rdfs:seeAlso`; the
+ontology becomes a package dependency that no graph imports. Do not state
+`rdfs:subPropertyOf` across: every statement of the package would become one of
+the other property's, so whatever that ontology says about it - domain, range,
+characteristics, and their next release - applies to the package's data.
+
+A class may extend a class of an upper ontology with `rdfs:subClassOf` - a
+domain's concepts subclass `skos:Concept`, a package class may specialize a
+gist, BFO or schema.org class. Its node shape then needs `shacl:order 0`, so
+that the package's form opens before the upper class's (the `shapes` skill).
+Never make a class a subclass of `owl:Class` or another meta-ontology term -
+that turns its instances into classes.
 
 ## Measure the claim before naming a property
 

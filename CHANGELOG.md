@@ -16,7 +16,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - a computed *Type* row shows only the most specific classes
   - `askIf…` queries edit and remove a resource only in the graph that holds it, with string placeholders and an empty guard because Explore also runs them without a resource; clone and create decide by graph alone, since Explore passes them no resource
   - validate through the graph that imports what the shapes need, data must satisfy the system shapes, no managed class in a shipped graph users create in, table reports set both flags and carry counts of marks
-- The `vocabulary` skill: a term's IRI and label always match; an upper ontology is linked with `rdfs:seeAlso`, never bridged by axioms; German definitions; class colours from a fixed palette with families spaced 360°/n apart, one neutral class in black and dependents in their owner's hue
+- The `vocabulary` skill: a term's IRI and label always match; a property links to an upper ontology's property with `rdfs:seeAlso`, never `rdfs:subPropertyOf`, while a class may extend an upper ontology's class; German definitions; class colours from a fixed palette with families spaced 360°/n apart, one neutral class in black and dependents in their owner's hue
 
 ## [1.8.0] 2026-10-18
 
