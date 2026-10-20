@@ -74,6 +74,19 @@ added to the source's class instead, the package would change a vocabulary it
 does not own, and the next update of the source would drop it. The depiction
 uses the FOAF namespace, so the manifest needs the `foaf-vocab` dependency (see
 the `package-content` skill on dependencies).
+**A package class whose instances another node shape also reaches gets
+`shacl:order 0` on its node shape** - because the class extends a class that
+Corporate Memory or another package already shapes (a domain's concepts under
+`skos:Concept`, a class under a gist, BFO or schema.org class), or because its
+instances carry such a type as well (a source that types its datatypes
+`rdfs:Datatype` too brings Corporate Memory's datatype form along). Explore
+offers a resource a form for every node shape whose target class it reaches
+through its types and `rdfs:subClassOf`, and opens the page on the first, so
+without the order the generic form can win. The other shape is not
+the package's to change or remove, so ordering is the lever; check with
+`GET /dataplatform/api/explore/resource/nodeshapeforms/byresource` that the
+package's shape comes first for an instance of each such class.
+
 **A resource is edited only where it lives.** When other graphs import a
 resource, its node shape carries `shui:askIfEditableQuery`, so the form offers
 editing only in the graph that holds the resource's statements; opened through
