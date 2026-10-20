@@ -49,30 +49,14 @@ The taxonomy editor's own term is *thesaurus project*.
   `?x prop/skos:broader* ?top . FILTER NOT EXISTS { ?top skos:broader ?b }`.
   Then the taxonomy can change without touching a chart or report.
 
-## Extending an upper ontology: the package's form comes first
+## The package's concept form comes first
 
-A package class that specializes a class of an upper ontology - `skos:Concept`,
-a gist, BFO or schema.org class - inherits that class's node shape: Corporate
-Memory ships `shacl:ConceptShape` (`skos:Concept`) and `ConceptSchemeShape`, and
-another package may ship shapes for gist or BFO. Explore offers a resource a
-form for every node shape whose target class it reaches through
-`rdfs:subClassOf` and opens the page on the first. Without an order the generic
-one can win.
-
-**Treat the upper class as an abstract superclass, and give every node shape of
-a class that specializes it `shacl:order 0`.** The upper ontology's shape is not
-the package's to remove or change, so ordering is the lever. Check with
-`GET /dataplatform/api/explore/resource/nodeshapeforms/byresource` that the
-package's shape is listed first for an instance of each such class.
-
-- Apply it to every subclass of the upper class, not only the one that showed
-  the problem.
-- Inside the package's own vocabulary an abstract superclass simply gets **no**
-  node shape (the `shapes` skill): there the package owns both, so remove
-  instead of ordering.
-- Navigation and views follow the same idea: browse by the package's class or a
-  scheme's top concepts, not by `skos:Concept`, which lists every concept on the
-  instance.
+A package class under `skos:Concept` inherits Corporate Memory's concept form
+(`shacl:ConceptShape`, and `ConceptSchemeShape` for schemes), so its node shape
+gets `shacl:order 0` (the `shapes` skill) - every such class, not only the one
+that showed the problem. Navigation and views follow the same idea: browse by
+the package's class or a scheme's top concepts, not by `skos:Concept`, which
+lists every concept on the instance.
 
 ## Labels and languages
 
@@ -327,10 +311,10 @@ The link from a resource to a concept is curated data, not a build product:
   `shui:GraphTemplate` names a graph of the manifest, or the default of the bootstrap variable that set-up writes into
   it. *Use case: a save lands in the graph the instance really uses, also when
   the package ships that graph empty or not at all.*
-- **Bridge to gist by a link, never by an axiom**: depend on the gist vocabulary
-  package, import it nowhere, and state
+- **Link the categorizing property to gist, do not subclass it**: depend on the
+  gist vocabulary package, import it nowhere, and state
   `<categorizing property> rdfs:seeAlso gist:isCategorizedBy` - no
-  `rdfs:subPropertyOf`, no `rdfs:subClassOf` (the `vocabulary` skill).
+  `rdfs:subPropertyOf` (the `vocabulary` skill).
 - **Keep the scheme IRI apart from the graph IRI** when the graph is a thesaurus
   project.
 - **The categorizing property's range is the package subclass, also for term
