@@ -23,6 +23,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - the **subclass split** in full - one property, one editable row per leaf class of its range, `shacl:class` at the range, one group per split property, a path builder query and a selectable resources query per row, no inline creation, curated links kept in a graph the build does not clear - grilled and measured on the product data demo (2026-10-07)
 - `bin/check_path_builder_queries.py`, run by `check_all.py`: classifies every path builder query row into the seven uses and fails a subclass split whose rows drift from their queries - a missing query, a query not mentioning the path, the leaf as `shacl:class`, `?graph` not bound through `FROM NAMED`/`GRAPH`, rows not sharing one group of their own, or a leaf of the range without a row; warns on inline creation, on a selectable resources query that offers held values, and on the two anti-patterns
 
+- Competency questions: a package states the questions its model has to answer as SPARQL queries in `requirements/questions/`, and `task visualizations` draws each as a Business Knowledge Editor visualisation - the part of the model that answers it, laid out in the order the question asks - into `graphs/competency-questions.ttl`; `task visualizations:check` reports drift (`bin/question_visualizations.py`); the `vocabulary` skill describes both
+
 ### Changed
 
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
