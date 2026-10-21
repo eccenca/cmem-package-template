@@ -97,6 +97,31 @@ Where premises are conjoined, one premise is not *sufficient*; where several
 rules reach the same object, none is *necessary*. What usually survives both
 counts is participation - "contributes to".
 
+## Competency questions, drawn
+
+A package states the questions its model has to answer as competency questions:
+one SPARQL query per file in `requirements/questions/<slug>.rq` (next to the
+package directory, not shipped), its header comment carrying the question as
+it was asked - `# question: Which of our suppliers sit in a country we flag?`.
+*Whoever changes the model sees which questions it still answers, and a
+customer signs off a model as the answer to their own questions.*
+
+After changing a question, a class or a property, run `task visualizations`.
+It writes one Business Knowledge Editor visualisation per question into
+`graphs/competency-questions.ttl` (declared in the manifest): the part of the
+model that answers it, named after the question.
+
+- The BKE draws properties as boxes too, so the drawing follows the query left
+  to right: subject class, property box, object class, next property; a
+  property path `a/b` is two steps, a second pattern on the same variable
+  starts a row below.
+- The boxes are the classes and properties the query names, plus each
+  property's domain and range, so every box is connected. A question that
+  names no term of the vocabulary gets no drawing, and the check says so.
+- Positions are never placed by hand: `task visualizations:check` reports a
+  drawing that no longer matches its question or the vocabulary. A hand-made
+  visualisation goes into a graph of its own.
+
 ## Going further
 
 - `references/depictions.md` - the `foaf:depiction` icon every class wants, and
