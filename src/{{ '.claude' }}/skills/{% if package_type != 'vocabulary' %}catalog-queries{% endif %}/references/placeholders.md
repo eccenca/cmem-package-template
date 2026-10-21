@@ -18,21 +18,16 @@ not put one in `https://ns.eccenca.com/data/queries/`, which is Corporate
 Memory's system catalog, where its own `graph` placeholder lives marked
 `shui:isSystemResource true`.
 
-## `shuiResource` and `shuiMainResource` are not the same
+## Use `{{shuiResource}}`, never `{{shuiMainResource}}`
 
-Both name "the resource this is rendered for", and in most cases they resolve
-to the same IRI - which is exactly why the wrong one survives until somebody
-nests the shape.
+`{{shuiResource}}` is the resource the form or widget is rendered for. Inside a
+nested form it follows the nesting and names whatever that level is about - which
+is what a query on that level wants. `{{shuiMainResource}}` is deprecated: don't
+use it.
 
-- **`{{shuiResource}}` is the one to use normally.** It refers to the resource
-  being rendered in the *immediate* sub-shape, so inside a nested form it
-  follows the nesting and names whatever that level is about.
-- **`{{shuiMainResource}}` keeps a stable reference to the top-level origin
-  resource** of the entire structure, whatever depth the query runs at. Widgets
-  use it, because a widget reports on the page rather than on a level.
-
-Reach for `shuiMainResource` only where the query genuinely needs the origin
-rather than the current level, and say so in its `dcterms:description`.
+A widget follows the same rule: on an embedded node shape it reports on the
+embedded resource, so a widget about the page's own resource goes on the page's
+own node shape (the `shapes` skill, *widgets*).
 
 ## Declaring a built-in key does not hijack it
 

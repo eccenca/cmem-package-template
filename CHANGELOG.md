@@ -48,6 +48,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - **a package that already replaced `LICENSE` by hand** (a W3C or CC BY 1.0 mirror, say) answers its identifier on the next update and gets a conflict in `LICENSE` once: keep its own text
   - **a package whose `license` answer was dropped** by an update to a release without the question (seen on 1.8.0) is asked again, and the default would switch it back; answer the identifier in its manifest
   - `LicenseRef-scancode-unknown` makes an internal package: no `LICENSE`, no manifest entry for it; an update to that answer deletes the root `LICENSE` but leaves the package directory's `LICENSE` link behind - delete it
+- `catalog-queries` and `shapes` drop `{{shuiMainResource}}`: always `{{shuiResource}}`, and a widget about the page's own resource sits on the page's own node shape
 - the strip rule in `shapes/references/validation.md` keeps the subclass split and the enriched stored relation: their path is honest, and a split row's qualified value shape counts would otherwise never be checked
 - `shapes/references/paths.md` names the subclass split as the intended subset, not the "they differ" fault
 - `catalog-queries` names the three query roles - path builder query, selectable resources query, placeholder values query - and drops "value query", which meant two things; `check_placeholders.py` reports in the same terms
