@@ -19,6 +19,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - every build project carries the package's tag and its role (`bootstrap`, `demo` or `operational`) as project tags, so the workbench groups a package's projects and tells them apart
   - every build project carries the project tag `from-repository` and says in its description that the next `task import` replaces it, so people sharing a workspace with an agent see which projects an import overwrites
 
+- `shapes` gained `references/path-builder-queries.md`: the seven uses of a path builder query (subclass split, enriched stored relation, derived shortcut, back-link listing, read-only split, and the catalogued anti-patterns computed link and embedded widget), each with its row, query, validation treatment and `?graph` handling
+  - the **subclass split** in full - one property, one editable row per leaf class of its range, `shacl:class` at the range, one group per split property, a path builder query and a selectable resources query per row, no inline creation, curated links kept in a graph the build does not clear - grilled and measured on the product data demo (2026-10-07)
+- `bin/check_path_builder_queries.py`, run by `check_all.py`: classifies every path builder query row into the seven uses and fails a subclass split whose rows drift from their queries - a missing query, a query not mentioning the path, the leaf as `shacl:class`, `?graph` not bound through `FROM NAMED`/`GRAPH`, rows not sharing one group of their own, or a leaf of the range without a row; warns on inline creation, on a selectable resources query that offers held values, and on the two anti-patterns
+
 ### Changed
 
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
@@ -44,6 +48,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - **a package that already replaced `LICENSE` by hand** (a W3C or CC BY 1.0 mirror, say) answers its identifier on the next update and gets a conflict in `LICENSE` once: keep its own text
   - **a package whose `license` answer was dropped** by an update to a release without the question (seen on 1.8.0) is asked again, and the default would switch it back; answer the identifier in its manifest
   - `LicenseRef-scancode-unknown` makes an internal package: no `LICENSE`, no manifest entry for it; an update to that answer deletes the root `LICENSE` but leaves the package directory's `LICENSE` link behind - delete it
+- the strip rule in `shapes/references/validation.md` keeps the subclass split and the enriched stored relation: their path is honest, and a split row's qualified value shape counts would otherwise never be checked
+- `shapes/references/paths.md` names the subclass split as the intended subset, not the "they differ" fault
+- `catalog-queries` names the three query roles - path builder query, selectable resources query, placeholder values query - and drops "value query", which meant two things; `check_placeholders.py` reports in the same terms
+- `catalog-queries` limits "no markup datatype is honoured" to extra columns: a value column typed `sysont:Markdown` renders as markup (checked in the browser)
+- `scripts/check-offline.py` matches a checker's verdict by name, not by column width (the summary pads names to the longest checker)
 
 ## [1.8.0] 2026-10-18
 
@@ -61,17 +70,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - Every Python script a generated package ships - the hooks in `.claude/hooks/` and the checkers in `bin/` - is a PEP 723 script with a `uv run --script` shebang and is run by path, so [uv](https://docs.astral.sh/uv/) is now a prerequisite for working in a generated package with Claude Code - without it the hooks stay silent rather than block, so the skill reminders and the template feedback are simply missing; `task check:offline` calls `bin/check_all.py` by path, and `check_all.py` calls each checker the same way
 - `task check:offline` stops with an install hint when uv is missing, and a checker that cannot be run fails with one line instead of a traceback
 - `task import` runs the offline checks before it uninstalls the installed package, so a failed check leaves the instance as it was
-- `shapes` gained `references/path-builder-queries.md`: the seven uses of a path builder query (subclass split, enriched stored relation, derived shortcut, back-link listing, read-only split, and the catalogued anti-patterns computed link and embedded widget), each with its row, query, validation treatment and `?graph` handling
-  - the **subclass split** in full - one property, one editable row per leaf class of its range, `shacl:class` at the range, one group per split property, a path builder query and a selectable resources query per row, no inline creation, curated links kept in a graph the build does not clear - grilled and measured on the product data demo (2026-10-07)
-- `bin/check_path_builder_queries.py`, run by `check_all.py`: classifies every path builder query row into the seven uses and fails a subclass split whose rows drift from their queries - a missing query, a query not mentioning the path, the leaf as `shacl:class`, `?graph` not bound through `FROM NAMED`/`GRAPH`, rows not sharing one group of their own, or a leaf of the range without a row; warns on inline creation, on a selectable resources query that offers held values, and on the two anti-patterns
-
-### Changed
-
-- the strip rule in `shapes/references/validation.md` keeps the subclass split and the enriched stored relation: their path is honest, and a split row's qualified value shape counts would otherwise never be checked
-- `shapes/references/paths.md` names the subclass split as the intended subset, not the "they differ" fault
-- `catalog-queries` names the three query roles - path builder query, selectable resources query, placeholder values query - and drops "value query", which meant two things; `check_placeholders.py` reports in the same terms
-- `catalog-queries` limits "no markup datatype is honoured" to extra columns: a value column typed `sysont:Markdown` renders as markup (checked in the browser)
-- `scripts/check-offline.py` matches a checker's verdict by name, not by column width (the summary pads names to the longest checker)
 
 ## [1.7.0] 2026-10-06
 
