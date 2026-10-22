@@ -1,0 +1,18 @@
+{
+  "package_id": "fixture-visualizations",
+  "files": [
+    {
+      "file_type": "graph",
+      "file_path": "graphs/vocab.ttl",
+      "graph_iri": "https://example.com/fixture/",
+      "register_as_vocabulary": true
+    },
+    {
+      "file_path": "graphs/competency-questions.ttl",
+      "file_type": "graph",
+      "graph_iri": "https://example.com/fixture/competency-questions/",
+      "import_into": [],
+      "register_as_vocabulary": false
+    }
+  ]
+}

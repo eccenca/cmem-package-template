@@ -111,13 +111,65 @@ It writes one Business Knowledge Editor visualisation per question into
 `graphs/competency-questions.ttl` (declared in the manifest): the part of the
 model that answers it, named after the question.
 
-- The BKE draws properties as boxes too, so the drawing follows the query left
-  to right: subject class, property box, object class, next property; a
-  property path `a/b` is two steps, a second pattern on the same variable
-  starts a row below.
+Each relation reads as an L: its box in the row of the class it leaves from,
+right beside it, and the class it leads to in the box's column, above or
+below. Where the two classes are already aligned, the box sits on the line
+between them, and several relations between the same two classes stand stacked
+across it. *A reader follows each relation along one short edge and one
+straight drop, the way the model's author would sketch it.* A class's
+attributes (datatype properties) sit on its left, one below the other - on the
+first free side of below, right and above where an edge arrives on the left,
+never above a class with a parent - closer to it than any of its relations.
+*Closeness reads as belonging: a class and its attributes are one unit, the
+relations connect units.* The BKE places the datatypes itself and marks them
+as not declared in the vocabulary, which is true.
+
+Where these meet, a higher rule decides, so a reader of a drawing can tell why
+each box sits where it does:
+
+0. **No edge across the drawing**: a relation box at most three columns from
+   the class it leaves from, the class it leads to at most one column beside
+   it, and no edge longer than that across or down. *An edge across the whole
+   picture reads as badly as a crossing.*
+1. **Nothing crosses**: no edge through a box or a label, no label on a box or
+   another label, no two edges leaving a box together, no box on a box. The
+   BKE draws each edge as a curve with its label in the middle; the check takes
+   the straight line. A crossing no placement avoids is named by the check.
+2. **Hierarchies run top-down**, parent above child: a superclass above its
+   subclass, and every relation the vocabulary marks as a tree -
+   `rdfs:subClassOf`, `skos:broader`, a transitive part-of, a property linked by
+   `rdfs:seeAlso` to `gist:isPartOf`, `gist:isMemberOf` or
+   `gist:isCategorizedBy` - with its box on the line between parent and child,
+   whichever way the query reads it. Every level between a class and a
+   superclass is drawn. A step between instances of one class -
+   `?c skos:broader* ?parent` within a taxonomy - gets no box: the drawing
+   shows the model, the visualisation's description names the walk, and the
+   application view shows the tree.
+3. **The L**, as above.
+4. **One parent straight above.** A class with several parents in the drawing
+   has one bound parent directly above it - the hierarchy the question asks
+   about (member of, part of) before `rdfs:subClassOf` - and the others reach it
+   by an angled edge. The L ranks higher: a class the question reaches by a
+   relation hangs below that relation, and its `rdfs:subClassOf` runs angled.
+5. **A parent centred** over its bound children.
+6. **The question's first class top left**, where nothing above decides; the
+   same question always gives the same drawing.
+7. **The shortest edges.**
+
 - The boxes are the classes and properties the query names, plus each
-  property's domain and range, so every box is connected. A question that
-  names no term of the vocabulary gets no drawing, and the check says so.
+  property's declared domain and range, so every box is connected: where the
+  query names a subclass (`?x a :Hardware ; :hasSupplier ?s` with the property
+  declared on `:Product`), the declared class sits above it and the BKE draws
+  the `rdfs:subClassOf` link. A question that names no term of the vocabulary
+  gets no drawing, and the check says so.
+- **Open a drawing** for whoever reviews it in the Business Knowledge Editor
+  with one link per visualisation, so nobody searches for it by name:
+  `https://<host>/<view>/bke/viz?graph=<context graph>&vizIri=<visualisation IRI>&catalogGraphIri=<graph holding the visualisations>`,
+  each IRI URL-encoded - `graph` is the visualisation's `shui:hasContextGraph`
+  (the vocabulary), `catalogGraphIri` the competency-questions graph, and
+  `<view>` an application view of the instance. *A reviewer judges a drawing
+  only in the BKE; the Explore page of the same IRI shows its triples, not the
+  drawing.*
 - Positions are never placed by hand: `task visualizations:check` reports a
   drawing that no longer matches its question or the vocabulary. A hand-made
   visualisation goes into a graph of its own.

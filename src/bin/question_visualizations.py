@@ -17,29 +17,38 @@ positions are all this script decides:
 
 - the terms are the classes the query states (`?x a <Class>`) and the properties it uses, plus each
   property's domain and range class, so every box is connected;
-- the layout follows the query: its triple patterns in the order written, left to right - subject class,
-  property box, object class, next property (a property path `a/b` is two steps); a second pattern on
-  the same variable starts a row below; a datatype property ends its row;
-- a term is placed once; positions are fixed by the query, so the output only changes when a question
-  or the vocabulary does.
+- the rules, in order (the vocabulary skill's "Competency questions, drawn" explains them): 0 no edge
+  across the drawing - a relation within three columns of its class; 1 nothing crosses - faults()
+  counts edges through boxes and labels, labels on boxes, edges leaving a box together, boxes on
+  boxes; 2 hierarchies top-down, a hierarchy property on the line between parent and child, a walk
+  within one class named instead of drawn; 3 the L - a relation box in its domain's row, its range
+  class in the box's column, on the line where the two are aligned; 4 one bound parent straight
+  above; 5 a parent centred over its bound children; 6 the question's first class top left; 7 the
+  shortest edges. Attributes sit on their class's free side, left first, closer than any relation.
+  layered() searches the class positions for the placement that keeps them best in this order,
+  starting once from each class, and derives each relation box from its two classes;
+- positions are fixed by the query, so the output only changes when a question or the vocabulary does.
 
 The visualisation's context graph is the vocabulary the manifest registers that defines most of the
 question's terms. --write also declares the graph in cpa-manifest.json when it is missing; --check
-writes nothing and exits 1 when the graph is missing, stale or undeclared, or a question names no
-vocabulary term. A hand-made visualisation belongs in a graph of its own: this script owns the file.
+writes nothing and exits 1 when the graph is missing, stale or undeclared, a question names no
+vocabulary term, or a drawing keeps a fault no placement avoids. A hand-made visualisation belongs in a
+graph of its own: this script owns the file.
 """
 import hashlib
+import math
 import json
 import re
 import sys
 from pathlib import Path
 
 from rdflib import OWL, RDF, RDFS, Graph, URIRef, Variable
-from rdflib.paths import InvPath, SequencePath
+from rdflib.paths import InvPath, MulPath, SequencePath
 from rdflib.plugins.sparql import prepareQuery
 
 SHUI = "https://vocab.eccenca.com/shui/"
-COL, ROW = 320, 110  # px between columns and rows
+COL, ROW = 380, 60  # px from a class to its attribute (a box of 240 px plus an edge label) and per half row: the
+# BKE's Bezier curves and their labels need that much room between boxes
 QUESTIONS = Path("requirements") / "questions"
 OUTPUT = "graphs/competency-questions.ttl"
 
@@ -75,9 +84,35 @@ def steps(triples) -> list[tuple]:
                 out += steps([(nodes[i], part, nodes[i + 1])])
         elif isinstance(p, InvPath):
             out += steps([(o, p.arg, s)])
+        elif isinstance(p, MulPath):  # p* / p+ / p?: drawn like one step of p
+            out += steps([(s, p.path, o)])
         elif isinstance(p, URIRef):
             out.append((s, p, o))
     return out
+
+
+SKOS = "http://www.w3.org/2004/02/skos/core#"
+GIST = "https://w3id.org/semanticarts/ns/ontology/gist/"
+# Properties whose object is the parent (drawn above) or the child (drawn below) in a hierarchy.
+UP = {str(RDFS.subClassOf), SKOS + "broader", SKOS + "broaderTransitive", GIST + "isPartOf", GIST + "isMemberOf",
+      GIST + "isCategorizedBy"}
+DOWN = {SKOS + "narrower", SKOS + "narrowerTransitive", GIST + "hasPart", GIST + "hasMember"}
+
+
+def hierarchy(prop: URIRef, vocab: Graph) -> str | None:
+    """'up' when the property's object is the parent, 'down' when it is the child, None otherwise."""
+    if str(prop) in UP:
+        return "up"
+    if str(prop) in DOWN:
+        return "down"
+    linked = {str(o) for o in vocab.objects(prop, RDFS.seeAlso)} | {str(o) for o in vocab.objects(prop, RDFS.subPropertyOf)}
+    if linked & UP:
+        return "up"
+    if linked & DOWN:
+        return "down"
+    if (prop, RDF.type, OWL.TransitiveProperty) in vocab:
+        return "up"  # a transitive relation in a vocabulary is a part-of or broader-than: its object is the whole
+    return None
 
 
 def written_at(query: str, term: URIRef) -> int:
@@ -91,8 +126,11 @@ def written_at(query: str, term: URIRef) -> int:
     return min(spots) if spots else len(query)
 
 
-def layout(query: str, vocab: Graph) -> list[tuple[URIRef, int, int]]:
+def model(query: str, vocab: Graph):
+    """What a question draws: classes, relations (source, property, range class), hierarchy relations
+    (parent, property, child), subclass links between drawn classes, each class's attributes, notes."""
     algebra = prepareQuery(query).algebra
+
     def first_iri(path):
         while isinstance(path, (SequencePath, InvPath)):
             path = path.args[0] if isinstance(path, SequencePath) else path.arg
@@ -101,51 +139,450 @@ def layout(query: str, vocab: Graph) -> list[tuple[URIRef, int, int]]:
     patterns = bgp_triples(algebra)
     ordered = sorted(patterns, key=lambda t: (written_at(query, first_iri(t[1])) if first_iri(t[1]) is not None else len(query),
                                               patterns.index(t)))
-    all_steps = steps(ordered)  # a path's steps stay together, in the order the query writes the paths
+    all_steps = steps(ordered)
     typed = {s: o for s, p, o in all_steps if p == RDF.type and isinstance(o, URIRef)}
     datatype = set(vocab.subjects(RDF.type, OWL.DatatypeProperty))
+
+    def declared(prop, end):
+        found = [c for c in vocab.objects(prop, end) if isinstance(c, URIRef)]
+        return found[0] if len(found) == 1 else None
 
     def cls(node, prop, end):
         if isinstance(node, URIRef):
             return node
-        if node in typed:
-            return typed[node]
-        found = [c for c in vocab.objects(prop, end) if isinstance(c, URIRef)]
-        return found[0] if len(found) == 1 else None
+        return typed.get(node) or declared(prop, end)
 
-    placed: dict[URIRef, tuple[int, int]] = {}
-    var_pos: dict = {}
-    next_row = 0
+    def path_up(sub, sup):
+        """The superclasses from sub up to sup, nearest first; None when sub is no subclass of sup."""
+        paths = [[sub]]
+        while paths:
+            path = paths.pop(0)
+            for nxt in vocab.objects(path[-1], RDFS.subClassOf):
+                if nxt == sup:
+                    return path[1:] + [nxt]
+                if isinstance(nxt, URIRef) and nxt not in path and len(path) < 8:
+                    paths.append(path + [nxt])
+        return None
 
-    def put(term, col, row):
-        if term is not None and term not in placed:
-            placed[term] = (col, row)
+    def label_of(term):
+        labels = [str(l) for l in vocab.objects(term, RDFS.label) if getattr(l, "language", None) in ("en", None)]
+        return labels[0] if labels else str(term).rsplit("/", 1)[-1].rsplit("#", 1)[-1]
+
+    classes: list = []
+    subs: list = []  # (superclass, subclass), direct
+    rels: list = []  # (source class, property, range class)
+    hrels: list = []  # (parent, property, child)
+    attrs: dict = {}
+    notes: list = []
+
+    def add(c):
+        if c is not None and c not in classes:
+            classes.append(c)
+
+    def link(sub, sup):
+        """sub and every level up to sup drawn, each direct subclass link once."""
+        chain = path_up(sub, sup) or []
+        add(sub)
+        below = sub
+        for c in chain:
+            add(c)
+            if (c, below) not in subs:
+                subs.append((c, below))
+            below = c
+
+    def lifted(c, decl):
+        """A property declared on a superclass of the class the query names leaves from that superclass."""
+        if c is not None and decl is not None and c != decl and path_up(c, decl) is not None:
+            link(c, decl)
+            return decl
+        return c if c is not None else decl
 
     for s, p, o in all_steps:
         if p == RDF.type:
+            if isinstance(o, URIRef):
+                add(o)
             continue
-        if s in var_pos:
-            col, row = var_pos[s]
-            if var_pos.get(("used", s)):
-                row = next_row  # a second pattern on the same subject: a row below
-            var_pos[("used", s)] = True
+        s_cls = cls(s, p, RDFS.domain)
+        if p in datatype:
+            owner = lifted(s_cls, declared(p, RDFS.domain))
+            if owner is not None:
+                add(owner)
+                if p not in attrs.setdefault(owner, []):
+                    attrs[owner].append(p)
+            continue
+        o_cls = cls(o, p, RDFS.range)
+        direction = hierarchy(p, vocab)
+        if direction is not None:
+            s_cls = lifted(s_cls, declared(p, RDFS.domain))
+            o_cls = lifted(o_cls, declared(p, RDFS.range))
+            parent, child = (o_cls, s_cls) if direction == "up" else (s_cls, o_cls)
+            if parent is None or child is None or parent == child:
+                of = parent or child
+                what = f"the {label_of(of)} hierarchy" if of is not None else "a hierarchy"
+                note = f"also walks {what} ({p.n3(vocab.namespace_manager)})"
+                if note not in notes:
+                    notes.append(note)
+                continue
+            add(parent), add(child)
+            if all(h[1] != p for h in hrels):
+                hrels.append((parent, p, child))
+            continue
+        src = lifted(s_cls, declared(p, RDFS.domain))
+        tgt = lifted(o_cls, declared(p, RDFS.range))
+        add(src), add(tgt)
+        if all(r[1] != p for r in rels) and (src is not None or tgt is not None):
+            rels.append((src, p, tgt))
+    for c in list(classes):  # drawn classes related through the hierarchy: every level between them
+        for a in list(classes):
+            if a != c and path_up(c, a) is not None:
+                link(c, a)
+    return classes, subs, rels, hrels, attrs, notes
+
+
+SX = 570  # px per placement column: a box (240), a relation's domain edge (330, Q203) - classes and relations sit on it
+W, H = 240, 36  # a BKE box
+LW, LH = 118, 26  # the label the BKE puts in the middle of every edge
+
+
+def drawn_edges(terms, vocab: Graph) -> list[tuple]:
+    """The edges the BKE draws between placed terms: domain, range, subClassOf."""
+    return [(t, o) for t in terms for pred in (RDFS.domain, RDFS.range, RDFS.subClassOf)
+            for o in vocab.objects(t, pred) if o in terms and o != t]
+
+
+def _seg_rect(x1, y1, x2, y2, l, t, r, b) -> bool:
+    """Whether the segment passes through the open rectangle (Liang-Barsky)."""
+    dx, dy = x2 - x1, y2 - y1
+    lo, hi = 0.0, 1.0
+    for p, q in ((-dx, x1 - l), (dx, r - x1), (-dy, y1 - t), (dy, b - y1)):
+        if p == 0:
+            if q <= 0:
+                return False
         else:
-            col, row = 0, next_row
-            var_pos[s] = (col, row)
-            var_pos[("used", s)] = True
-            put(cls(s, p, RDFS.domain), col, row)
-        put(p, col + 1, row)
-        next_row = max(next_row, row + 1)
-        if p in datatype or (o not in var_pos and not isinstance(o, (Variable, URIRef))):
-            continue
-        if o not in var_pos:
-            var_pos[o] = (col + 2, row)
-        put(cls(o, p, RDFS.range), *var_pos[o])
-    for c in typed.values():  # a class the query types but never reaches through a property
-        if c not in placed:
-            put(c, 0, next_row)
-            next_row += 1
-    return [(t, x * COL, y * ROW) for t, (x, y) in placed.items()]
+            u = q / p
+            if p < 0:
+                lo = max(lo, u)
+            else:
+                hi = min(hi, u)
+            if lo >= hi:
+                return False
+    return True
+
+
+def _cross(p1, p2, p3, p4) -> bool:
+    d = lambda a, b, c: (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])
+    return d(p3, p4, p1) * d(p3, p4, p2) < 0 and d(p1, p2, p3) * d(p1, p2, p4) < 0
+
+
+def faults(pos: dict, edges: list, limit: float = float("inf")) -> list[str]:
+    """Rule 1 on a drawing: an edge through a box or a label, a label on a box or a label, two edges
+    crossing, a box on a box. Each curve is taken as its chord; stops after `limit` findings."""
+    short = lambda t: str(t).rsplit("/", 1)[-1].rsplit("#", 1)[-1]
+    centre = {t: (x + W / 2, y + H / 2) for t, (x, y) in pos.items()}
+    boxes = list(pos.items())
+    labels = [((a, b), ((centre[a][0] + centre[b][0]) / 2, (centre[a][1] + centre[b][1]) / 2)) for a, b in edges]
+    found = []
+
+    def add(text):
+        found.append(text)
+        return len(found) >= limit
+
+    for i, (s, (sx, sy)) in enumerate(boxes):
+        for t, (tx, ty) in boxes[i + 1:]:
+            if abs(sx - tx) < W - 4 and abs(sy - ty) < H + 4:
+                if add(f"{short(s)} on {short(t)}"):
+                    return found
+    for a, b in edges:
+        (x1, y1), (x2, y2) = centre[a], centre[b]
+        for t, (bx, by) in boxes:
+            if t not in (a, b) and _seg_rect(x1, y1, x2, y2, bx + 4, by + 2, bx + W - 4, by + H - 2):
+                if add(f"{short(a)} -> {short(b)} passes {short(t)}"):
+                    return found
+    for (a, b), (lx, ly) in labels:
+        for t, (bx, by) in boxes:
+            if abs(lx - (bx + W / 2)) < (LW + W) / 2 - 4 and abs(ly - (by + H / 2)) < (LH + H) / 2 - 2:
+                if add(f"label of {short(a)} -> {short(b)} on {short(t)}"):
+                    return found
+    for i, ((a, b), (lx, ly)) in enumerate(labels):
+        for (c, d), (mx, my) in labels[i + 1:]:
+            if abs(lx - mx) < LW - 4 and abs(ly - my) < LH - 2:
+                if add(f"label of {short(a)} -> {short(b)} on label of {short(c)} -> {short(d)}"):
+                    return found
+    for a, b in edges:
+        (x1, y1), (x2, y2) = centre[a], centre[b]
+        for (c, d), (lx, ly) in labels:
+            if {a, b} != {c, d} and _seg_rect(x1, y1, x2, y2, lx - LW / 2 + 4, ly - LH / 2 + 2, lx + LW / 2 - 4, ly + LH / 2 - 2):
+                if add(f"{short(a)} -> {short(b)} passes the label of {short(c)} -> {short(d)}"):
+                    return found
+    for i, (a, b) in enumerate(edges):
+        for c, d in edges[i + 1:]:
+            shared = {a, b} & {c, d}
+            if len(shared) == 1:  # two edges leaving one box almost together read as one
+                o = shared.pop()
+                u, v = (b if a == o else a), (d if c == o else c)
+                ang = lambda q: math.atan2(centre[q][1] - centre[o][1], centre[q][0] - centre[o][0])
+                diff = abs((ang(u) - ang(v) + math.pi) % (2 * math.pi) - math.pi)
+                if diff < math.radians(4):
+                    if add(f"{short(a)} -> {short(b)} runs along {short(c)} -> {short(d)}"):
+                        return found
+            if not {a, b} & {c, d} and _cross(centre[a], centre[b], centre[c], centre[d]):
+                if add(f"{short(a)} -> {short(b)} crosses {short(c)} -> {short(d)}"):
+                    return found
+    return found
+
+
+def crossings(placements, vocab: Graph) -> list[str]:
+    """Rule 1 faults of a finished drawing, its edges taken from the vocabulary as the BKE takes them."""
+    pos = {t: (x, y) for t, x, y in placements}
+    return faults(pos, drawn_edges(pos, vocab))
+
+
+def gap(a, b) -> float:
+    """The visible length of an edge between two boxes placed at a and b (top left corners)."""
+    gx, gy = max(0.0, abs(a[0] - b[0]) - W), max(0.0, abs(a[1] - b[1]) - H)
+    return (gx * gx + gy * gy) ** 0.5
+
+
+def layered(query: str, vocab: Graph):
+    """The drawing (Q211): the classes searched on a grid of SX x ROW for the placement that keeps the
+    rules best in their order; each relation box derived from its two classes - on the line where they
+    are aligned, at the corner of the L otherwise (Q210); attributes on their class's free side (Q202).
+    Returns (term, x, y) in BKE units, the notes and warnings."""
+    classes, subs, rels, hrels, attrs, notes = model(query, vocab)
+    hier = {p for _, p, _ in hrels}
+    rels = [(s, p, t) for s, p, t in rels if p not in hier]
+    bound = {}  # Q197: one bound parent per class - the hierarchy the question asks about first
+    for parent, p, child in hrels:
+        bound.setdefault(child, (parent, p))
+    for sup, sub in subs:
+        bound.setdefault(sub, (sup, None))
+    kids_of = {}
+    for child, (parent, _) in bound.items():
+        kids_of.setdefault(parent, []).append(child)
+    has_parent = set(bound)
+    bundle = {}  # relations between the same two classes, stacked across their line
+    for s, p, t in rels:
+        bundle.setdefault(frozenset((s, t)), []).append(p)
+    attr_of = {a: c for c in attrs for a in attrs[c]}
+    terms = set(classes) | {p for _, p, _ in rels} | hier | set(attr_of)
+    edges = drawn_edges(terms, vocab)
+    start = classes[0] if classes else None
+    links = [(s, p, t) for s, p, t in rels] + [(child, p, parent) for parent, p, child in hrels]
+
+    def sign(v):
+        return (v > 0) - (v < 0)
+
+    def candidates(s, p, t, g):
+        """Cells for a relation box, preferred first."""
+        if s is None or t is None:
+            c = g[s if s is not None else t]
+            return [(c[0] + 1, c[1]), (c[0] - 1, c[1]), (c[0], c[1] + 4), (c[0], c[1] - 4)]
+        (dx, dy), (rx, ry) = g[s], g[t]
+        out = []
+        if p in hier:
+            if dx == rx:
+                out.append((dx, (dy + ry) // 2))
+            out += [(rx, dy), (dx, ry)]
+        elif dy == ry and abs(rx - dx) >= 2:
+            mid = dx + sign(rx - dx) * (abs(rx - dx) // 2)
+            out += [(mid, dy + o) for o in (0, -1, 1, -2, 2)]
+        elif dx == rx and abs(ry - dy) >= 4:
+            out.append((dx, (dy + ry) // 2))
+        if rx != dx:
+            out.append((rx, dy))  # the corner of the L: in the domain's row, the range class below or above
+        side = sign(rx - dx) or 1
+        out += [(dx + side, dy), (dx - side, dy), (dx + 2 * side, dy), (dx + side, dy + 2), (dx + side, dy - 2)]
+        return out
+
+    def boxes(g, choice):
+        """Each relation box on its first free candidate cell (or the one `choice` picks)."""
+        taken = {(x, y + o) for x, y in g.values() for o in (-1, 0, 1)}
+        cells = {}
+        for s, p, t in links:
+            cands = [c for c in candidates(s, p, t, g) if c not in taken]
+            if not cands:
+                cands = candidates(s, p, t, g)
+            cell = cands[min(choice.get(p, 0), len(cands) - 1)]
+            cells[p] = cell
+            taken |= {(cell[0], cell[1] + o) for o in (-1, 0, 1)} if p not in sum(bundle.values(), []) else {cell}
+        return cells
+
+    def place(g, cells):
+        """Grid cells -> BKE positions, the attributes added on their class's free side (Q202)."""
+        grid = {**g, **cells}
+        pos = {n: (gx * SX, gy * ROW) for n, (gx, gy) in grid.items()}
+        for c, its in attrs.items():
+            if c not in pos:
+                continue
+            x, y = pos[c]
+            used = set()
+            for a, b in edges:
+                if c in (a, b) and a not in attr_of and b not in attr_of:
+                    ox, oy = pos[b if a == c else a]
+                    used.add(("left" if ox < x else "right") if abs(oy - y) < 90 else ("above" if oy < y else "below"))
+            free = [s for s in ("left", "below", "right", "above") if s not in used and (s != "above" or c not in has_parent)]
+            side = free[0] if free else "left"
+            n = len(its)
+            for i, a in enumerate(its):
+                pos[a] = {"left": (x - COL, y + i * ROW), "right": (x + COL, y + i * ROW),
+                          "below": (x + round((i - (n - 1) / 2) * COL), y + 2 * ROW),
+                          "above": (x + round((i - (n - 1) / 2) * COL), y - 2 * ROW)}[side]
+        return pos
+
+    def on_line(b, d, r):
+        """Q210: the box on the line between two aligned classes, or at the corner of the L."""
+        (bx, by), (dx, dy), (rx, ry) = b, d, r
+        if dy == ry and min(dx, rx) < bx < max(dx, rx) and abs(by - dy) <= 2:
+            return True
+        if dx == rx and bx == dx and min(dy, ry) < by < max(dy, ry):
+            return True
+        return by == dy and bx == rx and bx != dx
+
+    def cost(g, choice, best=None):
+        """The rules of Q211 as a tuple, compared in order; None as soon as it cannot beat `best`."""
+        out = []
+
+        def worse(value):
+            out.append(value)
+            return best is not None and tuple(out) > tuple(best[:len(out)])
+
+        cells = boxes(g, choice)
+        grid = {**g, **cells}
+        # 0 range (Q198): a box at most three columns from its domain, its range class one column beside it
+        # - and no edge longer than that, across or down: an edge across the whole drawing reads as badly as a crossing
+        far = sum(1 for s, p, t in rels if s is not None and abs(grid[p][0] - g[s][0]) * SX > 3 * COL)
+        far += sum(1 for s, p, t in rels if t is not None and abs(grid[p][0] - g[t][0]) > 1)
+        far += sum(1 for a, b in edges if a in grid and b in grid and
+                   (abs(grid[a][0] - grid[b][0]) * SX > 3 * COL or abs(grid[a][1] - grid[b][1]) > 8))
+        if worse(far):
+            return None
+        pos = place(g, cells)
+        within = best is not None and out[0] == best[0]
+        found = faults(pos, edges, best[1] + 1 if within else float("inf"))
+        for c, its in attrs.items():  # Q203: an attribute's edge shorter than every relation edge of its class
+            if c in pos and its:
+                rel = [gap(pos[c], pos[p]) for s, p, t in links if c in (s, t)]
+                if rel and min(rel) <= max(gap(pos[c], pos[a]) for a in its):
+                    found.append(f"an attribute of {c} as far from it as a relation")
+        if worse(len(found)):
+            return None
+        # 2 hierarchy top-down
+        upside = sum(1 for sup, sub in subs if g[sup][1] >= g[sub][1])
+        upside += sum(1 for parent, p, child in hrels if not g[parent][1] < g[child][1])
+        if worse(upside):
+            return None
+        # 3 the L (Q210)
+        bent = sum(1 for s, p, t in links if s is not None and t is not None and not on_line(grid[p], g[s], g[t]))
+        if worse(bent):
+            return None
+        # 4 one bound parent straight above (Q197), 5 centred over several bound children
+        loose = sum(abs(g[parent][0] - g[child][0]) for child, (parent, _) in bound.items() if len(kids_of[parent]) == 1)
+        if worse(loose):
+            return None
+        off = sum(abs(g[parent][0] - sum(g[k][0] for k in kids) / len(kids)) for parent, kids in kids_of.items() if len(kids) > 1)
+        if worse(off):
+            return None
+        # 6 the starting class top left (Q206), 7 the shortest edges
+        top, left = min(y for _, y in grid.values()), min(x for x, _ in grid.values())
+        if worse((g[start][1] - top, g[start][0] - left) if start else (0, 0)):
+            return None
+        out.append(round(sum(gap(pos[a], pos[b]) for a, b in edges)))
+        return tuple(out)
+
+    # first drawings the way the user draws one: from the starting class, each relation beside its
+    # domain with its range class below the box (or, for a bundle, beside it), each superclass above
+    def first(root, across):
+        g, taken = {}, set()
+
+        def put(n, cell):
+            x, y = cell
+            while (x, y) in taken:
+                x += 1
+            g[n] = (x, y)
+            taken.update({(x, y), (x + 1, y)})
+
+        todo = [root] + [c for c in classes if c != root]
+        while todo:
+            c = todo.pop(0)
+            if c not in g:
+                put(c, (0, 0) if not g else (max(x for x, _ in g.values()) + 2, 0))
+            cx, cy = g[c]
+            for sup, sub in subs:
+                if sub == c and sup not in g:
+                    put(sup, (cx, cy - 4))
+                if sup == c and sub not in g:
+                    put(sub, (cx, cy + 4))
+            for parent, p, child in hrels:
+                if child == c and parent not in g:
+                    put(parent, (cx, cy - 8))
+                if parent == c and child not in g:
+                    put(child, (cx, cy + 8))
+            for s, p, t in rels:
+                if s == c and t is not None and t not in g:
+                    put(t, (cx + 2, cy) if across or len(bundle[frozenset((s, t))]) > 1 else (cx + 1, cy + 4))
+                if t == c and s is not None and s not in g:
+                    put(s, (cx - 1, cy - 4))
+            todo.sort(key=lambda n: n not in g)
+        return g
+
+    def improve(g, choice, best):
+        for _ in range(12):
+            improved = False
+            for n in classes:  # one class at a time
+                for dx in range(-4, 5):
+                    for dy in range(-12, 13, 2):
+                        if dx == dy == 0:
+                            continue
+                        trial = dict(g)
+                        trial[n] = (g[n][0] + dx, g[n][1] + dy)
+                        if len(set(trial.values())) < len(trial):
+                            continue
+                        c = cost(trial, choice, best)
+                        if c is not None and c < best:
+                            best, g, improved = c, trial, True
+            for i, a in enumerate(classes):  # two classes swapped
+                for b in classes[i + 1:]:
+                    trial = dict(g)
+                    trial[a], trial[b] = g[b], g[a]
+                    c = cost(trial, choice, best)
+                    if c is not None and c < best:
+                        best, g, improved = c, trial, True
+            for s, p, t in links:  # a relation box on another of its cells
+                for k in range(8):
+                    if k == choice.get(p, 0):
+                        continue
+                    trial = {**choice, p: k}
+                    c = cost(g, trial, best)
+                    if c is not None and c < best:
+                        best, choice, improved = c, trial, True
+            if not improved:
+                break
+        return best, g, choice
+
+    # every class as the root of a first drawing, the best one improved: one search gets caught where a
+    # single move cannot leave a placement, a few starts rarely all do
+    best = g = choice = None
+    for root in classes:
+        for across in (False, True):
+            start_g = first(root, across)
+            result = improve(start_g, {}, cost(start_g, {}))
+            if best is None or result[0] < best:
+                best, g, choice = result
+    pos = place(g, boxes(g, choice))
+    left = min(x for x, _ in pos.values())
+    top = min(y for _, y in pos.values())
+    order = classes + [p for _, p, _ in links] + [a for c in attrs for a in attrs[c] if a in pos]
+    warnings = []
+    if len(classes) > 10:
+        warnings.append(f"{len(classes)} classes - the question may be two questions")
+    return [(t, pos[t][0] - left, pos[t][1] - top) for t in order], notes, warnings
+
+
+def planar_layout(query: str, vocab: Graph):
+    """The drawing, its notes, the rule-1 faults no placement avoided (--check names them) and
+    warnings about a question that may be two."""
+    placements, notes, warnings = layered(query, vocab)
+    return placements, notes, crossings(placements, vocab), warnings
 
 
 def question_of(text: str, slug: str) -> str:
@@ -194,7 +631,11 @@ def main() -> None:
     for path in questions:
         text = path.read_text()
         try:
-            placements = layout(text, union)
+            placements, notes, crossed, warnings = planar_layout(text, union)
+            for c in crossed:
+                problems.append(f"{path.name}: crossing left - {c}")
+            for w in warnings:
+                print(f"{path.name}: {w}")
         except Exception as exc:  # a query rdflib cannot parse
             problems.append(f"{path.name}: not parsed ({exc.__class__.__name__}: {str(exc)[:80]})")
             continue
@@ -207,7 +648,7 @@ def main() -> None:
         names = [f"<{viz}/{h(str(t), 12)}>" for t, _, _ in placements]
         label = question_of(text, path.stem).replace("\\", "\\\\").replace('"', '\\"')
         out += [f"<{viz}> a shui:Visualization ;", f'    rdfs:label "{label}"@en ;',
-                f'    rdfs:comment "Competency question {path.name}"@en ;',
+                f'    rdfs:comment "Competency question {path.name}' + "".join(f"; {n}" for n in notes).replace('"', '\\"') + '"@en ;',
                 f"    shui:hasContextGraph <{context}> ;",
                 "    shui:hasVizNodePlacement " + ",\n        ".join(names) + " .", ""]
         for (t, x, y), n in zip(placements, names):
