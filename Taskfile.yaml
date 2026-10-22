@@ -119,7 +119,8 @@ tasks:
       rendered package's bin/question_visualizations.py over
       tests/fixtures/visualizations instead: the committed drawings must be
       what it writes, every drawing free of crossings and true to the layout
-      rules, and three planted faults caught. After a deliberate layout change,
+      rules, the hand arrangements in arrangements.json kept box by box, and
+      three planted faults caught. After a deliberate layout change,
       rewrite the drawings with `../scripts/check-visualizations.py --bless`
       from inside a rendered case and review the diff.
     cmds:

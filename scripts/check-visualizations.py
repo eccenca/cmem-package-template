@@ -10,17 +10,18 @@ Run from inside a generated package directory; `check:visualizations:case` does 
 A generated package has no competency questions, so `task visualizations:check`
 passes over it whatever the generator does. This drives the *rendered*
 package's own `bin/question_visualizations.py` over
-`tests/fixtures/visualizations` instead - a small vocabulary and eight
+`tests/fixtures/visualizations` instead - two small vocabularies and fifteen
 questions covering every rule of the vocabulary skill's "Competency questions,
-drawn":
+drawn", five of them arranged by hand by a reviewer:
 
 * the committed drawings must still be what the generator writes, so a layout
   change shows up as a diff of the fixture to review, not as a surprise in a
   customer's Business Knowledge Editor (`--bless` rewrites them after review);
 * every drawing must keep the rules - no crossing, no edge longer than the range,
   hierarchies top-down, each relation box in the L or on the line, attributes on
-  the free side and closer than any relation - so a rule that fixes one drawing
-  by breaking another fails;
+  the free side and closer than any relation - and each hand arrangement the
+  properties `arrangements.json` lists for it, box by box, so a rule that fixes
+  one drawing by breaking another fails;
 * three planted faults must be caught: a drawing edited by hand (drift), a box
   on an edge (the fault counter), and a fault no placement avoids (named by
   `--check`, not dropped).
@@ -29,6 +30,7 @@ Exits non-zero with a one-line reason on the first failure.
 """
 
 import importlib.util
+import json
 import shutil
 import subprocess
 import sys
@@ -123,6 +125,36 @@ def rule_breaks(placements, vocab, qv):
     return breaks
 
 
+def arrangement_breaks(placements, expected):
+    """Each property of a hand arrangement the drawing does not have."""
+    pos = {str(t).rsplit("/", 1)[-1]: (x, y) for t, x, y in placements}
+    breaks = []
+    for kind, *names in expected:
+        missing = [n for n in [names[0]] + (names[1] if kind == "centred" else names[1:]) if n not in pos]
+        if missing:
+            breaks.append(f"{kind} {names}: {missing} not drawn")
+            continue
+        if kind == "above" and not pos[names[0]][1] < pos[names[1]][1]:
+            breaks.append(f"{names[0]} not above {names[1]}")
+        elif kind == "column" and pos[names[0]][0] != pos[names[1]][0]:
+            breaks.append(f"{names[0]} not in the column of {names[1]}")
+        elif kind == "row" and pos[names[0]][1] != pos[names[1]][1]:
+            breaks.append(f"{names[0]} not in the row of {names[1]}")
+        elif kind == "left" and not pos[names[0]][0] < pos[names[1]][0]:
+            breaks.append(f"{names[0]} not left of {names[1]}")
+        elif kind == "centred":
+            xs = [pos[n][0] for n in names[1]]
+            if abs(pos[names[0]][0] - sum(xs) / len(xs)) > 1:
+                breaks.append(f"{names[0]} not centred over {', '.join(names[1])}")
+        elif kind == "between":
+            (bx, by), (ax, ay), (cx, cy) = pos[names[0]], pos[names[1]], pos[names[2]]
+            row = ay == cy and min(ax, cx) < bx < max(ax, cx) and abs(by - ay) <= 2 * ROW
+            col = ax == cx == bx and min(ay, cy) < by < max(ay, cy)
+            if not (row or col):
+                breaks.append(f"{names[0]} not on the line between {names[1]} and {names[2]}")
+    return breaks
+
+
 def main():
     if not GENERATOR.is_file():
         fail(f"{GENERATOR} does not exist - the template did not ship the generator")
@@ -148,6 +180,9 @@ def main():
         vocab = Graph()
         for path in sorted((root / "package" / "graphs").glob("vocab*.ttl")):
             vocab.parse(path)
+        arrangements = json.loads((root / "arrangements.json").read_text())
+        slugs = {qv.question_of((root / "requirements" / "questions" / f"{slug}.rq").read_text(), slug): slug
+                 for slug in (p.stem for p in (root / "requirements" / "questions").glob("*.rq"))}
         count = 0
         for label, placements in drawings(root / "package" / "graphs" / "competency-questions.ttl"):
             count += 1
@@ -155,6 +190,7 @@ def main():
             if crossed:
                 fail(f"{label}: crossing - {crossed[0]}")
             breaks = rule_breaks(placements, vocab, qv)
+            breaks += arrangement_breaks(placements, arrangements.get(slugs.get(label), []))
             if breaks:
                 fail(f"{label}: {breaks[0]}")
         questions = len(list((root / "requirements" / "questions").glob("*.rq")))
@@ -184,7 +220,8 @@ def main():
     qv.layered = lambda query, vocab: (planted, [], [])
     if not qv.planar_layout("", vocab)[2]:
         fail("a fault no placement avoids was dropped instead of reported")
-    print(f"check-visualizations: {count} fixture drawings keep their rules; 3 planted faults caught")
+    print(f"check-visualizations: {count} fixture drawings keep their rules, {len(arrangements) - 1} hand arrangements "
+          f"their properties; 3 planted faults caught")
 
 
 if __name__ == "__main__":

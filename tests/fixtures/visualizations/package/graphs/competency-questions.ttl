@@ -57,6 +57,195 @@
     shui:hasXPosition "570"^^xsd:int ;
     shui:hasYPosition "120"^^xsd:int .
 
+<https://example.com/fixture/competency-questions/viz/842854dddde71908> a shui:Visualization ;
+    rdfs:label "In which countries are the organisations that operate the sites of the equipment a work order concerns?"@en ;
+    rdfs:comment "Competency question chain-to-country.rq"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/842854dddde71908/74a9ed06f0cf>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/3f05338753d4>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/f2c2adca76dd>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/d5bf3112e291>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/757149607afc>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/debd0f4bf2ba>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/a602d2972107>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/e1800163722c>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/4b56e700d296>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/dd34bfd8fe1d>,
+        <https://example.com/fixture/competency-questions/viz/842854dddde71908/34f7f33c2cfd> .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/74a9ed06f0cf> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/WorkOrder" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/3f05338753d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Equipment" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/f2c2adca76dd> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Asset" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/d5bf3112e291> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Site" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/757149607afc> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Facility" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "360"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/debd0f4bf2ba> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Organization" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "840"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/a602d2972107> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Country" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "1080"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/e1800163722c> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/concerns" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/4b56e700d296> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/locatedIn" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "300"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/dd34bfd8fe1d> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/operatedBy" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "600"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/842854dddde71908/34f7f33c2cfd> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/country" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "960"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb> a shui:Visualization ;
+    rdfs:label "Is the team responsible for a site the team of the person assigned to work there?"@en ;
+    rdfs:comment "Competency question diamond.rq"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/74a9ed06f0cf>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/6f31bd58847a>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/3f05338753d4>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/c38f9ff09b83>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/f2c2adca76dd>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/d5bf3112e291>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/757149607afc>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/128c8589e42a>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/e1800163722c>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/4b56e700d296>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/c0213b5869f1>,
+        <https://example.com/fixture/competency-questions/viz/f872caad177d67bb/39f3f0671479> .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/74a9ed06f0cf> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/WorkOrder" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "720"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/6f31bd58847a> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Person" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "720"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/3f05338753d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Equipment" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/c38f9ff09b83> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Team" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/f2c2adca76dd> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Asset" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/d5bf3112e291> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Site" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/757149607afc> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Facility" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/128c8589e42a> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/assignee" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "720"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/e1800163722c> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/concerns" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "600"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/4b56e700d296> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/locatedIn" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/c0213b5869f1> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/responsibleTeam" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "360"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/f872caad177d67bb/39f3f0671479> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/memberOf" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "600"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4> a shui:Visualization ;
+    rdfs:label "Which work orders address a failure mode, or a broader one, that is typical for the equipment they concern?"@en ;
+    rdfs:comment "Competency question failure-modes.rq; also walks the Failure mode hierarchy (<https://example.com/complex/broaderMode>)"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/74a9ed06f0cf>,
+        <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/91f508f76269>,
+        <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/3f05338753d4>,
+        <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/d0ff05467f5e>,
+        <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/e1800163722c>,
+        <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/0e3cb6338a22> .
+
+<https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/74a9ed06f0cf> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/WorkOrder" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/91f508f76269> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/FailureMode" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/3f05338753d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Equipment" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/d0ff05467f5e> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/addresses" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/e1800163722c> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/concerns" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/0e3cb6338a22> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/typicalFor" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
 <https://example.com/fixture/competency-questions/viz/32c7cdfeeef5ff44> a shui:Visualization ;
     rdfs:label "Which hardware sits in a category or one of its subcategories?"@en ;
     rdfs:comment "Competency question hardware-by-category-tree.rq; also walks a hierarchy (skos:broader)"@en ;
@@ -138,6 +327,207 @@
     shui:hasLocatedResource "https://example.com/fixture/hasCategory" ;
     shui:hasXPosition "0"^^xsd:int ;
     shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af> a shui:Visualization ;
+    rdfs:label "Which people work for the organisation that maintains a pump, and which teams are they in?"@en ;
+    rdfs:comment "Competency question inverse-employees.rq"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/1b7e40f016d7>,
+        <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/3f05338753d4>,
+        <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/debd0f4bf2ba>,
+        <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/6f31bd58847a>,
+        <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/c38f9ff09b83>,
+        <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/6f11a18847d3>,
+        <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/745807538613>,
+        <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/39f3f0671479>,
+        <https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/b8a69ad746b7> .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/1b7e40f016d7> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Pump" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/3f05338753d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Equipment" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/debd0f4bf2ba> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Organization" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/6f31bd58847a> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Person" ;
+    shui:hasXPosition "1710"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/c38f9ff09b83> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Team" ;
+    shui:hasXPosition "1710"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/6f11a18847d3> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/maintainedBy" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/745807538613> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/employs" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/39f3f0671479> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/memberOf" ;
+    shui:hasXPosition "1710"^^xsd:int ;
+    shui:hasYPosition "300"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/dd1c1b097a3965af/b8a69ad746b7> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/email" ;
+    shui:hasXPosition "1710"^^xsd:int ;
+    shui:hasYPosition "600"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a> a shui:Visualization ;
+    rdfs:label "Which contractors and manufacturers maintain equipment, and which people do they employ?"@en ;
+    rdfs:comment "Competency question maintainers.rq"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/e6d6f1bf2876>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/debd0f4bf2ba>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/3f05338753d4>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/238204e17ee0>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/6f31bd58847a>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/a602d2972107>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/6f11a18847d3>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/745807538613>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/34f7f33c2cfd>,
+        <https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/289502dc9a89> .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/e6d6f1bf2876> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Contractor" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/debd0f4bf2ba> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Organization" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/3f05338753d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Equipment" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "360"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/238204e17ee0> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Manufacturer" ;
+    shui:hasXPosition "2280"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/6f31bd58847a> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Person" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/a602d2972107> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Country" ;
+    shui:hasXPosition "2280"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/6f11a18847d3> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/maintainedBy" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "180"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/745807538613> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/employs" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/34f7f33c2cfd> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/country" ;
+    shui:hasXPosition "1710"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/46e32e0550119b6a/289502dc9a89> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/serialNumber" ;
+    shui:hasXPosition "760"^^xsd:int ;
+    shui:hasYPosition "360"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7> a shui:Visualization ;
+    rdfs:label "Which pumps and motors of a plant have which flow rate and rated power, and who made them?"@en ;
+    rdfs:comment "Competency question pumps-and-motors.rq"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/050445841c5a>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/3f05338753d4>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/73a41be028ae>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/1b7e40f016d7>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/238204e17ee0>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/757149607afc>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/f2c2adca76dd>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/dc77dfb99eb1>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/0784e8f1fe9b>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/55cabc51b1a8>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/98b97711b160>,
+        <https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/b19811e02526> .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/050445841c5a> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Motor" ;
+    shui:hasXPosition "380"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/3f05338753d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Equipment" ;
+    shui:hasXPosition "950"^^xsd:int ;
+    shui:hasYPosition "360"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/73a41be028ae> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Plant" ;
+    shui:hasXPosition "380"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/1b7e40f016d7> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Pump" ;
+    shui:hasXPosition "1520"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/238204e17ee0> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Manufacturer" ;
+    shui:hasXPosition "950"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/757149607afc> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Facility" ;
+    shui:hasXPosition "380"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/f2c2adca76dd> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Asset" ;
+    shui:hasXPosition "380"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/dc77dfb99eb1> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/madeBy" ;
+    shui:hasXPosition "950"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/0784e8f1fe9b> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/partOf" ;
+    shui:hasXPosition "380"^^xsd:int ;
+    shui:hasYPosition "360"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/55cabc51b1a8> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/flowRate" ;
+    shui:hasXPosition "1140"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/98b97711b160> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/ratedPower" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "480"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6ff423baff68acd7/b19811e02526> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/name" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
 
 <https://example.com/fixture/competency-questions/viz/c34c4ab9791e958e> a shui:Visualization ;
     rdfs:label "Which services share a supplier with an alternative supplier of some hardware?"@en ;
@@ -385,3 +775,56 @@
     shui:hasLocatedResource "https://example.com/fixture/hasSupplier" ;
     shui:hasXPosition "570"^^xsd:int ;
     shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7> a shui:Visualization ;
+    rdfs:label "Who requested, approved and works on each open work order, and when is it due?"@en ;
+    rdfs:comment "Competency question work-order-roles.rq"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/74a9ed06f0cf>,
+        <https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/6f31bd58847a>,
+        <https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/246242665b94>,
+        <https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/998ef20ddb47>,
+        <https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/128c8589e42a>,
+        <https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/e01d32a44b58>,
+        <https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/91b1da77710a>,
+        <https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/b8a69ad746b7> .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/74a9ed06f0cf> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/WorkOrder" ;
+    shui:hasXPosition "380"^^xsd:int ;
+    shui:hasYPosition "60"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/6f31bd58847a> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Person" ;
+    shui:hasXPosition "1520"^^xsd:int ;
+    shui:hasYPosition "60"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/246242665b94> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/requester" ;
+    shui:hasXPosition "950"^^xsd:int ;
+    shui:hasYPosition "60"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/998ef20ddb47> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/approver" ;
+    shui:hasXPosition "950"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/128c8589e42a> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/assignee" ;
+    shui:hasXPosition "950"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/e01d32a44b58> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/dueDate" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "60"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/91b1da77710a> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/openedOn" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/6efc33e55796f8a7/b8a69ad746b7> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/email" ;
+    shui:hasXPosition "1520"^^xsd:int ;
+    shui:hasYPosition "180"^^xsd:int .
