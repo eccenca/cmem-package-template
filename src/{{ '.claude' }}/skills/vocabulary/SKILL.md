@@ -164,12 +164,24 @@ each box sits where it does:
   gets no drawing, and the check says so.
 - **Open a drawing** for whoever reviews it in the Business Knowledge Editor
   with one link per visualisation, so nobody searches for it by name:
-  `https://<host>/<view>/bke/viz?graph=<context graph>&vizIri=<visualisation IRI>&catalogGraphIri=<graph holding the visualisations>`,
+  `https://<host>/default/bke/viz?graph=<context graph>&vizIri=<visualisation IRI>&catalogGraphIri=<graph holding the visualisations>`,
   each IRI URL-encoded - `graph` is the visualisation's `shui:hasContextGraph`
-  (the vocabulary), `catalogGraphIri` the competency-questions graph, and
-  `<view>` an application view of the instance. *A reviewer judges a drawing
+  (the vocabulary), `catalogGraphIri` the competency-questions graph; `default`
+  is the instance's default application view. *A reviewer judges a drawing
   only in the BKE; the Explore page of the same IRI shows its triples, not the
   drawing.*
+- **A class's page lists its questions.** The drawings' graph carries a
+  read-only row "Competency questions" for Corporate Memory's own class forms,
+  in a group "Overview" at the end: every question whose drawing contains the
+  class, each a link that opens the drawing in the BKE. The graph is imported
+  into the global shape catalog for Explore to find the row; every package
+  writes the same triples, so an instance shows one row however many packages
+  ship questions, and a class in no drawing shows neither row nor group.
+  *Whoever changes a class sees which questions depend on it and opens their
+  drawings in one click.*
+- **The drawings form one catalog in the BKE**: the graph is labelled
+  "<package name>: competency questions", the catalog the BKE's Visualization
+  catalog lists them under, so a reviewer filters the questions of one package.
 - Positions are never placed by hand: `task visualizations:check` reports a
   drawing that no longer matches its question or the vocabulary. A hand-made
   visualisation goes into a graph of its own.

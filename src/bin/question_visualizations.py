@@ -30,8 +30,13 @@ positions are all this script decides:
 - positions are fixed by the query, so the output only changes when a question or the vocabulary does.
 
 The visualisation's context graph is the vocabulary the manifest registers that defines most of the
-question's terms. --write also declares the graph in cpa-manifest.json when it is missing; --check
-writes nothing and exits 1 when the graph is missing, stale or undeclared, a question names no
+question's terms. The graph is labelled "<package name>: competency questions", the catalog the BKE's
+Visualization catalog lists the drawings under. It also carries the "Competency questions" row on
+Corporate Memory's class forms (CLASS_FORM_ROW): a class's page lists the questions whose drawing contains
+it, each linked to the drawing in the BKE - so the graph is imported into the global shape catalog.
+--write also declares the graph in cpa-manifest.json, imported into the shape catalog, when it is not; --check
+writes nothing and exits 1 when the graph is missing, stale, undeclared or not imported into the shape
+catalog, a question names no
 vocabulary term, or a drawing keeps a fault no placement avoids. A hand-made visualisation belongs in a
 graph of its own: this script owns the file.
 """
@@ -50,6 +55,72 @@ SHUI = "https://vocab.eccenca.com/shui/"
 COL, ROW = 380, 60  # px from a class to its attribute (a box of 240 px plus an edge label) and per half row: the
 # BKE's Bezier curves and their labels need that much room between boxes
 QUESTIONS = Path("requirements") / "questions"
+SHAPE_CATALOG = "https://vocab.eccenca.com/shacl/"
+# The "Competency questions" row on Corporate Memory's class forms (Q212, Q220): a class's page lists the
+# questions whose drawing contains it, each linked to the drawing in the BKE. Every package writes these
+# triples unchanged, so an instance shows one row and one Overview group however many packages ship them;
+# the graph is imported into the global shape catalog for Explore to find them. Change them here only.
+CLASS_FORM_ROW = r'''<https://vocab.eccenca.com/shacl/OwlClassNodeShape> shacl:property shared-shapes:Class-competencyQuestions .
+<https://vocab.eccenca.com/shacl/RdfsClassNodeShape> shacl:property shared-shapes:Class-competencyQuestions .
+
+shared-shapes:Class-competencyQuestions
+  a shacl:PropertyShape ;
+  shacl:name "Competency questions"@en, "Kompetenzfragen"@de ;
+  rdfs:label "Class: Competency questions property shape"@en ;
+  shacl:description "The questions the model has to answer whose drawing contains this class; a link opens the drawing in the Business Knowledge Editor - read only."@en, "Die Fragen, die das Modell beantworten muss und deren Zeichnung diese Klasse enthält; ein Verweis öffnet die Zeichnung im Business Knowledge Editor – schreibgeschützt."@de ;
+  shacl:path rdfs:value ;
+  shacl:group shared-shapes:Overview ;
+  shacl:order 10 ;
+  shui:readOnly true ;
+  shui:valueQuery shared-shapes:Class-competencyQuestionsQuery ;
+  shui:valueQueryHideHeader true ;
+  shui:valueQueryHideFooter true .
+
+shared-shapes:Overview a shacl:PropertyGroup ;
+  rdfs:label "Overview"@en, "Übersicht"@de ;
+  rdfs:comment "What the resource is used for and where it appears - questions, drawings, summaries; last on the form, read only."@en, "Wofür die Ressource verwendet wird und wo sie vorkommt – Fragen, Zeichnungen, Zusammenfassungen; zuletzt im Formular, schreibgeschützt."@de ;
+  shacl:order 900 .
+
+shared-shapes:Class-competencyQuestionsQuery a shui:SparqlQuery, shui:SparqlOperation ;
+  rdfs:label "Class -> Competency questions" ;
+  dcterms:description "Lists the competency questions whose drawing contains the class, each as a link to the drawing in the Business Knowledge Editor." ;
+  shui:queryText """# Lists the competency questions whose drawing contains the class, each linked to the drawing.
+#
+# ?resource: the question as a Markdown link to the drawing in the Business Knowledge Editor
+#
+# A drawing is a shui:Visualization written by bin/question_visualizations.py (its comment starts with
+# "Competency question"); a placement names its term as a string, so the class is compared by string.
+# The link is relative, so it works on every host; graph is the drawing's context graph (the
+# vocabulary), catalogGraphIri the graph that holds the drawing.
+# Note: ?resource must stay left-most: it is the value the row shows. No FROM - the row is shared by
+# every package that ships it, so it lists the drawings of all installed packages.
+
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX shui: <https://vocab.eccenca.com/shui/>
+PREFIX sysont: <http://ns.ontowiki.net/SysOnt/>
+
+SELECT DISTINCT ?resource
+WHERE {
+  GRAPH ?catalog {
+    ?viz a shui:Visualization ;
+      rdfs:label ?question ;
+      rdfs:comment ?comment ;
+      shui:hasContextGraph ?context ;
+      shui:hasVizNodePlacement ?placement .
+    ?placement shui:hasLocatedResource ?located .
+  }
+  FILTER(STR(?located) = STR(<{{shuiResource}}>))
+  FILTER(STRSTARTS(STR(?comment), "Competency question"))
+  BIND(CONCAT("/default/bke/viz?graph=", ENCODE_FOR_URI(STR(?context)),
+              "&vizIri=", ENCODE_FOR_URI(STR(?viz)),
+              "&catalogGraphIri=", ENCODE_FOR_URI(STR(?catalog))) AS ?href)
+  BIND(STRDT(CONCAT("[", STR(?question), "](", ?href, ")"), sysont:Markdown) AS ?resource)
+}
+ORDER BY ?question
+""" ;
+  dcterms:created "2026-10-22T00:00:00"^^xsd:dateTime ;
+  dcterms:modified "2026-10-22T00:00:00"^^xsd:dateTime .
+'''
 OUTPUT = "graphs/competency-questions.ttl"
 
 
@@ -613,19 +684,25 @@ def main() -> None:
     for g in vocab_graphs.values():
         union += g
     graph_iri = vocabularies[0]["graph_iri"].rstrip("/#") + "/competency-questions/"
+    # the BKE's Visualization catalog shows this label as the drawings' catalog (Q219)
+    name = (manifest.get("metadata") or {}).get("name") or manifest.get("package_id", "Package")
+    name = name.replace("\\", "\\\\").replace('"', '\\"')
     problems = []
     out = [
         "# Generated by bin/question_visualizations.py from requirements/questions/ and the vocabulary - do not edit;",
         "# run `task visualizations`. One Business Knowledge Editor visualisation per competency question.",
         "",
+        "@prefix dcterms: <http://purl.org/dc/terms/> .",
         "@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .",
+        "@prefix shacl: <http://www.w3.org/ns/shacl#> .",
+        "@prefix shared-shapes: <https://vocab.eccenca.com/shared-shapes/> .",
         f"@prefix shui: <{SHUI}> .",
         "@prefix void: <http://rdfs.org/ns/void#> .",
         "@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .",
         "",
         f"<{graph_iri}> a void:Dataset ;",
-        '    rdfs:label "Competency questions: visualisations"@en ;',
-        '    rdfs:comment "One Business Knowledge Editor visualisation per competency question of the package - the part of the model that answers it, in the order the question asks."@en .',
+        f'    rdfs:label "{name}: competency questions"@en ;',
+        '    rdfs:comment "One Business Knowledge Editor visualisation per competency question of the package - the part of the model that answers it - and the row that lists them on a class\'s page."@en .',
         "",
     ]
     for path in questions:
@@ -654,24 +731,33 @@ def main() -> None:
         for (t, x, y), n in zip(placements, names):
             out += [f"{n} a shui:VizNodePlacement ;", f'    shui:hasLocatedResource "{t}" ;',
                     f'    shui:hasXPosition "{x}"^^xsd:int ;', f'    shui:hasYPosition "{y}"^^xsd:int .', ""]
+    out.append(CLASS_FORM_ROW)
     text = "\n".join(out)
     output = package / OUTPUT
-    declared = any(f.get("file_path") == OUTPUT for f in files)
+    entry = next((f for f in files if f.get("file_path") == OUTPUT), None)
+    imported = entry is not None and SHAPE_CATALOG in (entry.get("import_into") or [])
     if mode == "--check":
         if not output.exists() or output.read_text() != text:
             problems.append(f"{OUTPUT}: stale or missing - run `task visualizations`")
-        if not declared:
+        if entry is None:
             problems.append(f"{OUTPUT}: not declared in cpa-manifest.json - run `task visualizations`")
+        elif not imported:
+            problems.append(f"{OUTPUT}: not imported into the shape catalog {SHAPE_CATALOG}, so no class page "
+                            "lists its questions - run `task visualizations`")
     else:
         output.parent.mkdir(exist_ok=True)
         if not output.exists() or output.read_text() != text:
             output.write_text(text)
             print(f"wrote {OUTPUT} ({len(questions)} question(s))")
-        if not declared:
+        if entry is None:
             files.append({"file_path": OUTPUT, "file_type": "graph", "graph_iri": graph_iri,
-                          "import_into": [], "register_as_vocabulary": False})
-            manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
+                          "import_into": [SHAPE_CATALOG], "register_as_vocabulary": False})
             print(f"declared {OUTPUT} in cpa-manifest.json")
+        elif not imported:
+            entry["import_into"] = (entry.get("import_into") or []) + [SHAPE_CATALOG]
+            print(f"imported {OUTPUT} into the shape catalog in cpa-manifest.json")
+        if entry is None or not imported:
+            manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
     for p in problems:
         print(p, file=sys.stderr)
     if problems and mode == "--check":

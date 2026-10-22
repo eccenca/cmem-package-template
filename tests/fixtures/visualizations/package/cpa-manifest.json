@@ -1,5 +1,8 @@
 {
   "package_id": "fixture-visualizations",
+  "metadata": {
+    "name": "Visualisation fixture"
+  },
   "files": [
     {
       "file_type": "graph",
@@ -17,7 +20,9 @@
       "file_path": "graphs/competency-questions.ttl",
       "file_type": "graph",
       "graph_iri": "https://example.com/fixture/competency-questions/",
-      "import_into": [],
+      "import_into": [
+        "https://vocab.eccenca.com/shacl/"
+      ],
       "register_as_vocabulary": false
     }
   ]

@@ -17,6 +17,9 @@ drawn", five of them arranged by hand by a reviewer:
 * the committed drawings must still be what the generator writes, so a layout
   change shows up as a diff of the fixture to review, not as a surprise in a
   customer's Business Knowledge Editor (`--bless` rewrites them after review);
+* the graph carries the shared "Competency questions" row on Corporate Memory's
+  class forms and is imported into the shape catalog, so a class's page lists
+  its questions;
 * every drawing must keep the rules - no crossing, no edge longer than the range,
   hierarchies top-down, each relation box in the L or on the line, attributes on
   the free side and closer than any relation - and each hand arrangement the
@@ -42,6 +45,7 @@ from rdflib import OWL, RDF, RDFS, Graph, Namespace, URIRef
 GENERATOR = Path("bin") / "question_visualizations.py"
 FIXTURE = Path(__file__).resolve().parent.parent / "tests" / "fixtures" / "visualizations"
 SHUI = Namespace("https://vocab.eccenca.com/shui/")
+SH = Namespace("http://www.w3.org/ns/shacl#")
 ROW = 60
 
 
@@ -193,6 +197,16 @@ def main():
             breaks += arrangement_breaks(placements, arrangements.get(slugs.get(label), []))
             if breaks:
                 fail(f"{label}: {breaks[0]}")
+        # the class-form row ships with the drawings, and the graph is imported where Explore finds it
+        drawn_graph = Graph().parse(root / "package" / "graphs" / "competency-questions.ttl")
+        row = URIRef("https://vocab.eccenca.com/shared-shapes/Class-competencyQuestions")
+        for form in ("OwlClassNodeShape", "RdfsClassNodeShape"):
+            if (URIRef(f"https://vocab.eccenca.com/shacl/{form}"), SH.property, row) not in drawn_graph:
+                fail(f"the competency-question row is not attached to {form}")
+        entry = next(f for f in json.loads((root / "package" / "cpa-manifest.json").read_text())["files"]
+                     if f["file_path"] == "graphs/competency-questions.ttl")
+        if qv.SHAPE_CATALOG not in entry.get("import_into", []):
+            fail("the drawings' graph is not imported into the shape catalog, so no class page lists its questions")
         questions = len(list((root / "requirements" / "questions").glob("*.rq")))
         if count != questions:
             fail(f"{count} drawing(s) for {questions} question(s)")
