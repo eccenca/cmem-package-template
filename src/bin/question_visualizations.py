@@ -211,6 +211,18 @@ def model(query: str, vocab: Graph):
     ordered = sorted(patterns, key=lambda t: (written_at(query, first_iri(t[1])) if first_iri(t[1]) is not None else len(query),
                                               patterns.index(t)))
     all_steps = steps(ordered)
+
+    def walks(path):
+        """The properties a path walks: p* and p+, also inside a sequence or an inverse."""
+        if isinstance(path, MulPath):
+            return walks(path.path) | ({path.path} if isinstance(path.path, URIRef) and path.mod in "*+" else set())
+        if isinstance(path, SequencePath):
+            return set().union(*(walks(a) for a in path.args))
+        if isinstance(path, InvPath):
+            return walks(path.arg)
+        return set()
+
+    walked = set().union(*(walks(p) for _, p, _ in ordered)) if ordered else set()
     typed = {s: o for s, p, o in all_steps if p == RDF.type and isinstance(o, URIRef)}
     datatype = set(vocab.subjects(RDF.type, OWL.DatatypeProperty))
 
@@ -301,6 +313,11 @@ def model(query: str, vocab: Graph):
         src = lifted(s_cls, declared(p, RDFS.domain))
         tgt = lifted(o_cls, declared(p, RDFS.range))
         add(src), add(tgt)
+        if src is not None and src == tgt and p in walked:  # a walk within one class: named, not drawn (Q184)
+            note = f"also walks from {label_of(src)} to {label_of(src)} ({p.n3(vocab.namespace_manager)})"
+            if note not in notes:
+                notes.append(note)
+            continue
         if all(r[1] != p for r in rels) and (src is not None or tgt is not None):
             rels.append((src, p, tgt))
     for c in list(classes):  # drawn classes related through the hierarchy: every level between them
@@ -376,6 +393,10 @@ def faults(pos: dict, edges: list, limit: float = float("inf")) -> list[str]:
                     return found
     for i, ((a, b), (lx, ly)) in enumerate(labels):
         for (c, d), (mx, my) in labels[i + 1:]:
+            # two edges joining the same two boxes - a relation from a class to itself - share one chord: no
+            # placement separates them, and the BKE draws them as two curves
+            if {a, b} == {c, d}:
+                continue
             if abs(lx - mx) < LW - 4 and abs(ly - my) < LH - 2:
                 if add(f"label of {short(a)} -> {short(b)} on label of {short(c)} -> {short(d)}"):
                     return found
@@ -683,6 +704,8 @@ def main() -> None:
     union = Graph()
     for g in vocab_graphs.values():
         union += g
+        for prefix, ns in g.namespaces():  # so a description names a term as the vocabulary writes it
+            union.bind(prefix, ns, override=False)
     graph_iri = vocabularies[0]["graph_iri"].rstrip("/#") + "/competency-questions/"
     # the BKE's Visualization catalog shows this label as the drawings' catalog (Q219)
     name = (manifest.get("metadata") or {}).get("name") or manifest.get("package_id", "Package")

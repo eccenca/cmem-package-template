@@ -141,10 +141,12 @@ each box sits where it does:
    `rdfs:seeAlso` to `gist:isPartOf`, `gist:isMemberOf` or
    `gist:isCategorizedBy` - with its box on the line between parent and child,
    whichever way the query reads it. Every level between a class and a
-   superclass is drawn. A step between instances of one class -
-   `?c skos:broader* ?parent` within a taxonomy - gets no box: the drawing
-   shows the model, the visualisation's description names the walk, and the
-   application view shows the tree.
+   superclass is drawn. A walk between instances of one class -
+   `?c skos:broader* ?parent` within a taxonomy, `?shelf :partOf* ?room` within
+   the locations - gets no box: the drawing shows the model, the
+   visualisation's description names the walk, and the application view shows
+   the tree. A single step from a class to itself keeps its box, beside the
+   class.
 3. **The L**, as above.
 4. **One parent straight above.** A class with several parents in the drawing
    has one bound parent directly above it - the hierarchy the question asks
