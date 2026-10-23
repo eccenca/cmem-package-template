@@ -1,0 +1,3 @@
+# question: Which contractors and manufacturers maintain equipment, and which people do they employ?
+PREFIX ex: <https://example.com/complex/>
+SELECT * WHERE { ?eq a ex:Equipment ; ex:maintainedBy ?c, ?m ; ex:serialNumber ?sn . ?c a ex:Contractor ; ex:employs ?p . ?m a ex:Manufacturer ; ex:country ?country . }

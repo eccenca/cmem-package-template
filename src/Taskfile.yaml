@@ -128,6 +128,33 @@ tasks:
     cmds:
       - bin/task_tags.py --check {{.PACKAGE_DIR}}
 
+  visualizations:
+    desc: Write one Business Knowledge Editor visualisation per competency question
+    summary: |
+      For every query in requirements/questions/, writes the part of the
+      vocabulary that answers it into graphs/competency-questions.ttl -
+      properties as boxes, laid out in the order the query asks - and declares
+      the graph in the manifest. Run it after changing a question, a class or
+      a property; the vocabulary skill describes the layout. Not part of
+      check:offline.
+    preconditions:
+      - sh: command -v uv
+        msg: "bin/question_visualizations.py runs through uv (PEP 723). Install it: https://docs.astral.sh/uv/"
+    cmds:
+      - bin/question_visualizations.py --write {{.PACKAGE_DIR}}
+
+  visualizations:check:
+    desc: Report question visualisations that no longer match their questions or the vocabulary
+    summary: |
+      Writes nothing; exits non-zero when the graph is missing, stale or
+      undeclared, or a question names no term of the vocabulary. A package that wants it as a gate adds this task to
+      its check:custom.
+    preconditions:
+      - sh: command -v uv
+        msg: "bin/question_visualizations.py runs through uv (PEP 723). Install it: https://docs.astral.sh/uv/"
+    cmds:
+      - bin/question_visualizations.py --check {{.PACKAGE_DIR}}
+
   build:
     desc: Build package archive
     preconditions:

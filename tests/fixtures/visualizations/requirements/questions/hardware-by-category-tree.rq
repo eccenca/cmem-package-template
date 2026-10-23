@@ -1,0 +1,7 @@
+# question: Which hardware sits in a category or one of its subcategories?
+PREFIX ex: <https://example.com/fixture/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+SELECT ?hardware ?category WHERE {
+  ?hardware a ex:Hardware ; ex:hasCategory ?leaf .
+  ?leaf skos:broader* ?category .
+}

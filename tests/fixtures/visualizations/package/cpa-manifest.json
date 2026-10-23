@@ -1,0 +1,29 @@
+{
+  "package_id": "fixture-visualizations",
+  "metadata": {
+    "name": "Visualisation fixture"
+  },
+  "files": [
+    {
+      "file_type": "graph",
+      "file_path": "graphs/vocab.ttl",
+      "graph_iri": "https://example.com/fixture/",
+      "register_as_vocabulary": true
+    },
+    {
+      "file_type": "graph",
+      "file_path": "graphs/vocab-maintenance.ttl",
+      "graph_iri": "https://example.com/complex/",
+      "register_as_vocabulary": true
+    },
+    {
+      "file_path": "graphs/competency-questions.ttl",
+      "file_type": "graph",
+      "graph_iri": "https://example.com/fixture/competency-questions/",
+      "import_into": [
+        "https://vocab.eccenca.com/shacl/"
+      ],
+      "register_as_vocabulary": false
+    }
+  ]
+}

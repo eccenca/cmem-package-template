@@ -1,0 +1,3 @@
+# question: Which work orders address a failure mode, or a broader one, that is typical for the equipment they concern?
+PREFIX ex: <https://example.com/complex/>
+SELECT * WHERE { ?wo a ex:WorkOrder ; ex:addresses ?fm ; ex:concerns ?eq . ?fm ex:broaderMode* ?general . ?general ex:typicalFor ?eq . }

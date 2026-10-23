@@ -1,0 +1,3 @@
+# question: Which pumps and motors of a plant have which flow rate and rated power, and who made them?
+PREFIX ex: <https://example.com/complex/>
+SELECT * WHERE { ?pump a ex:Pump ; ex:partOf ?plant ; ex:flowRate ?f ; ex:madeBy ?m . ?motor a ex:Motor ; ex:partOf ?plant ; ex:ratedPower ?p ; ex:madeBy ?m . ?plant a ex:Plant ; ex:name ?n . }

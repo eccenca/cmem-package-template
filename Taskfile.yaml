@@ -111,6 +111,21 @@ tasks:
     cmds:
       - cd {{.TEST_CASE}}_dir && ../scripts/check-offline.py
 
+  check:visualizations:case:
+    desc: assert the question visualisations a generated package ships keep their layout rules
+    summary: |
+      A generated package has no competency questions, so its own
+      visualizations:check passes whatever the generator does. This drives the
+      rendered package's bin/question_visualizations.py over
+      tests/fixtures/visualizations instead: the committed drawings must be
+      what it writes, every drawing free of crossings and true to the layout
+      rules, the hand arrangements in arrangements.json kept box by box, and
+      three planted faults caught. After a deliberate layout change,
+      rewrite the drawings with `../scripts/check-visualizations.py --bless`
+      from inside a rendered case and review the diff.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-visualizations.py
+
   check:validate:case:
     desc: validate a project test case
     preconditions:
@@ -130,6 +145,8 @@ tasks:
       - task: check:skills:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - task: check:offline:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:visualizations:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - cd {{.TEST_CASE}}_dir && task check
 
