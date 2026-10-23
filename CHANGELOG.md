@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Added
 
-- A `thesauri` skill for project packages: the shape of a SKOS taxonomy that resources are categorized by, who maintains it (taxonomy editor, external term library, seed), linking a standard classification without copying it, what the taxonomy editor reads and writes, icons for schemes and concepts, typing editor-made concepts on use, concept forms, where categorization links are saved, importing a term library, and an application view to browse the taxonomy; a concept form whose thesaurus has another master answers every `askIf…` query false
+- A `thesauri` skill for project packages: the shape of a SKOS taxonomy that resources are categorized by, who maintains it (taxonomy editor, external term library, seed), linking a standard classification without copying it, what the taxonomy editor reads and writes, icons for schemes and concepts, typing editor-made concepts on use, concept forms, where categorization links are saved, importing a term library; a concept form whose thesaurus has another master answers every `askIf…` query false
 
 ### Changed
 
