@@ -6,6 +6,7 @@
     {"skill": "shapes", "paths": ["*/*shapes*.ttl", "*/*shacl*.ttl"], "content": ["shacl:NodeShape", "shacl:PropertyShape", "sh:NodeShape", "sh:PropertyShape"]},
     {"skill": "thesauri", "content": ["skos:ConceptScheme", "skos:topConceptOf", "skos:hasTopConcept", "ThesaurusProject"]},
     {"skill": "catalog-queries", "content": ["shui:queryText", "shui:SparqlQuery", "shui:valueQuery"]},
+    {"skill": "workflows", "paths": ["*/*/workflow/*.xml", "*/*/custom/*.xml", "*/*/transform/**", "*/*/linking/**"], "exclude": ["scripts/**"]},
     {"skill": "build-projects", "paths": ["*/projects/**", "*/build/**", "*/*/workflow/*.xml", "*/*/custom/*.xml", "*/*/dataset/*.xml", "*/*/transform/**", "*/*/linking/**"], "exclude": ["scripts/**"]}
   ]
 }

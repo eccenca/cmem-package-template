@@ -27,7 +27,7 @@ ALWAYS = ("template-feedback", "package-content", "vocabulary")
 # ontology graph and an icon, so a build project, a shape catalog and the
 # queries inside one are things it will never have. They are dropped by a
 # conditional directory name.
-PROJECT_ONLY = ("build-projects", "shapes", "catalog-queries", "thesauri")
+PROJECT_ONLY = ("build-projects", "workflows", "shapes", "catalog-queries", "thesauri")
 
 SKILLS = Path(".claude") / "skills"
 
