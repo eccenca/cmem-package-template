@@ -108,19 +108,20 @@ is what stops them coming back.
 
 ## Skills shipped into generated packages
 
-Beyond `template-feedback`, `src/{{ '.claude' }}/skills/` holds five authoring
+Beyond `template-feedback`, `src/{{ '.claude' }}/skills/` holds six authoring
 skills: `package-content` (the manifest contract, graph ownership, licence
 rules, offline checking), `vocabulary` (the ontology and its class icons),
-`build-projects` (DataIntegration exports), `shapes` (the shape catalog) and
-`catalog-queries` (the SPARQL inside one). The first three exist because four
+`build-projects` (DataIntegration exports), `shapes` (the shape catalog),
+`catalog-queries` (the SPARQL inside one) and `thesauri` (SKOS taxonomies that
+resources are categorized by). The first three exist because four
 packages in the fleet had each written the same knowledge into their own
 `CLAUDE.md` - the survey behind them is in
 `docs/superpowers/specs/2026-09-16-package-authoring-skills-design.md`. The
 vocabulary and query material arrived later, from a companion conventions
 repository a colleague maintained alongside this template.
 
-`build-projects`, `shapes` and `catalog-queries` are dropped for vocabulary
-packages by a conditional directory name,
+`build-projects`, `shapes`, `catalog-queries` and `thesauri` are dropped for
+vocabulary packages by a conditional directory name,
 `skills/{% if package_type != 'vocabulary' %}shapes{% endif %}/`. Copier removes
 such a directory entirely rather than leaving an empty one. `vocabulary` is
 **not** conditional: a vocabulary package is one, and a project package usually
@@ -134,7 +135,7 @@ the fallback, so there is no second copy to drift - the failure this repository
 already has with the cmemc pin.
 
 `check:skills:case` asserts that the right skills ship, with parseable
-frontmatter and a `name` matching the directory, and that the conditional three
+frontmatter and a `name` matching the directory, and that the conditional four
 are absent from a vocabulary package. It cannot assess what a skill *says*;
 that is a hand read.
 
