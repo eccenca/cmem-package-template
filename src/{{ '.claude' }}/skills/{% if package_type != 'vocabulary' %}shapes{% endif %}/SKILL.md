@@ -62,6 +62,19 @@ every instance. Without one the UI offers no way to create a bare instance,
 which is exactly what abstract means. Each subclass carries the shape; the
 superclass carries none.
 
+**A class the package does not own gets its icon from the node shape.** A
+package that shapes a vocabulary it ships unchanged or depends on - QUDT, FOAF,
+a customer's ontology - leaves those classes as the source ships them and puts
+a `foaf:depiction` on its node shape instead, stroked as described in the
+`vocabulary` skill's `references/depictions.md`. Explore takes a resource's icon
+from the node shapes that target its class whenever the class has none, in the
+navigation tree, the list and the page header (observed on CMEM 26.2). Without
+it every unit or person in the package's views shows no icon; with a depiction
+added to the source's class instead, the package would change a vocabulary it
+does not own, and the next update of the source would drop it. The depiction
+uses the FOAF namespace, so the manifest needs the `foaf-vocab` dependency (see
+the `package-content` skill on dependencies).
+
 ## Property shapes
 
 ```turtle
