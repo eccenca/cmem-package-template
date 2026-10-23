@@ -21,7 +21,7 @@ that is easy to lose and fatal to lose:
 
 ```json
 {
-  "file_path": "explore/shapes.ttl",
+  "file_path": "graphs/shapes.ttl",
   "file_type": "graph",
   "graph_iri": "https://vocabs.example.com/<vocab>/shapes/",
   "import_into": ["https://vocab.eccenca.com/shacl/"],
