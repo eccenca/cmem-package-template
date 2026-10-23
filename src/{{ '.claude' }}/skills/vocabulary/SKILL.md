@@ -47,6 +47,12 @@ everything else the invariants, the measured counts and the pointers to related
 terms. Name related terms with the vocabulary's own prefix, in the comment
 rather than the definition.
 
+**German definitions** follow the same principle and keep German noun capitals:
+"no initial capital" applies only where the definition starts with an adjective
+or a participle. Where the head noun and the agent are both feminine, a relative
+clause can be read the wrong way round (*die Bedingung, die die Regel prüft*) -
+write it passive (*die von der Regel geprüft wird*).
+
 ## Naming
 
 - Class labels are sentence case (`"Feature value"`, not `"FeatureValue"`);
@@ -54,6 +60,10 @@ rather than the definition.
 - Class names are **head-final**: the last word says what the thing *is*.
   `ValuePrecondition` is a precondition; `ConditionValue` would wrongly name a
   value.
+- **A term's IRI and its label always match.** Renaming a term renames its IRI,
+  and with it every slug, query, task id and instance IRI built from it, so a
+  reader never has to translate between the two. The former name, and an expert
+  name users search for, stay as `skos:altLabel` or `skos:hiddenLabel`.
 - Bump `dcterms:modified` whenever a term's definition changes.
 
 ## Classify by intention, not by content
@@ -61,6 +71,22 @@ rather than the definition.
 A class is what its role in the model makes it, not what its instances happen
 to contain. A content-based rule silently reclassifies things when the data
 changes, which is how a vocabulary stops describing anything stable.
+
+## Upper ontologies: properties link, classes may extend
+
+A property that corresponds to a property of an upper or external ontology
+(gist's `isCategorizedBy`, for instance) links to it with `rdfs:seeAlso`; the
+ontology becomes a package dependency that no graph imports. Do not state
+`rdfs:subPropertyOf` across: every statement of the package would become one of
+the other property's, so whatever that ontology says about it - domain, range,
+characteristics, and their next release - applies to the package's data.
+
+A class may extend a class of an upper ontology with `rdfs:subClassOf` - a
+domain's concepts subclass `skos:Concept`, a package class may specialize a
+gist, BFO or schema.org class. Its node shape then needs `shacl:order 0`, so
+that the package's form opens before the upper class's (the `shapes` skill).
+Never make a class a subclass of `owl:Class` or another meta-ontology term -
+that turns its instances into classes.
 
 ## Measure the claim before naming a property
 
