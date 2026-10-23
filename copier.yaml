@@ -4,6 +4,12 @@
 _min_copier_version: "9.0.0"
 _subdirectory: src
 _preserve_symlinks: true
+# The template carries the LICENSE text of Apache-2.0 and CC-BY-4.0 only. For
+# any other licence the package supplies the text, and an update must not
+# write over it. Rendering nothing instead would make copier delete the file
+# on update, even one the package wrote itself.
+_skip_if_exists:
+  - "{% if license not in ['Apache-2.0', 'CC-BY-4.0'] %}LICENSE{% endif %}"
 
 # Questions for the user
 package_type:
@@ -51,6 +57,45 @@ package_description:
     {% elif package_description | length > 150 %}
       Package description must be at most 150 characters
     {% endif %}
+
+# An ontology is content rather than software, so a vocabulary package
+# defaults to a licence written for content; a project package bundles
+# workflows and shapes with its data and keeps the software licence. A package
+# that redistributes outside content - a published ontology, a unit catalogue,
+# a code list - declares that content's licence instead, so the choices are
+# every identifier the marketplace accepts (its manifest's metadata.license
+# list), never an expression like "Apache-2.0 AND CC-BY-4.0". The template
+# carries the LICENSE text of the two defaults only; for any other answer the
+# package supplies the source's own text, and an update never writes over it.
+# LicenseRef-scancode-unknown is the internal package: no LICENSE is shipped.
+license:
+  type: str
+  default: "{{ 'CC-BY-4.0' if package_type == 'vocabulary' else 'Apache-2.0' }}"
+  choices:
+    "Apache License 2.0": "Apache-2.0"
+    "Creative Commons Attribution 4.0 International": "CC-BY-4.0"
+    "Academic Free License v3.0": "AFL-3.0"
+    "BSD 2-Clause \"Simplified\" License": "BSD-2-Clause"
+    "BSD 3-Clause \"New\" or \"Revised\" License": "BSD-3-Clause"
+    "Creative Commons Attribution 1.0 Generic": "CC-BY-1.0"
+    "Creative Commons Attribution Share Alike 3.0 Unported": "CC-BY-SA-3.0"
+    "Creative Commons Attribution Share Alike 4.0 International": "CC-BY-SA-4.0"
+    "Creative Commons Zero v1.0 Universal": "CC0-1.0"
+    "Community Data License Agreement Permissive 2.0": "CDLA-Permissive-2.0"
+    "Community Data License Agreement Sharing 1.0": "CDLA-Sharing-1.0"
+    "Eclipse Public License 2.0": "EPL-2.0"
+    "MIT License": "MIT"
+    "Open Data Commons Attribution License v1.0": "ODC-By-1.0"
+    "Open Data Commons Open Database License v1.0": "ODbL-1.0"
+    "Open Data Commons Public Domain Dedication & License 1.0": "PDDL-1.0"
+    "W3C Software Notice and Document License (2015-05-13)": "W3C-20150513"
+    "Unknown / no licence - an internal package, ships no LICENSE": "LicenseRef-scancode-unknown"
+  help: >-
+    license: The package licence. A package that redistributes outside content
+    declares that content's licence (always for share-alike content) and
+    supplies its text as LICENSE; otherwise CC-BY-4.0 suits a vocabulary
+    (content), Apache-2.0 a project package (workflows and shapes with their
+    data).
 
 # Vocabulary packages cannot have dependencies at all, so both dependency
 # questions below are asked for project packages only.
