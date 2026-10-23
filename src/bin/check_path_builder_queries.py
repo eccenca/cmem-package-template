@@ -17,6 +17,12 @@ row into one of them by what can be seen without data:
     6  computed link            a stand-in path rdfs:seeAlso on a read-only row     (anti-pattern)
     7  embedded widget          a stand-in path rdfs:value, or the header hidden     (anti-pattern)
 
+Every row, whatever its use case, **fails** when its path builder query projects no ?graph column.
+The Business Knowledge Editor resolves the relations between the resources on its canvas through
+every path builder row of their node shapes, and one row without the column makes that whole request
+fail (HTTP 500, observed on CMEM 26.2.2) - so a read-only or derived row needs it as much as an
+editable one: the echo BIND(<{{shuiGraph}}> AS ?graph) where no stored triple underlies the value.
+
 For every subclass split (1) it then checks what keeps the rows and their queries in line. It
 **fails** where
 
@@ -52,7 +58,15 @@ SHUI = Namespace("https://vocab.eccenca.com/shui/")
 TRUE = {"true", "1"}
 
 PREFIX_LINE = re.compile(r"^\s*PREFIX\s+([\w-]*):\s*<([^>]*)>", re.IGNORECASE | re.MULTILINE)
+SELECT_CLAUSE = re.compile(r"\bSELECT\b(.*?)(?:\bWHERE\b|\bFROM\b|\{)", re.IGNORECASE | re.DOTALL)
 TYPE_TEST = re.compile(r"\s(?:a|rdf:type|<http://www\.w3\.org/1999/02/22-rdf-syntax-ns#type>)\s+(<[^>]+>|[\w-]*:[\w-]+)")
+
+
+def projects_graph(text):
+    """Tell whether the outer SELECT of a query projects ?graph (comments ignored)."""
+    body = re.sub(r"#[^\n]*", "", text)
+    clause = SELECT_CLAUSE.search(body)
+    return bool(clause) and (clause.group(1).strip() == "*" or re.search(r"\?graph\b", clause.group(1)) is not None)
 
 
 def local(term):
@@ -129,6 +143,12 @@ def check(paths):
             for shape in group:
                 kind = use_case(graph, shape, len(group))
                 rows.append((local(node), local(shape), local(path), kind))
+                text = query_text(graph, graph.value(shape, SHUI.valueQuery))
+                if text and not projects_graph(text):
+                    failures.append(
+                        f"{local(node)} / {local(shape)}: the path builder query projects no ?graph - the "
+                        "Business Knowledge Editor's relations fail for this node shape (echo "
+                        "BIND(<{{shuiGraph}}> AS ?graph) where no stored triple underlies the value)")
                 if kind in ("6", "7"):
                     warnings.append(f"{local(shape)}: use case {kind}, a catalogued anti-pattern - move it to a widget")
             if kinds != {"1"}:
@@ -191,9 +211,9 @@ def check(paths):
     if not has_vocabulary:
         print("note: no vocabulary among the files, so leaf coverage and superclasses were not judged")
     if failures:
-        print(f"FAIL: {len(failures)} problem(s) in subclass splits")
+        print(f"FAIL: {len(failures)} problem(s) in path builder queries")
         return 1
-    print(f"OK: {len(rows)} path builder query row(s) classified, the subclass splits hold")
+    print(f"OK: {len(rows)} path builder query row(s) classified, each projects ?graph, the subclass splits hold")
     return 0
 
 

@@ -46,6 +46,8 @@ shapes:Band-gigs a shacl:PropertyShape ;
 
 # audit_queries: no dcterms:description, a capitalised projection variable,
 # a header whose variable lines do not match the projection, no body comment.
+# check_path_builder_queries: the Gigs row's path builder query projects no ?graph, which makes the
+# Business Knowledge Editor's relation lookup fail for every resource on its canvas.
 shapes:Band-gigsQuery a shui:SparqlQuery ;
   rdfs:label "Band gigs"@en ;
   shui:queryText """# Lists the gigs a band played.

@@ -137,6 +137,11 @@ def main():
         if not re.search(rf"^\s+{re.escape(name)}\s+FAIL\s*$", output, re.MULTILINE):
             fail(f"{name} did not report its planted fault in the bad fixture:\n{output}")
 
+    # The bad fixture plants two path builder faults; the ?graph one must be named on its own, or
+    # the subclass-split fault would keep the checker red while the graph rule had gone blind.
+    if "projects no ?graph" not in output:
+        fail(f"check_path_builder_queries.py did not report the row without a ?graph column:\n{output}")
+
     # The package as generated has no catalog, which is a pass with a note
     # rather than a failure - otherwise every new package starts red.
     code, output = run_checks(Path("."))
