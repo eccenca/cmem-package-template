@@ -74,6 +74,7 @@ added to the source's class instead, the package would change a vocabulary it
 does not own, and the next update of the source would drop it. The depiction
 uses the FOAF namespace, so the manifest needs the `foaf-vocab` dependency (see
 the `package-content` skill on dependencies).
+
 **A package class whose instances another node shape also reaches gets
 `shacl:order 0` on its node shape** - because the class extends a class that
 Corporate Memory or another package already shapes (a domain's concepts under
@@ -134,11 +135,13 @@ gigos:Festival-startDate a shacl:PropertyShape ;
 ```
 
 `shacl:group` points at a `shacl:PropertyGroup`; `shacl:order` sorts within it.
+
 **Number the rows of a section in steps of 10, without ties, and give every
 visible row an explicit order**: editable stored rows first, then read-only
 stored rows, then rows computed by a query. Ties and gaps in the numbering let
 the renderer decide, and a reader then meets the things to fill in after the
 things to look at.
+
 `shui:` adds the UI behaviour: `shui:showAlways` holds an empty row open,
 `shui:readOnly` forbids editing, `shui:markdown` and `shui:textarea` change the
 input widget, `shui:languageIn` restricts language tags.
@@ -242,7 +245,6 @@ orphan.
 along**, so the three stay findable from each other. A role in parentheses goes
 into the slug camel-cased: *Acts (headliner)* becomes
 `Festival-actsHeadliner`.
-
 
 ## Sections: one set per package, the same on every form
 
