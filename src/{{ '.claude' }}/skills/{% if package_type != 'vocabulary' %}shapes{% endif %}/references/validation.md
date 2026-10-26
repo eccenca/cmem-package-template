@@ -24,13 +24,12 @@ vocabulary or the catalog.
 
 **Validate the graph that imports everything, never a part alone.** The
 validator does not follow `owl:imports`, so a part validated on its own lacks
-the vocabulary and the data its shapes refer to: in one package the rules graph
-alone gave 4,366 violations over 909 of its 910 resources, the integration graph
-none. Validate the integration graph, or whichever graph imports what the
-shapes need. One exception: where that import closure is very large (around a
-hundred thousand triples), validating through it can exhaust Explore's memory
-for everyone on the instance - validate the package's own data graphs one by one
-there instead.
+the vocabulary and the data its shapes refer to, and reports violations that
+the graph importing them does not. Validate the integration graph, or whichever
+graph imports what the shapes need. One exception: where that import closure
+is very large (around a hundred thousand triples), validating through it can
+exhaust Explore's memory for everyone on the instance - validate the package's
+own data graphs one by one there instead.
 
 **Data has to satisfy Corporate Memory's own system shapes too**, which a
 package's catalog does not show:

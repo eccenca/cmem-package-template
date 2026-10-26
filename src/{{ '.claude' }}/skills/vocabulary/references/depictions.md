@@ -36,8 +36,11 @@ of the eccenca palette, defined in `@eccenca/gui-elements`
 (`src/configuration/_palettes.scss`, five tones per hue) - so packages installed
 side by side look like one product. Take the values from there rather than
 copying them. The palette's semantic colours (success, info, warning, danger, a
-separate group in the same file) are reserved for badges and marks, and a class hue keeps at least 26° away from
-them: a class drawn in the warning colour reads as a warning.
+separate group in the same file) are reserved for badges and marks, and a class
+hue keeps at least 26° away from them: a class drawn in the warning colour reads
+as a warning. The 26° is a convention, not a measurement: it is the gap between
+the palette's yellow and its warning colour, the smallest that keeps the yellow
+usable for a class. Choose a wider gap if the palette leaves room.
 
 **Hue carries the family.** A family is an independent top-level class, a class
 that is merely related included. Not counted as families:
