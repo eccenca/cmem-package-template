@@ -75,6 +75,19 @@ does not own, and the next update of the source would drop it. The depiction
 uses the FOAF namespace, so the manifest needs the `foaf-vocab` dependency (see
 the `package-content` skill on dependencies).
 
+**A package class whose instances another node shape also reaches gets
+`shacl:order 0` on its node shape** - because the class extends a class that
+Corporate Memory or another package already shapes (a domain's concepts under
+`skos:Concept`, a class under a gist, BFO or schema.org class), or because its
+instances carry such a type as well (a source that types its datatypes
+`rdfs:Datatype` too brings Corporate Memory's datatype form along). Explore
+offers a resource a form for every node shape whose target class it reaches
+through its types and `rdfs:subClassOf`, and opens the page on the first, so
+without the order the generic form can win. The other shape is not
+the package's to change or remove, so ordering is the lever; check with
+`GET /dataplatform/api/explore/resource/nodeshapeforms/byresource` that the
+package's shape comes first for an instance of each such class.
+
 **Several packages adding to the page of one class attach their rows to one
 node shape.** A class several packages use - a domain ontology's asset, a
 reference package's country - shows one page. A package that wants something
@@ -116,18 +129,6 @@ that class on the instance, whichever package is installed, so:
   Corporate Memory's own catalog.
 - **Check it on the stack**: the form shows the row once, and a query counting
   the row per node shape across all graphs (`COUNT(DISTINCT ?row)`) finds one.
-**A package class whose instances another node shape also reaches gets
-`shacl:order 0` on its node shape** - because the class extends a class that
-Corporate Memory or another package already shapes (a domain's concepts under
-`skos:Concept`, a class under a gist, BFO or schema.org class), or because its
-instances carry such a type as well (a source that types its datatypes
-`rdfs:Datatype` too brings Corporate Memory's datatype form along). Explore
-offers a resource a form for every node shape whose target class it reaches
-through its types and `rdfs:subClassOf`, and opens the page on the first, so
-without the order the generic form can win. The other shape is not
-the package's to change or remove, so ordering is the lever; check with
-`GET /dataplatform/api/explore/resource/nodeshapeforms/byresource` that the
-package's shape comes first for an instance of each such class.
 
 **A resource is edited only where it lives.** When other graphs import a
 resource, its node shape carries `shui:askIfEditableQuery`, so the form offers
@@ -176,11 +177,13 @@ gigos:Festival-startDate a shacl:PropertyShape ;
 ```
 
 `shacl:group` points at a `shacl:PropertyGroup`; `shacl:order` sorts within it.
+
 **Number the rows of a section in steps of 10, without ties, and give every
 visible row an explicit order**: editable stored rows first, then read-only
 stored rows, then rows computed by a query. Ties and gaps in the numbering let
 the renderer decide, and a reader then meets the things to fill in after the
 things to look at.
+
 `shui:` adds the UI behaviour: `shui:showAlways` holds an empty row open,
 `shui:readOnly` forbids editing, `shui:markdown` and `shui:textarea` change the
 input widget, `shui:languageIn` restricts language tags.
@@ -292,7 +295,6 @@ along**, so the three stay findable from each other. A role in parentheses goes
 into the slug camel-cased: *Acts (headliner)* becomes
 `Festival-actsHeadliner`.
 
-
 ## Sections: one set per package, the same on every form
 
 A form's sections are its property groups. **A package defines one set of
@@ -327,6 +329,51 @@ fit and put the package's own sections between them, in the range 400-700:
 
 A user who knows one package then finds *Identity* at the top and *Overview* at
 the bottom of the next one, while each domain keeps its own sections.
+
+The gig package defines its set once and uses it on the Festival form and on
+the Band form:
+
+```turtle
+gigos:group-identity a shacl:PropertyGroup ;
+  rdfs:label "Identity"@en ;
+  rdfs:comment "What the festival or band is called."@en ;
+  shacl:order 100 .
+
+gigos:group-description a shacl:PropertyGroup ;
+  rdfs:label "Description"@en ;
+  rdfs:comment "What the festival or band is about."@en ;
+  shacl:order 200 .
+
+gigos:group-when a shacl:PropertyGroup ;
+  rdfs:label "When"@en ;
+  rdfs:comment "The days a festival takes place."@en ;
+  shacl:order 400 .
+
+gigos:group-lineup a shacl:PropertyGroup ;
+  rdfs:label "Line-up"@en ;
+  rdfs:comment "Who plays at a festival, and where a band plays."@en ;
+  shacl:order 500 .
+
+gigos:group-overview a shacl:PropertyGroup ;
+  rdfs:label "Overview"@en ;
+  rdfs:comment "Figures computed from the gigs."@en ;
+  shacl:order 900 .
+
+gigos:Band-playsAt a shacl:PropertyShape ;
+  shacl:name "Plays at"@en ;
+  shacl:path [ shacl:inversePath gigo:hasAct ] ;
+  shacl:nodeKind shacl:IRI ;
+  shacl:group gigos:group-lineup ;
+  shacl:order 10 .
+```
+
+The Festival form shows *Identity*, *When*, *Line-up* and *Overview*; the Band
+form has no row for *When* and so does not show it, but its *Line-up* sits at
+the same height as the festival's. *Plays at* reaches the band's festivals
+through the inverse of `gigo:hasAct` and still goes into *Line-up*, because
+sections follow meaning, not link direction. The row examples in this skill and
+its references - *First day* in *When*, the band's *Visitors per year* widget in
+*Overview* - use this set.
 
 ## `shacl:name` is the form, `rdfs:label` is the catalog
 

@@ -109,6 +109,10 @@ def rule_breaks(placements, vocab, qv):
         if d not in pos or r not in pos:
             continue
         (bx, by), (dx, dy), (rx, ry) = pos[p], pos[d], pos[r]
+        if d == r:  # a relation from a class to itself has no L: its box sits beside the class, in its row
+            if by != dy:
+                breaks.append(f"{short(p)} not beside its class {short(d)}")
+            continue
         line = (dy == ry and min(dx, rx) < bx < max(dx, rx) and abs(by - dy) <= 2 * ROW) or \
             (dx == rx == bx and min(dy, ry) < by < max(dy, ry))
         corner = by == dy and bx == rx
@@ -134,6 +138,10 @@ def arrangement_breaks(placements, expected):
     pos = {str(t).rsplit("/", 1)[-1]: (x, y) for t, x, y in placements}
     breaks = []
     for kind, *names in expected:
+        if kind == "absent":  # a walk within one class is named in the description, not drawn (Q184)
+            if names[0] in pos:
+                breaks.append(f"{names[0]} drawn, though the question only walks it")
+            continue
         missing = [n for n in [names[0]] + (names[1] if kind == "centred" else names[1:]) if n not in pos]
         if missing:
             breaks.append(f"{kind} {names}: {missing} not drawn")
@@ -234,8 +242,8 @@ def main():
     qv.layered = lambda query, vocab: (planted, [], [])
     if not qv.planar_layout("", vocab)[2]:
         fail("a fault no placement avoids was dropped instead of reported")
-    print(f"check-visualizations: {count} fixture drawings keep their rules, {len(arrangements) - 1} hand arrangements "
-          f"their properties; 3 planted faults caught")
+    print(f"check-visualizations: {count} fixture drawings keep their rules, {len(arrangements) - 1} the properties "
+          f"arrangements.json lists; 3 planted faults caught")
 
 
 if __name__ == "__main__":

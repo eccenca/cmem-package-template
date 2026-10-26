@@ -1,5 +1,5 @@
 {
-  "_comment": "What the hand-made arrangements of the reviewer show, box by box, as the test checks it (Q200): between = the box on the straight line between two aligned classes; row = the box in the class's row; column = the same x; above = higher; centred = centred over the classes listed; left = an attribute left of its class.",
+  "_comment": "What the hand-made arrangements of the reviewer show, box by box, as the test checks it (Q200), and the walks a question names instead of drawing them (absent, Q184): between = the box on the straight line between two aligned classes; row = the box in the class's row; column = the same x; above = higher; centred = centred over the classes listed; left = an attribute left of its class.",
   "alternative-suppliers": [["above", "Product", "Hardware"], ["column", "Product", "Hardware"],
                             ["row", "hasSupplier", "Product"], ["row", "alternativeSupplier", "Hardware"]],
   "two-subclasses": [["centred", "Product", ["Hardware", "Service"]], ["column", "hasSupplier", "Supplier"]],
@@ -9,5 +9,6 @@
               ["above", "Asset", "Facility"], ["above", "Facility", "Site"]],
   "work-order-roles": [["between", "requester", "WorkOrder", "Person"], ["between", "assignee", "WorkOrder", "Person"],
                        ["between", "approver", "WorkOrder", "Person"], ["left", "dueDate", "WorkOrder"],
-                       ["left", "openedOn", "WorkOrder"]]
+                       ["left", "openedOn", "WorkOrder"]],
+  "fed-by-a-pump": [["absent", "feeds"]]
 }
