@@ -19,8 +19,8 @@ NodeShape ──shui:WidgetIntegration_integrate──▶ shui:WidgetIntegration
 gigos:widget-visitors-per-year a shui:WidgetIntegration ;
   rdfs:label "Visitors per year"@en ;
   rdfs:comment "How many gigs this band played each year, and how many people were there."@en ;
-  shacl:order 63 ;
-  shui:WidgetIntegration_group gigos:group-stats ;
+  shacl:order 10 ;
+  shui:WidgetIntegration_group gigos:group-overview ;
   shui:WidgetIntegration_widget gigos:report-visitors-per-year .
 ```
 
@@ -38,6 +38,15 @@ together.** There is no search-specific property - a table report carries only
 report worth searching keeps its header and tolerates the search field; a
 single-value report hides both header and footer, because there is nothing to
 search and a column title would only repeat the widget's label.
+
+**Set both flags, always.** The catalog's own validation reports a table report
+that carries only one of `hideHeader` and `hideFooter`.
+
+**Counts of marks belong in a table report, not in a badge.** A table on the
+resource that aggregates them - class, finding, count - is computed live and
+needs no stored property or summary. Give the class and finding cells IRIs, so
+they render as links to the resources, and the count a number; a clean result
+shows one row saying so rather than an empty table.
 
 ## The query
 
