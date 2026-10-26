@@ -8,9 +8,23 @@ each labelled after the file that ships it:
 | vocabulary | the ontology; `register_as_vocabulary: true` |
 | shapes | the SHACL catalog; `import_into` the Corporate Memory shapes graph |
 | data | the instances; shipped holding only its own description |
-| integration | the entry point - imports the vocabulary and the data |
+| integration | the root users open - imports the vocabulary and the data; read-only |
 
-## Keep the `owl:imports` in the integration graph
+## The integration root is read-only
+
+The integration graph is the root of the package: users open it to see the
+vocabulary and the data together, and it holds nothing but its own description
+and its `owl:imports`. **Nothing writes into it** - no workflow, and no form
+save. A statement saved into the root sits apart from the data it belongs to,
+in a graph no workflow owns and no uninstall of a data graph takes along.
+
+Between the data graphs and the root there may be **intermediate integration
+graphs**: a graph that imports parts and also holds data of its own - a
+product's graph holding the product and importing its components, say. Such a
+graph integrates, but it is not read-only; users may edit the data it holds.
+The read-only rule is for the root alone.
+
+## Keep the `owl:imports` in the integration graphs
 
 A data graph that imports the vocabulary itself cannot be explored
 independently of it, and every pipeline run would have to preserve that import

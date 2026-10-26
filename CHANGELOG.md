@@ -31,6 +31,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 
 - The `vocabulary` skill names every relation (object property) as a verb phrase read from its domain to its range - a verb such as `manages`, or `has` / `is … of` with the role the range plays, such as `hasProductManager` - never as a bare class or role name
+- `package-content` now states that the integration graph is the package's read-only root: it holds nothing but its description and imports, and neither a workflow nor a form writes into it. Intermediate integration graphs between the data and the root - a product's graph importing its components, say - may hold data of their own and stay editable
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 - The `shapes` skill carries the shape-catalog rules the eccenca packages settled on
   - one set of sections (property groups) per package, used on every form in steps of 100, findings first, the overview last, none by link direction; recommended common sections at fixed positions keep packages alike, replacing the fixed house-style groups and the advice to give each form its own group
