@@ -57,6 +57,14 @@ write it passive (*die von der Regel geprüft wird*).
 
 - Class labels are sentence case (`"Feature value"`, not `"FeatureValue"`);
   property labels are lowercase words (`"selects material"`).
+- **A relation is named as a verb phrase**, read from its domain to its range:
+  a verb (`manages`, `appliesTo`, `standsInFor`), or `has` / `is … of` with the
+  role the range plays (`hasProductManager`, `isMemberOf`). Never a bare class or
+  role name: `productManager` reads like the class Product manager and hides
+  which way the relation runs. *A form row, a query and a Business Knowledge
+  Editor drawing show the label between two resources - "Product has product
+  manager Employee" says what it states, "Product product manager Employee" does
+  not.*
 - Class names are **head-final**: the last word says what the thing *is*.
   `ValuePrecondition` is a precondition; `ConditionValue` would wrongly name a
   value.
