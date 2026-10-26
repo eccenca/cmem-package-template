@@ -62,6 +62,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - `catalog-queries` limits "no markup datatype is honoured" to extra columns: a value column typed `sysont:Markdown` renders as markup (checked in the browser)
 - `scripts/check-offline.py` matches a checker's verdict by name, not by column width (the summary pads names to the longest checker)
 
+### Fixed
+
+- `task check:offline` no longer reports a catalog that adds a row to one of Corporate Memory's own forms (`<system node shape> sh:property <row>`, the row in a system group) as dangling: only namespaces the file types a resource in count as the catalog's own, whatever prefixes the file binds
+
 ## [1.8.0] 2026-10-18
 
 ### Added
