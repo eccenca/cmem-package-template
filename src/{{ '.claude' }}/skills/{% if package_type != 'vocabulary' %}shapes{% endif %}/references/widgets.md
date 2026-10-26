@@ -19,8 +19,8 @@ NodeShape ──shui:WidgetIntegration_integrate──▶ shui:WidgetIntegration
 gigos:widget-visitors-per-year a shui:WidgetIntegration ;
   rdfs:label "Visitors per year"@en ;
   rdfs:comment "How many gigs this band played each year, and how many people were there."@en ;
-  shacl:order 63 ;
-  shui:WidgetIntegration_group gigos:group-stats ;
+  shacl:order 10 ;
+  shui:WidgetIntegration_group gigos:group-overview ;
   shui:WidgetIntegration_widget gigos:report-visitors-per-year .
 ```
 
