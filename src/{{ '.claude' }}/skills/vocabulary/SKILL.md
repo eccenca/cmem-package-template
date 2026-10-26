@@ -99,6 +99,96 @@ Where premises are conjoined, one premise is not *sufficient*; where several
 rules reach the same object, none is *necessary*. What usually survives both
 counts is participation - "contributes to".
 
+## Competency questions, drawn
+
+A package states the questions its model has to answer as competency questions:
+one SPARQL query per file in `requirements/questions/<slug>.rq` (next to the
+package directory, not shipped), its header comment carrying the question as
+it was asked - `# question: Which of our suppliers sit in a country we flag?`.
+*Whoever changes the model sees which questions it still answers, and a
+customer signs off a model as the answer to their own questions.*
+
+After changing a question, a class or a property, run `task visualizations`.
+It writes one Business Knowledge Editor visualisation per question into
+`graphs/competency-questions.ttl` (declared in the manifest): the part of the
+model that answers it, named after the question.
+
+Each relation reads as an L: its box in the row of the class it leaves from,
+right beside it, and the class it leads to in the box's column, above or
+below. Where the two classes are already aligned, the box sits on the line
+between them, and several relations between the same two classes stand stacked
+across it. *A reader follows each relation along one short edge and one
+straight drop, the way the model's author would sketch it.* A class's
+attributes (datatype properties) sit on its left, one below the other - on the
+first free side of below, right and above where an edge arrives on the left,
+never above a class with a parent - closer to it than any of its relations.
+*Closeness reads as belonging: a class and its attributes are one unit, the
+relations connect units.* The BKE places the datatypes itself and marks them
+as not declared in the vocabulary, which is true.
+
+Where these meet, a higher rule decides, so a reader of a drawing can tell why
+each box sits where it does:
+
+0. **No edge across the drawing**: a relation box at most three columns from
+   the class it leaves from, the class it leads to at most one column beside
+   it, and no edge longer than that across or down. *An edge across the whole
+   picture reads as badly as a crossing.*
+1. **Nothing crosses**: no edge through a box or a label, no label on a box or
+   another label, no two edges leaving a box together, no box on a box. The
+   BKE draws each edge as a curve with its label in the middle; the check takes
+   the straight line. A crossing no placement avoids is named by the check.
+2. **Hierarchies run top-down**, parent above child: a superclass above its
+   subclass, and every relation the vocabulary marks as a tree -
+   `rdfs:subClassOf`, `skos:broader`, a transitive part-of, a property linked by
+   `rdfs:seeAlso` to `gist:isPartOf`, `gist:isMemberOf` or
+   `gist:isCategorizedBy` - with its box on the line between parent and child,
+   whichever way the query reads it. Every level between a class and a
+   superclass is drawn. A walk between instances of one class -
+   `?c skos:broader* ?parent` within a taxonomy, `?shelf :partOf* ?room` within
+   the locations - gets no box: the drawing shows the model, and the
+   visualisation's description names the walk. A single step from a class to itself keeps its box, beside the
+   class.
+3. **The L**, as above.
+4. **One parent straight above.** A class with several parents in the drawing
+   has one bound parent directly above it - the hierarchy the question asks
+   about (member of, part of) before `rdfs:subClassOf` - and the others reach it
+   by an angled edge. The L ranks higher: a class the question reaches by a
+   relation hangs below that relation, and its `rdfs:subClassOf` runs angled.
+5. **A parent centred** over its bound children.
+6. **The question's first class top left**, where nothing above decides; the
+   same question always gives the same drawing.
+7. **The shortest edges.**
+
+- The boxes are the classes and properties the query names, plus each
+  property's declared domain and range, so every box is connected: where the
+  query names a subclass (`?x a :Hardware ; :hasSupplier ?s` with the property
+  declared on `:Product`), the declared class sits above it and the BKE draws
+  the `rdfs:subClassOf` link. A question that names no term of the vocabulary
+  gets no drawing, and the check says so.
+- **Open a drawing** for whoever reviews it in the Business Knowledge Editor
+  with one link per visualisation, so nobody searches for it by name:
+  `https://<host>/default/bke/viz?graph=<context graph>&vizIri=<visualisation IRI>&catalogGraphIri=<graph holding the visualisations>`,
+  each IRI URL-encoded - `graph` is the visualisation's `shui:hasContextGraph`
+  (the vocabulary), `catalogGraphIri` the competency-questions graph; `default`
+  is the instance's default application view. *A reviewer judges a drawing
+  only in the BKE; the Explore page of the same IRI shows its triples, not the
+  drawing.*
+- **A class's page lists its questions.** The drawings' graph carries a
+  read-only row "Competency questions" for Corporate Memory's own class forms,
+  in a group "Overview" at the end: every question whose drawing contains the
+  class, each a link that opens the drawing in the BKE. The graph is imported
+  into the global shape catalog for Explore to find the row; every package
+  writes the same triples, so an instance shows one row however many packages
+  ship questions, and a class in no drawing shows neither row nor group.
+  *Whoever changes a class sees which questions depend on it and opens their
+  drawings in one click.*
+- **The drawings form one catalog in the BKE**: the graph is labelled
+  "<package name>: competency questions", the catalog the BKE's Visualization
+  catalog lists them under, so a reviewer filters the questions of one package.
+- Positions are never placed by hand: `task visualizations:check` reports a
+  drawing that no longer matches its question or the vocabulary. A hand-made
+  visualisation goes into a graph of its own.
+
 ## Going further
 
 - `references/depictions.md` - the `foaf:depiction` icon every class wants, and

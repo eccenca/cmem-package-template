@@ -1,0 +1,8 @@
+# question: Which products come from a manufacturer, and which from a distributor?
+PREFIX ex: <https://example.com/fixture/>
+SELECT ?product ?manufacturer ?distributor WHERE {
+  ?product a ex:Product ; ex:hasSupplier ?manufacturer, ?distributor .
+  ?manufacturer a ex:Manufacturer .
+  ?distributor a ex:Distributor ; ex:addressText ?address .
+  ?product ex:name ?name .
+}

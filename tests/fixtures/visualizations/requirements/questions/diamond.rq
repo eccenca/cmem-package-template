@@ -1,0 +1,3 @@
+# question: Is the team responsible for a site the team of the person assigned to work there?
+PREFIX ex: <https://example.com/complex/>
+SELECT * WHERE { ?wo a ex:WorkOrder ; ex:assignee ?p ; ex:concerns ?eq . ?p ex:memberOf ?team . ?eq ex:locatedIn ?site . ?site ex:responsibleTeam ?team . }

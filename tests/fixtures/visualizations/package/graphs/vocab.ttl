@@ -1,0 +1,33 @@
+# A small vocabulary for testing bin/question_visualizations.py: a class hierarchy on both sides of a
+# relation, a categorisation, a foreign class (Country) and two attributes sharing xsd:string.
+@prefix ex: <https://example.com/fixture/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+ex:Agent a owl:Class ; rdfs:label "Agent"@en .
+ex:Supplier a owl:Class ; rdfs:label "Supplier"@en ; rdfs:subClassOf ex:Agent .
+ex:Manufacturer a owl:Class ; rdfs:label "Manufacturer"@en ; rdfs:subClassOf ex:Supplier .
+ex:Distributor a owl:Class ; rdfs:label "Distributor"@en ; rdfs:subClassOf ex:Supplier .
+ex:Product a owl:Class ; rdfs:label "Product"@en .
+ex:Hardware a owl:Class ; rdfs:label "Hardware"@en ; rdfs:subClassOf ex:Product .
+ex:Service a owl:Class ; rdfs:label "Service"@en ; rdfs:subClassOf ex:Product .
+ex:ProductCategory a owl:Class ; rdfs:label "Product category"@en .
+
+ex:hasSupplier a owl:ObjectProperty ; rdfs:label "has supplier"@en ;
+    rdfs:domain ex:Product ; rdfs:range ex:Supplier .
+ex:alternativeSupplier a owl:ObjectProperty ; rdfs:label "alternative supplier"@en ;
+    rdfs:domain ex:Hardware ; rdfs:range ex:Supplier .
+ex:previousSupplier a owl:ObjectProperty ; rdfs:label "previous supplier"@en ;
+    rdfs:domain ex:Hardware ; rdfs:range ex:Supplier .
+ex:hasCategory a owl:ObjectProperty ; rdfs:label "has category"@en ;
+    rdfs:domain ex:Product ; rdfs:range ex:ProductCategory ;
+    rdfs:seeAlso <https://w3id.org/semanticarts/ns/ontology/gist/isCategorizedBy> .
+ex:country a owl:ObjectProperty ; rdfs:label "country"@en ;
+    rdfs:domain ex:Supplier ; rdfs:range <http://dbpedia.org/ontology/Country> .
+ex:addressText a owl:DatatypeProperty ; rdfs:label "address text"@en ;
+    rdfs:domain ex:Agent ; rdfs:range xsd:string .
+ex:addressLocality a owl:DatatypeProperty ; rdfs:label "address locality"@en ;
+    rdfs:domain ex:Agent ; rdfs:range xsd:string .
+ex:name a owl:DatatypeProperty ; rdfs:label "name"@en ;
+    rdfs:domain ex:Product ; rdfs:range xsd:string .
