@@ -50,16 +50,14 @@ shows one row saying so rather than an empty table.
 
 ## The query
 
-The query takes `{{shuiMainResource}}` and may be a plain `SELECT … GROUP BY`
+The query takes `{{shuiResource}}` and may be a plain `SELECT … GROUP BY`
 returning aggregate literals - which is why a widget needs no invented property
 to hang on.
 
-**It is `shuiMainResource` here, not `shuiResource`.** The two usually resolve
-to the same IRI, which is what makes the wrong one survive: `shuiResource`
-follows the nesting and names the resource of the immediate sub-shape, while
-`shuiMainResource` stays pinned to the top-level resource whose page is open. A
-widget reports on the page, so it wants the stable one. Everywhere else,
-`shuiResource` is the default - see the `catalog-queries` skill.
+**A widget reports on the resource of the node shape it sits on.** On an
+embedded node shape that is the embedded resource; a widget about the page's own
+resource therefore goes on the page's own node shape. `{{shuiMainResource}}` is
+deprecated - don't use it (the `catalog-queries` skill, placeholders).
 
 Other widget types exist - `shui:ComplexResourceViewerWidget`,
 `shui:SimpleResourceViewerWidget`, `shui:ChartVisualization`,

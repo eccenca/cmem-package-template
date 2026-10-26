@@ -6,7 +6,7 @@
 """Check the shui:QueryPlaceholder declarations of a shape catalog.
 
 A placeholder declares a named parameter of a shipped query: the query embeds the key
-literally as ``{{key}}`` and the placeholder's value query supplies the choices offered in
+literally as ``{{key}}`` and the placeholder values query supplies the choices offered in
 the picker. Four things about that arrangement are easy to get wrong and impossible to see
 by reading the Turtle, and all four are checked here.
 
@@ -23,13 +23,13 @@ by reading the Turtle, and all four are checked here.
    and an editor fallback, not behaviour. For any other key it is a failure, because nothing
    will ever substitute a custom key that is not declared.
 
-3. **A value query must contain no placeholder at all.** It is evaluated in order to produce
+3. **A placeholder values query must contain no placeholder at all.** It is evaluated in order to produce
    values for a parameter, so a parameter of its own could never be resolved first. Name the
    graph literally.
 
 4. **No placeholder key in braces inside a comment.** Substitution is a plain text replace
    over the whole query text, comments included, so a query that mentions a key that way in
-   prose still gets substituted — and a value query mentioning its own key becomes circular.
+   prose still gets substituted — and a placeholder values query mentioning its own key becomes circular.
 
 Namespaces are read from the parsed graph; nothing here is specific to one package.
 
@@ -174,19 +174,19 @@ def check(paths):
     print(f"  -> {uncovered} uncovered parameter(s) over "
           f"{len(driving)} query-driven query/queries")
 
-    # 3. a value query must carry no parameter of its own
+    # 3. a placeholder values query must carry no parameter of its own
     print()
-    print(f"{len(value_queries)} value query/queries")
+    print(f"{len(value_queries)} placeholder values query/queries")
     for query in sorted(value_queries, key=str):
         text = texts.get(query)
         if text is None:
-            failures.append(f"value query {local(query)} ships no shui:queryText")
+            failures.append(f"placeholder values query {local(query)} ships no shui:queryText")
             continue
         params = parameters(text)
         print(f"  {local(query):58} {'ok' if not params else 'HAS ' + ','.join(params)}")
         for param in params:
             failures.append(
-                f"value query {local(query)} uses {{{{{param}}}}} — a value query is "
+                f"placeholder values query {local(query)} uses {{{{{param}}}}} — a placeholder values query is "
                 f"evaluated to produce values, so its own parameter can never be resolved")
 
     # 4. no key in braces inside a comment
@@ -215,7 +215,7 @@ def check(paths):
         print(f"OK: nothing broken ({len(warnings)} undeclared built-in key(s) noted above)")
     else:
         print("OK: placeholders unambiguous, parameters covered, "
-              "value queries and comments clean")
+              "placeholder values queries and comments clean")
     return 0
 
 

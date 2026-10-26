@@ -30,6 +30,7 @@ Exits non-zero with a one-line reason on the first failure.
 
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -46,6 +47,7 @@ CHECKERS = (
     "check_paths.py",
     "check_placeholders.py",
     "check_skill_map.py",
+    "check_path_builder_queries.py",
 )
 
 CUSTOM_MAP = Path(".claude") / "skill-map.custom.json"
@@ -167,9 +169,16 @@ def main():
     # single checker failing on all four would satisfy the exit code above
     # while three others had quietly gone blind.
     for name in ("check_dangling.py", "check_placeholders.py", "check_paths.py",
-                 "audit_queries.py"):
-        if f"  {name:21}  FAIL" not in output and f"{name}  FAIL" not in output:
+                 "audit_queries.py", "check_path_builder_queries.py"):
+        # The summary pads names to the longest checker name, so match the
+        # line by name and verdict rather than by column width.
+        if not re.search(rf"^\s+{re.escape(name)}\s+FAIL\s*$", output, re.MULTILINE):
             fail(f"{name} did not report its planted fault in the bad fixture:\n{output}")
+
+    # The bad fixture plants two path builder faults; the ?graph one must be named on its own, or
+    # the subclass-split fault would keep the checker red while the graph rule had gone blind.
+    if "projects no ?graph" not in output:
+        fail(f"check_path_builder_queries.py did not report the row without a ?graph column:\n{output}")
 
     # The package as generated has no catalog, which is a pass with a note
     # rather than a failure - otherwise every new package starts red.
