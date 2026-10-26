@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- A `thesauri` skill for project packages: the shape of a SKOS taxonomy that resources are categorized by, who maintains it (taxonomy editor, external term library, seed), linking a standard classification without copying it, what the taxonomy editor reads and writes, icons for schemes and concepts, typing editor-made concepts on use, concept forms, where categorization links are saved, importing a term library; a concept form whose thesaurus has another master answers every `askIf…` query false
+
 ### Changed
 
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
