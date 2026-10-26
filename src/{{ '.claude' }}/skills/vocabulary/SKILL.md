@@ -76,15 +76,17 @@ changes, which is how a vocabulary stops describing anything stable.
 
 A property that corresponds to a property of an upper or external ontology
 (gist's `isCategorizedBy`, for instance) links to it with `rdfs:seeAlso`; the
-ontology becomes a package dependency that no graph imports. Do not state
+project package that installs the vocabulary declares the ontology as a
+dependency that no graph imports. Do not state
 `rdfs:subPropertyOf` across: every statement of the package would become one of
 the other property's, so whatever that ontology says about it - domain, range,
 characteristics, and their next release - applies to the package's data.
 
 A class may extend a class of an upper ontology with `rdfs:subClassOf` - a
 domain's concepts subclass `skos:Concept`, a package class may specialize a
-gist, BFO or schema.org class. Its node shape then needs `shacl:order 0`, so
-that the package's form opens before the upper class's (the `shapes` skill).
+gist, BFO or schema.org class. Its node shape in the shape catalog of a
+project package then needs `shacl:order 0`, so that the package's form opens
+before the upper class's.
 Never make a class a subclass of `owl:Class` or another meta-ontology term -
 that turns its instances into classes.
 
