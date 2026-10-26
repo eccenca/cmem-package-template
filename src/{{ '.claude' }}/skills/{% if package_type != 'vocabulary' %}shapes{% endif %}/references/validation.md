@@ -22,6 +22,24 @@ cmemc -c <connection> graph validation execute <graph-iri> --wait --inspect
 Run this over every graph the change could touch after any edit to the
 vocabulary or the catalog.
 
+**Validate the graph that imports everything, never a part alone.** The
+validator does not follow `owl:imports`, so a part validated on its own lacks
+the vocabulary and the data its shapes refer to, and reports violations that
+the graph importing them does not. Validate the integration graph, or whichever
+graph imports what the shapes need. One exception: where that import closure
+is very large (around a hundred thousand triples), validating through it can
+exhaust Explore's memory for everyone on the instance - validate the package's
+own data graphs one by one there instead.
+
+**Data has to satisfy Corporate Memory's own system shapes too**, which a
+package's catalog does not show:
+
+- a graph's own `rdfs:label` and any `skos:hiddenLabel` must be language-tagged
+  (`rdf:langString`); an untagged `skos:altLabel` gives a warning
+- `1` is no `xsd:decimal` - write `1.0`
+- a table report needs both `shui:TableReport_hideHeader` and
+  `shui:TableReport_hideFooter` (see `widgets.md`)
+
 **Take counts from `violationsCount` in `graph validation list --raw`.** The
 `inspect` endpoint *streams* its results, so calling it twice on the same
 finished run can return different lengths - which looks like the data changing

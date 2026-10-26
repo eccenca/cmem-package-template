@@ -18,6 +18,13 @@ BusinessUnit; `ismo:Asset` stands for the data, physical and software assets.
 the classes that just became its subclasses.** New subclasses are never added. A
 root may be left out deliberately if end users have no business browsing it.
 
+**Leave a class out of a shipped graph's managed classes where users would
+create in it.** Explore creates new resources of a managed class in that graph,
+and the next install of the package replaces the graph - with the user's
+additions gone. A package that ships the starting members of a list (the top
+genres, the languages) lists their class only in a graph users own, so additions
+land there and survive an update.
+
 Each graph declares the kinds of resource it manages: a data graph names its
 domain classes, a vocabulary graph names `owl:Class` and the property types, a
 shape catalog names the `shacl:`/`shui:` shape types.
