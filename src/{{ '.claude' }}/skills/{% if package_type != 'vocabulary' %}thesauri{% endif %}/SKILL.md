@@ -1,6 +1,6 @@
 ---
 name: thesauri
-description: "Shape a thesaurus in a Corporate Memory package - a SKOS taxonomy of categories that resources point at - so that charts, forms and search stay readable, maintain it in the taxonomy editor or from an external term library, categorize resources against it, and give it an application view to browse it as a tree. Use when categories have grown flat and too many, when duplicates should be merged, when a taxonomy is to be maintained in the taxonomy editor or synchronised from a term library, when a standard classification is to be linked, or when users should browse a taxonomy in an application view."
+description: "Shape a thesaurus in a Corporate Memory package - a SKOS taxonomy of categories that resources point at - so that charts, forms and search stay readable, maintain it in the taxonomy editor or from an external term library, and categorize resources against it. Use when categories have grown flat and too many, when duplicates should be merged, when a taxonomy is to be maintained in the taxonomy editor or synchronised from a term library, when a standard classification is to be linked."
 ---
 
 # Thesauri
@@ -54,7 +54,7 @@ The taxonomy editor's own term is *thesaurus project*.
 A package class under `skos:Concept` inherits Corporate Memory's concept form
 (`shacl:ConceptShape`, and `ConceptSchemeShape` for schemes), so its node shape
 gets `shacl:order 0` (the `shapes` skill) - every such class, not only the one
-that showed the problem. Navigation and views follow the same idea: browse by
+that showed the problem. Navigation follows the same idea: browse by
 the package's class or a scheme's top concepts, not by `skos:Concept`, which
 lists every concept on the instance.
 
@@ -63,7 +63,7 @@ lists every concept on the instance.
 - `skos:prefLabel` with a language tag on every concept, in each language the
   package speaks. An untagged label fails a shape requiring `rdf:langString`.
 - A concept scheme (`skos:ConceptScheme`, `skos:topConceptOf`) is needed by a
-  tree view that roots at the scheme's top concepts; the roll-up above works
+  tree that roots at the scheme's top concepts; the roll-up above works
   without one.
 
 ## Changing a vocabulary that holds user data
@@ -163,9 +163,8 @@ data (ODbL, CC BY-SA) stays in its own graph, marked as such.
   `askIfCreatableQuery`, `askIfRemovableQuery` and `askIfCloneableQuery` as
   `ASK { FILTER(false) }` (the `shapes` skill, *A resource is edited only where
   it lives*), plus the read-only link row to the editor (below). Read-only rows
-  alone are not enough: Explore still offers *Edit*, and a save in an
-  application view would land in the graph that is open, never in the
-  thesaurus.
+  alone are not enough: Explore still offers *Edit*, and a save would land in
+  the graph that is open, never in the thesaurus.
 - **The taxonomy editor is not reached by those queries**: it draws Corporate
   Memory's own concept forms, so the concepts stay editable there. Protect the
   term graph with an access condition that makes it read-only for everyone but
@@ -242,8 +241,8 @@ use*:
   is offered or typed; when a concept is no longer used, the inferred type goes
   again - the concept stays in the editor.
 - **"Used"** means a resource sits at the concept or anywhere below it
-  (`?x <prop>/skos:broader* ?c`) - the same test as the pruned navigation tree,
-  so view, picker and type agree. Shipped top concepts are exempt, and so is a
+  (`?x <prop>/skos:broader* ?c`) - the same test for the picker and the type,
+  so they agree. Shipped top concepts are exempt, and so is a
   concept that another visible graph types with the class.
 - **Clean-up removes exactly what was inferred**: `a <class>` and
   `skos:inScheme`.
@@ -286,15 +285,12 @@ Package-specific data about a concept goes into SKOS terms:
 
 ## Categorizing resources by a taxonomy
 
-**A thesaurus whose concepts categorize resources gets an application view of
-its own**: a concept tree with the categorized resources as its list.
-
 The link from a resource to a concept is curated data, not a build product:
 
 - Keep the links in a **categorization graph** that the build does not clear;
   let it `owl:imports` what the resource's form needs, and describe it with
-  `void:propertyPartition [ void:property <categorizing property> ]` so a view's
-  graph list can find it. Links minted into a graph the build clears are lost on
+  `void:propertyPartition [ void:property <categorizing property> ]`, so the
+  graph says which links it holds. Links minted into a graph the build clears are lost on
   the next run.
 - Name it after gist: a *categorization* graph (gist's `isCategorizedBy` links a
   thing to a `Category`).
@@ -309,7 +305,7 @@ The link from a resource to a concept is curated data, not a build product:
   - a template names a **fixed** graph. Whether it substitutes any placeholder
     besides the account name is not yet observed - name the graph literally
     until a test shows otherwise.
-- **Save the categorization where it lives, from any view**: give the resource's
+- **Save the categorization where it lives, from any form**: give the resource's
   node shape and its categorizing row a `shui:targetGraphTemplate` naming the
   categorization graph, make every other row of that form read only. A save
   from the integration graph then lands in the categorization graph. Check in
@@ -354,66 +350,7 @@ The link from a resource to a concept is curated data, not a build product:
   class, where the tree has them), and drops hidden labels that name a narrower
   concept.
 
-## An application view to browse the taxonomy
-
-A taxonomy gets its own view, so users browse it as a tree beside the resources
-categorized by it, without switching to the taxonomy editor. The editor stays
-where the taxonomy is maintained.
-
-**Navigation box** (`navigationConfiguration`; keep `{{VALUES}}`, no `PREFIX`
-inside - put `skos:` into `fallbackPrefixes`):
-
-```sparql
-# topConceptQuery - projects ?resource
-SELECT ?resource WHERE {
-  {{VALUES}}
-  ?resource skos:topConceptOf <scheme> .
-  FILTER EXISTS { ?item a <ListedClass> ; <prop>/skos:broader* ?resource }
-}
-
-# conceptParentChildQuery - projects ?topResource ?resource ?parentResource
-SELECT ?topResource ?resource ?parentResource WHERE {
-  {{VALUES}}
-  ?resource skos:broader ?parentResource .
-  ?resource skos:broader+ ?topResource .
-  ?topResource skos:topConceptOf <scheme> .
-  FILTER EXISTS { ?item a <ListedClass> ; <prop>/skos:broader* ?resource }
-}
-```
-
-- `?topResource` must be the **root**, reached transitively, or grandchildren
-  drop out.
-- **Show only the paths that lead to an entry of the list**: the
-  `FILTER EXISTS` keeps a concept only if some resource the list would show is
-  categorized under it or a narrower concept. A kept concept takes its
-  ancestors with it, so the paths stay connected. The full taxonomy stays
-  visible in the editor.
-- Try a query in the query editor first: the fallback prefixes as `PREFIX`
-  lines, `{{VALUES}}` removed, the view's default graph as `FROM`.
-
-**The list beside the tree.** Clicking a concept lists `?instance a <concept>`
-by default - nothing. Give the view a
-`modules.exploreModuleConfiguration.navigationListQuery` (`{{FROM}}` and
-`{{RESOURCE}}` are filled in, while `{{shuiGraph}}` and `{{shuiResource}}` stay
-as written; the first projected variable is the listed resource) that keeps the
-class branch and adds the taxonomy:
-
-```sparql
-SELECT DISTINCT ?resource {{FROM}} WHERE {
-  { ?resource a {{RESOURCE}} } UNION { ?resource a/rdfs:subClassOf+ {{RESOURCE}} }
-  UNION { ?resource a <ListedClass> ; <prop>/skos:broader* {{RESOURCE}} }
-}
-```
-
-- **Name the listed class in the taxonomy branch** (`<ListedClass>`, the same
-  in the list and both tree queries): another class may point to the same
-  concepts through the same property - QUDT's physical constants share
-  `qudt:hasQuantityKind` with its units - and its instances would otherwise
-  turn up in the list, keep concepts in the tree and add to the badges.
-- Label views "<application>: <aspect>" in every package language and share an
-  id prefix so they sort together.
-
-**A link from the concept's form to the taxonomy editor**:
+## A link from the concept's form to the taxonomy editor
 
 - A read-only row on an annotation property of the package's own (e.g.
   `ex:openIn`, label "open in", comment "a link to another tool or view that
@@ -429,9 +366,8 @@ SELECT DISTINCT ?resource {{FROM}} WHERE {
   project with `FROM NAMED <{{shuiGraph}}>` and
   `GRAPH ?project { ?project a eccdsm:ThesaurusProject . <{{shuiResource}}> a skos:Concept }`;
   build the link with `ENCODE_FOR_URI`.
-- Make the link **absolute** (`/default/…`): an application view usually
-  enables only the Explore module, so a relative link from `/<view>/explore`
-  misses the editor.
+- Make the link **absolute** (`/default/…`), so it reaches the editor
+  wherever the form is opened.
 
 ## Charts on a taxonomy
 
