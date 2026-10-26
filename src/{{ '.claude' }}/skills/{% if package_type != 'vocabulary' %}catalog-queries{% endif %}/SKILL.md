@@ -3,6 +3,11 @@ name: catalog-queries
 description: Write and document the SPARQL queries a shape catalog ships - path builder queries behind a form row, selectable resources queries behind a row's picker, placeholder values queries behind a parameter picker, and the header comment, projection and placeholders each one needs. Use when a query is added to or edited in the catalog, when a form row shows the wrong column, or when a picker does not fill.
 ---
 
+<!--
+PREVIEW: not yet in the template's main branch. Open pull requests: #39.
+From the branch preview/skills of eccenca/cmem-package-template.
+-->
+
 # Queries inside a shape catalog
 
 A shipped query is a `shui:SparqlQuery` in the shape catalog, carrying its

@@ -3,6 +3,11 @@ name: workflows
 description: Design the DataIntegration workflows of a Corporate Memory package - CMEM constructs before SPARQL, the minimal input per task, linking natively, optimising a build, phases and in-memory hand-off, responsibilities between tasks and graphs, sticky notes, the waterfall canvas layout (task layout), testing, and the DataIntegration mechanics found on the way. Use when a workflow is created, split, laid out or reviewed, when a task is chosen or replaced, or when deciding how a build step gets its data into a graph.
 ---
 
+<!--
+PREVIEW: not yet in the template's main branch. Open pull requests: #35 (new
+skill). From the branch preview/skills of eccenca/cmem-package-template.
+-->
+
 # Workflows in a package's build project
 
 How to design the workflows a package ships. The `build-projects` skill holds the

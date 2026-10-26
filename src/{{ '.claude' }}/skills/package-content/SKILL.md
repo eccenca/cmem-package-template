@@ -3,6 +3,12 @@ name: package-content
 description: Add, remove or fix the content a Corporate Memory package ships - graphs, project exports, images - and keep cpa-manifest.json in step with it. Use when a file is added to or removed from the package directory, when a build fails on the manifest, when a graph should register as a vocabulary, or when the package licence has to be declared.
 ---
 
+<!--
+PREVIEW: not yet in the template's main branch. Open pull requests: #34,
+#38, #44, #47. From the branch preview/skills of
+eccenca/cmem-package-template.
+-->
+
 # The manifest is the contract
 
 Everything this package ships is declared in `cpa-manifest.json`, and `cmemc`

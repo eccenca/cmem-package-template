@@ -3,6 +3,12 @@ name: vocabulary
 description: Author and maintain the RDFS/OWL vocabulary a package ships - classes, properties, definitions, labels, comments and class icons. Use when a term is added, renamed or redefined, when writing skos:definition or rdfs:comment, or when deciding what a class is for.
 ---
 
+<!--
+PREVIEW: not yet in the template's main branch. Open pull requests: #31,
+#40, #48; merged to develop, not released: #30. From the branch
+preview/skills of eccenca/cmem-package-template.
+-->
+
 # The vocabulary
 
 The ontology a package ships: its classes, its properties, and the annotations

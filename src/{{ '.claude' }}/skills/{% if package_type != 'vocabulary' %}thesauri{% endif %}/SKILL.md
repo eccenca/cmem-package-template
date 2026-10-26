@@ -3,6 +3,11 @@ name: thesauri
 description: "Shape a thesaurus in a Corporate Memory package - a SKOS taxonomy of categories that resources point at - so that charts, forms and search stay readable, maintain it in the taxonomy editor or from an external term library, and categorize resources against it. Use when categories have grown flat and too many, when duplicates should be merged, when a taxonomy is to be maintained in the taxonomy editor or synchronised from a term library, when a standard classification is to be linked."
 ---
 
+<!--
+PREVIEW: not yet in the template's main branch. Open pull requests: #37 (new
+skill). From the branch preview/skills of eccenca/cmem-package-template.
+-->
+
 # Thesauri
 
 A thesaurus here is a set of SKOS concepts that resources point at through a

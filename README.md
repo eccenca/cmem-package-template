@@ -9,6 +9,14 @@
 
 A [Copier](https://copier.readthedocs.io/) template for creating [eccenca Corporate Memory (Marketplace) packages](https://go.eccenca.com/feature/marketplace-packages).
 
+> **Preview branch.** `preview/skills` merges every open pull request of this
+> template (#31 to #48) onto `develop`, so colleagues can test the complete set
+> of skills, scripts and checks before the pull requests are merged. A skill
+> changed here opens with a `PREVIEW` comment naming its pull requests. Update a
+> test package with `copier update --vcs-ref preview/skills`, and back to a
+> release with `copier update --vcs-ref <tag>` once they are in. This branch is
+> rebuilt from the pull requests and never merged.
+
 ## Package Types
 
 `package_type` is the first question the template asks, and it is more than a
