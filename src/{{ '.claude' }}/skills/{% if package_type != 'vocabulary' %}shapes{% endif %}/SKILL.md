@@ -281,6 +281,51 @@ fit and put the package's own sections between them, in the range 400-700:
 A user who knows one package then finds *Identity* at the top and *Overview* at
 the bottom of the next one, while each domain keeps its own sections.
 
+The gig package defines its set once and uses it on the Festival form and on
+the Band form:
+
+```turtle
+gigos:group-identity a shacl:PropertyGroup ;
+  rdfs:label "Identity"@en ;
+  rdfs:comment "What the festival or band is called."@en ;
+  shacl:order 100 .
+
+gigos:group-description a shacl:PropertyGroup ;
+  rdfs:label "Description"@en ;
+  rdfs:comment "What the festival or band is about."@en ;
+  shacl:order 200 .
+
+gigos:group-when a shacl:PropertyGroup ;
+  rdfs:label "When"@en ;
+  rdfs:comment "The days a festival takes place."@en ;
+  shacl:order 400 .
+
+gigos:group-lineup a shacl:PropertyGroup ;
+  rdfs:label "Line-up"@en ;
+  rdfs:comment "Who plays at a festival, and where a band plays."@en ;
+  shacl:order 500 .
+
+gigos:group-overview a shacl:PropertyGroup ;
+  rdfs:label "Overview"@en ;
+  rdfs:comment "Figures computed from the gigs."@en ;
+  shacl:order 900 .
+
+gigos:Band-playsAt a shacl:PropertyShape ;
+  shacl:name "Plays at"@en ;
+  shacl:path [ shacl:inversePath gigo:hasAct ] ;
+  shacl:nodeKind shacl:IRI ;
+  shacl:group gigos:group-lineup ;
+  shacl:order 10 .
+```
+
+The Festival form shows *Identity*, *When*, *Line-up* and *Overview*; the Band
+form has no row for *When* and so does not show it, but its *Line-up* sits at
+the same height as the festival's. *Plays at* reaches the band's festivals
+through the inverse of `gigo:hasAct` and still goes into *Line-up*, because
+sections follow meaning, not link direction. The row examples in this skill and
+its references - *First day* in *When*, the band's *Visitors per year* widget in
+*Overview* - use this set.
+
 ## `shacl:name` is the form, `rdfs:label` is the catalog
 
 The two serve different readers and therefore follow different conventions.
