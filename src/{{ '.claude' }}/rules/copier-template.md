@@ -49,6 +49,8 @@ generated with:
   templates, widgets, navigation and validation
 - `catalog-queries` - the SPARQL a catalog ships: the header comment, the
   projection, placeholders and the `?graph` column
+- `thesauri` - a SKOS taxonomy resources are categorized by: its shape, who
+  maintains it, the taxonomy editor, type on use, and a view to browse it
 - `template-feedback` - reporting a finding back to the template
 
 A vocabulary package ships fewer of them, because a build project and a shape
