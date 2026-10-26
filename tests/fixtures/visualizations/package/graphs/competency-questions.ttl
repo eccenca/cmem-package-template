@@ -208,9 +208,38 @@
     shui:hasXPosition "1140"^^xsd:int ;
     shui:hasYPosition "600"^^xsd:int .
 
+<https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96> a shui:Visualization ;
+    rdfs:label "Which equipment feeds which other equipment of the same plant?"@en ;
+    rdfs:comment "Competency question equipment-feeding-equipment.rq"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96/3f05338753d4>,
+        <https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96/73a41be028ae>,
+        <https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96/748a4740b5d4>,
+        <https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96/0784e8f1fe9b> .
+
+<https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96/3f05338753d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Equipment" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96/73a41be028ae> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Plant" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96/748a4740b5d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/feeds" ;
+    shui:hasXPosition "570"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/fc4aacd8766c5f96/0784e8f1fe9b> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/partOf" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
+
 <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4> a shui:Visualization ;
     rdfs:label "Which work orders address a failure mode, or a broader one, that is typical for the equipment they concern?"@en ;
-    rdfs:comment "Competency question failure-modes.rq; also walks the Failure mode hierarchy (<https://example.com/complex/broaderMode>)"@en ;
+    rdfs:comment "Competency question failure-modes.rq; also walks the Failure mode hierarchy (ex1:broaderMode)"@en ;
     shui:hasContextGraph <https://example.com/complex/> ;
     shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/74a9ed06f0cf>,
         <https://example.com/fixture/competency-questions/viz/b1e26829e9e71bd4/91f508f76269>,
@@ -248,6 +277,35 @@
     shui:hasLocatedResource "https://example.com/complex/typicalFor" ;
     shui:hasXPosition "570"^^xsd:int ;
     shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/711df6c8a13fb978> a shui:Visualization ;
+    rdfs:label "Which equipment does a pump feed, directly or through other equipment?"@en ;
+    rdfs:comment "Competency question fed-by-a-pump.rq; also walks from Equipment to Equipment (ex1:feeds)"@en ;
+    shui:hasContextGraph <https://example.com/complex/> ;
+    shui:hasVizNodePlacement <https://example.com/fixture/competency-questions/viz/711df6c8a13fb978/1b7e40f016d7>,
+        <https://example.com/fixture/competency-questions/viz/711df6c8a13fb978/3f05338753d4>,
+        <https://example.com/fixture/competency-questions/viz/711df6c8a13fb978/73a41be028ae>,
+        <https://example.com/fixture/competency-questions/viz/711df6c8a13fb978/0784e8f1fe9b> .
+
+<https://example.com/fixture/competency-questions/viz/711df6c8a13fb978/1b7e40f016d7> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Pump" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "360"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/711df6c8a13fb978/3f05338753d4> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Equipment" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "240"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/711df6c8a13fb978/73a41be028ae> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/Plant" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "0"^^xsd:int .
+
+<https://example.com/fixture/competency-questions/viz/711df6c8a13fb978/0784e8f1fe9b> a shui:VizNodePlacement ;
+    shui:hasLocatedResource "https://example.com/complex/partOf" ;
+    shui:hasXPosition "0"^^xsd:int ;
+    shui:hasYPosition "120"^^xsd:int .
 
 <https://example.com/fixture/competency-questions/viz/32c7cdfeeef5ff44> a shui:Visualization ;
     rdfs:label "Which hardware sits in a category or one of its subcategories?"@en ;

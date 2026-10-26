@@ -76,15 +76,17 @@ changes, which is how a vocabulary stops describing anything stable.
 
 A property that corresponds to a property of an upper or external ontology
 (gist's `isCategorizedBy`, for instance) links to it with `rdfs:seeAlso`; the
-ontology becomes a package dependency that no graph imports. Do not state
+project package that installs the vocabulary declares the ontology as a
+dependency that no graph imports. Do not state
 `rdfs:subPropertyOf` across: every statement of the package would become one of
 the other property's, so whatever that ontology says about it - domain, range,
 characteristics, and their next release - applies to the package's data.
 
 A class may extend a class of an upper ontology with `rdfs:subClassOf` - a
 domain's concepts subclass `skos:Concept`, a package class may specialize a
-gist, BFO or schema.org class. Its node shape then needs `shacl:order 0`, so
-that the package's form opens before the upper class's (the `shapes` skill).
+gist, BFO or schema.org class. Its node shape in the shape catalog of a
+project package then needs `shacl:order 0`, so that the package's form opens
+before the upper class's.
 Never make a class a subclass of `owl:Class` or another meta-ontology term -
 that turns its instances into classes.
 
@@ -141,10 +143,11 @@ each box sits where it does:
    `rdfs:seeAlso` to `gist:isPartOf`, `gist:isMemberOf` or
    `gist:isCategorizedBy` - with its box on the line between parent and child,
    whichever way the query reads it. Every level between a class and a
-   superclass is drawn. A step between instances of one class -
-   `?c skos:broader* ?parent` within a taxonomy - gets no box: the drawing
-   shows the model, the visualisation's description names the walk, and the
-   application view shows the tree.
+   superclass is drawn. A walk between instances of one class -
+   `?c skos:broader* ?parent` within a taxonomy, `?shelf :partOf* ?room` within
+   the locations - gets no box: the drawing shows the model, and the
+   visualisation's description names the walk. A single step from a class to itself keeps its box, beside the
+   class.
 3. **The L**, as above.
 4. **One parent straight above.** A class with several parents in the drawing
    has one bound parent directly above it - the hierarchy the question asks

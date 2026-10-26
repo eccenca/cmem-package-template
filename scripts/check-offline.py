@@ -28,6 +28,7 @@ a sound one passes.
 Exits non-zero with a one-line reason on the first failure.
 """
 
+import json
 import os
 import re
 import shutil
@@ -100,6 +101,41 @@ def check_custom_map():
         CUSTOM_MAP.unlink(missing_ok=True)
 
 
+def check_task_tags():
+    """task_tags.py tags every kind of task an export holds - a dataset, a custom task and a workflow
+    as one file, a transform and a linking task as a directory of their own - and --check then finds
+    each one tagged."""
+    meta = "<MetaData><Label>{0}</Label><Tags> </Tags></MetaData>"
+    with tempfile.TemporaryDirectory() as tmpdir:
+        project = Path(tmpdir) / "package" / "projects" / "demo"
+        files = {
+            "config.xml": f"<ProjectConfig>{meta.format('demo')}</ProjectConfig>",
+            "dataset/books.xml": f"<Dataset id=\"books\">{meta.format('books')}</Dataset>",
+            "transform/books-to-library/rules.xml":
+                f"<TransformSpec>{meta.format('books to library')}<Rule>{meta.format('')}</Rule></TransformSpec>",
+            "linking/link-authors/linkSpec.xml": f"<LinkSpec>{meta.format('link authors')}</LinkSpec>",
+        }
+        for name, text in files.items():
+            (project / name).parent.mkdir(parents=True, exist_ok=True)
+            (project / name).write_text(text)
+        register = Path(tmpdir) / "task-tags.json"
+        register.write_text(json.dumps({
+            "project-tags": {"demo": ["demo", "from-repository"]}, "systems": [],
+            "projects": {"demo": {"books": ["source", "demo-data"], "books-to-library": ["generated"],
+                                  "link-authors": ["generated"]}}}))
+        tool = [str(BIN / "task_tags.py")]
+        write = subprocess.run(tool + ["--write", str(Path(tmpdir) / "package"), str(register)],
+                               capture_output=True, text=True)
+        check = subprocess.run(tool + ["--check", str(Path(tmpdir) / "package"), str(register)],
+                               capture_output=True, text=True)
+        if write.returncode != 0 or check.returncode != 0:
+            fail(f"task_tags.py did not tag every kind of task:\n{write.stderr}{check.stderr}")
+        for name in ("transform/books-to-library/rules.xml", "linking/link-authors/linkSpec.xml"):
+            text = (project / name).read_text()
+            if "urn:silkframework:tag:generated" not in text.split("</MetaData>")[0]:
+                fail(f"task_tags.py --write left {name} untagged")
+
+
 def main():
     if not BIN.is_dir():
         fail(f"{BIN} does not exist - the template did not ship the checkers")
@@ -119,6 +155,8 @@ def main():
         if not (FIXTURES / kind).is_dir():
             fail(f"fixture directory {FIXTURES / kind} is missing")
 
+    check_task_tags()
+
     code, output = run_checks(FIXTURES / "good")
     if code != 0:
         fail(f"the good fixture failed, which it must not:\n{output}")
@@ -136,6 +174,11 @@ def main():
         # line by name and verdict rather than by column width.
         if not re.search(rf"^\s+{re.escape(name)}\s+FAIL\s*$", output, re.MULTILINE):
             fail(f"{name} did not report its planted fault in the bad fixture:\n{output}")
+
+    # The bad fixture plants two path builder faults; the ?graph one must be named on its own, or
+    # the subclass-split fault would keep the checker red while the graph rule had gone blind.
+    if "projects no ?graph" not in output:
+        fail(f"check_path_builder_queries.py did not report the row without a ?graph column:\n{output}")
 
     # The package as generated has no catalog, which is a pass with a note
     # rather than a failure - otherwise every new package starts red.

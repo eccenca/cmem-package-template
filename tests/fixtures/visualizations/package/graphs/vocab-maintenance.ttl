@@ -1,6 +1,6 @@
 # A second vocabulary for testing bin/question_visualizations.py: maintenance of technical assets - two class
 # trees meeting in one question (Asset, Organization), a membership and a part-whole hierarchy, three relations
-# between the same two classes, and a relation from the top of a tree into its own subtree (located in).
+# between the same two classes, a relation from the top of a tree into its own subtree (located in), and a relation from a class to itself that is no hierarchy (feeds).
 @prefix ex: <https://example.com/complex/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -40,6 +40,7 @@ ex:memberOf a owl:ObjectProperty ; rdfs:label "member of"@en ; rdfs:domain ex:Pe
 ex:responsibleTeam a owl:ObjectProperty ; rdfs:label "responsible team"@en ; rdfs:domain ex:Site ; rdfs:range ex:Team .
 ex:country a owl:ObjectProperty ; rdfs:label "country"@en ; rdfs:domain ex:Organization ; rdfs:range ex:Country .
 ex:typicalFor a owl:ObjectProperty ; rdfs:label "typical for"@en ; rdfs:domain ex:FailureMode ; rdfs:range ex:Equipment .
+ex:feeds a owl:ObjectProperty ; rdfs:label "feeds"@en ; rdfs:domain ex:Equipment ; rdfs:range ex:Equipment .
 ex:broaderMode a owl:ObjectProperty, owl:TransitiveProperty ; rdfs:label "broader mode"@en ;
     rdfs:domain ex:FailureMode ; rdfs:range ex:FailureMode .
 

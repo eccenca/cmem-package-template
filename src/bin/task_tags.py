@@ -8,9 +8,9 @@
   task_tags.py [--write | --check | --from-exports] <package-dir> [<register>]
 
 The register (default: task-tags.json in the working directory, the repository root - the package
-directory may hold only files the manifest declares) lists the tags of every dataset, custom task and
-workflow per project, the project's own tags, and the names of the external systems the package talks
-to:
+directory may hold only files the manifest declares) lists the tags of every dataset, transform,
+linking task, custom task and workflow per project, the project's own tags, and the names of the
+external systems the package talks to:
 
   {"project-tags": {"<project>": ["<package tag>", "operational", "from-repository"]},
    "systems": ["<system>"],
@@ -56,6 +56,8 @@ AXES = {
 SEVERAL = {"position", "writes", "system"}
 ROLES = {"bootstrap", "demo", "operational"}
 KINDS = ("dataset", "custom", "workflow")
+# a transform or linking task is a directory of its own; its tags sit in the first <MetaData> of this file
+TASK_DIRS = {"transform": "rules.xml", "linking": "linkSpec.xml"}
 
 
 def project_dirs(package: Path) -> dict[str, Path]:
@@ -64,7 +66,10 @@ def project_dirs(package: Path) -> dict[str, Path]:
 
 
 def task_files(folder: Path) -> dict[str, Path]:
-    return {p.stem: p for kind in KINDS for p in sorted((folder / kind).glob("*.xml"))}
+    files = {p.stem: p for kind in KINDS for p in sorted((folder / kind).glob("*.xml"))}
+    for kind, name in TASK_DIRS.items():
+        files.update({p.parent.name: p for p in sorted((folder / kind).glob(f"*/{name}"))})
+    return files
 
 
 def tags_in(text: str) -> list[str]:

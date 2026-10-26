@@ -40,12 +40,14 @@ shapes:Band-gigsQuery a shui:SparqlQuery ;
   shui:queryText """# Lists the gigs a band played.
 #
 # ?gig: the gig the band played
-SELECT ?gig
+# ?graph: the graph holding the example:playedAt triple
+SELECT ?gig ?graph
 FROM <https://example.org/data/>
+FROM NAMED <https://example.org/data/>
 WHERE {
 
-  # Reach the gigs from the band the form is rendered for
-  <{{shuiResource}}> <https://example.org/vocab/playedAt> ?gig .
+  # Reach the gigs from the band the form is rendered for, and the graph the link is stored in
+  GRAPH ?graph { <{{shuiResource}}> <https://example.org/vocab/playedAt> ?gig }
 
 }""" .
 
