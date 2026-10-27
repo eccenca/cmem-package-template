@@ -7,8 +7,13 @@ each labelled after the file that ships it:
 |---|---|
 | vocabulary | the ontology; `register_as_vocabulary: true` |
 | shapes | the SHACL catalog; `import_into` the Corporate Memory shapes graph |
-| data | the instances; shipped holding only its own description |
+| data | the instances the package's workflows rebuild; shipped holding only its own description |
 | integration | the root users open - imports the vocabulary and the data; read-only |
+
+A graph of data only the users produce - their own records, kept across
+updates - is not one of these: it is not shipped, and a workflow creates it
+(see "Listing a graph is what makes the package own it" in the skill). The
+integration root may import it like any data graph.
 
 ## The integration root is read-only
 
