@@ -98,5 +98,6 @@ counts is participation - "contributes to".
 
 ## Going further
 
-- `references/depictions.md` - the `foaf:depiction` icon every class wants, and
-  the colour scheme that keeps a family recognisable
+- `references/depictions.md` - the `foaf:depiction` icon every class wants, the
+  colour scheme that keeps a family recognisable, and the icons of relations and
+  attributes (`task icons`)

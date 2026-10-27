@@ -46,6 +46,7 @@ CHECKERS = (
     "check_paths.py",
     "check_placeholders.py",
     "check_skill_map.py",
+    "property_icons.py",
 )
 
 CUSTOM_MAP = Path(".claude") / "skill-map.custom.json"

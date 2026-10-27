@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- Property icons: `task icons` (`bin/property_icons.py`) gives every attribute of the package an icon for its meaning - mapped in `icons/property-icons.json`, else the kind of its value - and every mapped relation an icon for its kind with an arrow for its direction, coloured after the domain or range class, embedded in the vocabulary; the shared glyphs ship in `bin/glyphs/`, a package draws its own into `icons/glyphs/`, every glyph is refused unless it is drawing only, and `task check:offline` fails on a missing or stale icon; the `vocabulary` skill's depictions reference describes it, and the template's `check:icons:case` holds it on a fixture
+
 ### Changed
 
 - The `vocabulary` skill names every relation (object property) as a verb phrase read from its domain to its range - a verb such as `manages`, or `has` / `is … of` with the role the range plays, such as `hasProductManager` - never as a bare class or role name
