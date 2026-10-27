@@ -101,13 +101,19 @@ So what a graph holds decides whether it ships:
   populating workflow has to run after both. Say so in `DOCUMENTATION.md`.
 - **Data only its users can produce** - a library someone catalogued, the
   receipts of a household book, the categorisation users curate in a form even
-  where the package seeds its first version - is **not shipped**. In the manifest it would
-  be emptied by every update. A workflow creates such a graph instead, and
-  uninstalling leaves it behind on purpose; `DOCUMENTATION.md` says how to
-  remove it.
+  where the package seeds its first version - is **not shipped**. In the
+  manifest it would be emptied by every update. A workflow creates such a
+  graph instead, and uninstalling leaves it behind on purpose;
+  `DOCUMENTATION.md` says how to remove it.
 
 **Ship every graph the package owns**, even one with no content of its own - a
-file holding nothing but the graph's own description is enough. *The test: an
+file holding nothing but the graph's own description is enough.
+
+`install --replace` uninstalls the installed version first, and that deletes
+every graph its manifest listed. So a graph you **stop** shipping is deleted
+one last time by the update that removes it from the manifest; a migration in
+the new version runs too late. Tell users in `CHANGELOG.md` to export it before
+that update and import it again afterwards. *The test: an
 update that replaces the graph must lose nothing anyone but the package
 wrote.*
 
