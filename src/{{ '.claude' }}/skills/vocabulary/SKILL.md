@@ -51,6 +51,31 @@ rather than the definition.
 
 - Class labels are sentence case (`"Feature value"`, not `"FeatureValue"`);
   property labels are lowercase words (`"selects material"`).
+- **A relation is named as a verb phrase**, read from its domain to its range:
+  a verb (`manages`, `appliesTo`, `standsInFor`), or `has` / `is … of` with the
+  role the range plays (`hasProductManager`, `isMemberOf`). Never a bare class or
+  role name: `productManager` reads like the class Product manager and hides
+  which way the relation runs. *A form row, a query and a Business Knowledge
+  Editor drawing show the label between two resources - "Product has product
+  manager Employee" says what it states, "Product product manager Employee" does
+  not.*
+- **An attribute is named as a noun** for the value it holds (`title`, `price`,
+  `email`), without `has`, `is` or `was` - the verb belongs to relations, so the
+  name tells a reader, a query author and a mapping which of the two a property
+  is. *Schema.org, Dublin Core, DCAT and QUDT name their attributes this way, so
+  a package's own terms read like the ones it reuses.* Where a kind of value has
+  a form of its own, the name says it:
+  - a date or a point in time ends in `Date` or `Time` (`acquisitionDate`,
+    `startTime`), not a participle (`acquiredOn`) - the suffix names the
+    datatype;
+  - a yes/no value starts with `is` or `has` (`isSigned`, `hasCover`), the one
+    exception: a bare `signed` could be a date or a person;
+  - a count ends in `Count` (`pageCount`), an integer.
+
+  `task check:offline` checks these four by spelling (`bin/check_names.py`) on
+  the package's own properties; whether a name is a noun stays with review. A
+  package that mirrors a published vocabulary unchanged keeps its publisher's
+  names and switches the check off with an empty `.claude/no-naming-check`.
 - Class names are **head-final**: the last word says what the thing *is*.
   `ValuePrecondition` is a precondition; `ConditionValue` would wrongly name a
   value.
@@ -73,5 +98,6 @@ counts is participation - "contributes to".
 
 ## Going further
 
-- `references/depictions.md` - the `foaf:depiction` icon every class wants, and
-  the colour scheme that keeps a family recognisable
+- `references/depictions.md` - the `foaf:depiction` icon every class wants, the
+  colour scheme that keeps a family recognisable, and the icons of relations and
+  attributes (`task icons`)

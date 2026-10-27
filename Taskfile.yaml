@@ -111,6 +111,19 @@ tasks:
     cmds:
       - cd {{.TEST_CASE}}_dir && ../scripts/check-offline.py
 
+  check:icons:case:
+    desc: assert the property icons a generated package ships are drawn as the vocabulary skill says
+    summary: |
+      A generated package maps no property to an icon, so its own check
+      passes whatever bin/property_icons.py does. This drives the rendered
+      package's script over tests/fixtures/icons: icons written, coloured
+      after their classes, with and without the arrow, value kinds for
+      unmapped attributes, hand-drawn depictions left alone, and three planted
+      faults caught - an edited icon, a glyph with a script, a property of
+      another namespace.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-property-icons.py
+
   check:validate:case:
     desc: validate a project test case
     preconditions:
@@ -130,6 +143,8 @@ tasks:
       - task: check:skills:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - task: check:offline:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:icons:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - cd {{.TEST_CASE}}_dir && task check
 

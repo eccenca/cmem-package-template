@@ -42,9 +42,11 @@ CHECKERS = (
     "audit_queries.py",
     "check_all.py",
     "check_dangling.py",
+    "check_names.py",
     "check_paths.py",
     "check_placeholders.py",
     "check_skill_map.py",
+    "property_icons.py",
 )
 
 CUSTOM_MAP = Path(".claude") / "skill-map.custom.json"
@@ -126,10 +128,10 @@ def main():
         fail(f"the bad fixture passed, so a checker stopped detecting:\n{output}")
 
     # Each checker has to be the one that caught its own planted fault. A
-    # single checker failing on all four would satisfy the exit code above
+    # single checker failing on all five would satisfy the exit code above
     # while three others had quietly gone blind.
     for name in ("check_dangling.py", "check_placeholders.py", "check_paths.py",
-                 "audit_queries.py"):
+                 "audit_queries.py", "check_names.py"):
         if f"  {name:21}  FAIL" not in output and f"{name}  FAIL" not in output:
             fail(f"{name} did not report its planted fault in the bad fixture:\n{output}")
 

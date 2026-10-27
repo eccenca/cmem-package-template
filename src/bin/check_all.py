@@ -5,7 +5,7 @@
 # ///
 """Run every offline check in this toolkit over a Corporate Memory package directory.
 
-The four checks answer questions that a SHACL validation run cannot, because the catalog has
+The checks answer questions that a SHACL validation run cannot, because the catalog has
 to be installed before validation can say anything — and two of these mistakes make the
 install itself useless: a dangling reference turns every graph's validation into an HTTP 500,
 and a path that matches nothing turns every constraint on its row into a no-op that reports
@@ -28,6 +28,10 @@ gate, and a package with nothing to answer for has not failed anything.
 
 A file no parser accepts is the exception: that fails, because `cmemc package build` ignores
 RDF syntax entirely and such a graph installs only as an error.
+
+It also checks the names of the package's own attributes with `check_names.py`, and - where the
+project maps its properties to icons - that `property_icons.py` finds every icon written and drawing
+only; both need the vocabulary alone, so a vocabulary package is checked too.
 
 It also validates the project's own skill map, `.claude/skill-map.custom.json`, with
 `check_skill_map.py`, and names it in the combined summary: a broken rule there takes
@@ -156,11 +160,25 @@ def check(directory, quiet=False):
         print(f"FAIL: {len(unparseable)} file(s) no parser accepts: {names}")
         return 1
 
+    # The naming check needs only the vocabulary, so it runs for a vocabulary
+    # package too, before the shape-catalog checks below.
+    if vocab:
+        if not quiet:
+            print()
+            print("=" * 100)
+            print(f"== check_names.py  {' '.join(f.name for f in vocab)}")
+            print("=" * 100)
+        code, _ = run("check_names.py", vocab, quiet)
+        extra.append(("check_names.py", code))
+        # Property icons are opt-in: without icons/property-icons.json it passes with a note.
+        code, _ = run("property_icons.py", ["--check", root], quiet)
+        extra.append(("property_icons.py", code))
+
     if not shapes:
-        # Every check here is driven by a shape catalog, so a package without
-        # one - a plain vocabulary package, or one not yet written - has
-        # nothing to answer for. This runs as a build gate, so that is a pass.
-        return passed_early(extra, "no shape catalog found, so there is nothing to check")
+        # Every other check here is driven by a shape catalog, so a package
+        # without one - a plain vocabulary package, or one not yet written - has
+        # nothing more to answer for. This runs as a build gate, so that is a pass.
+        return passed_early(extra, "no shape catalog found, so there is nothing more to check")
 
     plan = [
         ("check_dangling.py", shapes),

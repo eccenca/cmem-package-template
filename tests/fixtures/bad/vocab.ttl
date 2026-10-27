@@ -25,3 +25,9 @@ example:bandName a owl:DatatypeProperty ;
   rdfs:domain example:Band ;
   rdfs:range xsd:string ;
   rdfs:label "band name"@en .
+
+# check_names.py: an attribute named like a relation
+example:hasFoundingYear a owl:DatatypeProperty ;
+  rdfs:domain example:Band ;
+  rdfs:range xsd:gYear ;
+  rdfs:label "has founding year"@en .

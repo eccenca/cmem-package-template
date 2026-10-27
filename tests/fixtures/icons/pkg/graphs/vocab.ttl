@@ -1,0 +1,79 @@
+# A small vocabulary for testing bin/property_icons.py: two classes with icons of their own, relations
+# with a shared glyph, with "range" and without a mapping, attributes with and without a mapped glyph, one
+# depiction drawn by hand, and a foreign property the package must not decorate.
+
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix ex: <https://example.org/icons/> .
+
+<https://example.org/icons/> a owl:Ontology ;
+  rdfs:label "Icon fixture"@en .
+
+ex:Band a owl:Class ;
+  rdfs:label "Band"@en ;
+  foaf:depiction <data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iI2I4MzI1YSIgZD0iTTQgNCBIMjAgVjIwIEg0IFoiLz48L3N2Zz4=> .
+
+ex:Venue a owl:Class ;
+  rdfs:label "Venue"@en ;
+  foaf:depiction <data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PHBhdGggZmlsbD0iIzJhN2Y2MiIgZD0iTTEyIDMgTDIxIDIxIEgzIFoiLz48L3N2Zz4=> .
+
+ex:isBasedAt a owl:ObjectProperty ;
+  rdfs:label "is based at"@en ;
+  rdfs:domain ex:Band ;
+  rdfs:range ex:Venue ;
+  rdfs:isDefinedBy <https://example.org/icons/> .
+
+ex:hasHomeVenue a owl:ObjectProperty ;
+  rdfs:label "has home venue"@en ;
+  rdfs:domain ex:Band ;
+  rdfs:range ex:Venue ;
+  rdfs:isDefinedBy <https://example.org/icons/> .
+
+ex:supports a owl:ObjectProperty ;
+  rdfs:label "supports"@en ;
+  rdfs:domain ex:Band ;
+  rdfs:range ex:Band ;
+  rdfs:isDefinedBy <https://example.org/icons/> .
+
+ex:email a owl:DatatypeProperty ;
+  rdfs:label "email"@en ;
+  rdfs:domain ex:Band ;
+  rdfs:range xsd:string ;
+  rdfs:isDefinedBy <https://example.org/icons/> .
+
+ex:foundingDate a owl:DatatypeProperty ;
+  rdfs:label "founding date"@en ;
+  rdfs:domain ex:Band ;
+  rdfs:range xsd:date ;
+  rdfs:isDefinedBy <https://example.org/icons/> .
+
+ex:isTouring a owl:DatatypeProperty ;
+  rdfs:label "is touring"@en ;
+  rdfs:domain ex:Band ;
+  rdfs:range xsd:boolean ;
+  rdfs:isDefinedBy <https://example.org/icons/> .
+
+ex:memberCount a owl:DatatypeProperty ;
+  rdfs:label "member count"@en ;
+  rdfs:domain ex:Band ;
+  rdfs:range xsd:integer ;
+  rdfs:isDefinedBy <https://example.org/icons/> .
+
+ex:capacity a owl:DatatypeProperty ;
+  rdfs:label "capacity"@en ;
+  rdfs:domain ex:Venue ;
+  rdfs:range xsd:integer ;
+  rdfs:isDefinedBy <https://example.org/icons/> .
+
+ex:stageName a owl:DatatypeProperty ;
+  rdfs:label "stage name"@en ;
+  rdfs:domain ex:Band ;
+  rdfs:range xsd:string ;
+  rdfs:isDefinedBy <https://example.org/icons/> ;
+  foaf:depiction <data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iOSIgZmlsbD0iIzU1NTU1NSIvPjwvc3ZnPg==> .
+
+<https://example.org/other/sponsor> a owl:ObjectProperty ;
+  rdfs:label "sponsor"@en ;
+  rdfs:domain ex:Band .
