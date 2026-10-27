@@ -1,7 +1,0 @@
-# question: Which services share a supplier with an alternative supplier of some hardware?
-PREFIX ex: <https://example.com/fixture/>
-SELECT ?service ?hardware WHERE {
-  ?service a ex:Service ; ex:hasSupplier ?supplier .
-  ?hardware a ex:Hardware ; ex:alternativeSupplier ?supplier .
-  ?supplier ex:country ?country ; ex:addressText ?address .
-}

@@ -1,7 +1,0 @@
-# question: Which hardware do we buy from suppliers in a given country?
-PREFIX ex: <https://example.com/fixture/>
-SELECT ?hardware ?supplier ?country WHERE {
-  ?hardware a ex:Hardware ; ex:hasSupplier ?supplier .
-  ?supplier ex:country ?country .
-  ?hardware ex:hasCategory ?category .
-}

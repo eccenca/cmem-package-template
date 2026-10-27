@@ -1,3 +1,0 @@
-# question: Which equipment does a pump feed, directly or through other equipment?
-PREFIX ex: <https://example.com/complex/>
-SELECT * WHERE { ?pump a ex:Pump ; ex:feeds+ ?eq ; ex:partOf ?plant . }

@@ -1,6 +1,0 @@
-# question: Which hardware changed from a previous supplier to one of its alternative suppliers?
-PREFIX ex: <https://example.com/fixture/>
-SELECT ?hardware ?supplier ?alternative ?previous WHERE {
-  ?hardware a ex:Hardware ; ex:hasSupplier ?supplier ; ex:alternativeSupplier ?alternative ; ex:previousSupplier ?previous .
-  ?supplier ex:country ?country .
-}

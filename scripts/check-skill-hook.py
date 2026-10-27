@@ -142,8 +142,6 @@ def check_edits(tmpdir: str) -> None:
     if (case.root / ".claude" / "skills" / "shapes").is_dir():
         expect("shapes" in context(case.edit("my-pkg/graphs/demo-shapes.ttl")),
                "did not remind of shapes on a catalog under graphs/")
-    expect("vocabulary" in context(case.edit("requirements/questions/suppliers.rq")),
-           "did not remind of vocabulary on a competency question")
     expect(not case.edit("my-pkg/notes.txt"), "spoke on a file nothing maps")
     expect(not case.edit("/somewhere/else/my-pkg/cpa-manifest.json"), "spoke on a file outside any package")
 

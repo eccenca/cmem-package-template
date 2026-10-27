@@ -1,5 +1,0 @@
-# question: Where are our suppliers located, and in which country?
-PREFIX ex: <https://example.com/fixture/>
-SELECT ?supplier ?city ?address ?country WHERE {
-  ?supplier a ex:Supplier ; ex:addressLocality ?city ; ex:addressText ?address ; ex:country ?country .
-}

@@ -1,3 +1,0 @@
-# question: Which people work for the organisation that maintains a pump, and which teams are they in?
-PREFIX ex: <https://example.com/complex/>
-SELECT * WHERE { ?pump a ex:Pump ; ex:maintainedBy ?org . ?person ^ex:employs ?org ; ex:memberOf ?team ; ex:email ?mail . }

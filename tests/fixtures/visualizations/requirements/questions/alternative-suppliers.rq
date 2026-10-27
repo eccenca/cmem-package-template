@@ -1,6 +1,0 @@
-# question: Which hardware has an alternative supplier in another country?
-PREFIX ex: <https://example.com/fixture/>
-SELECT ?hardware WHERE {
-  ?hardware a ex:Hardware ; ex:hasSupplier/ex:country ?c1 ; ex:alternativeSupplier/ex:country ?c2 .
-  FILTER(?c1 != ?c2)
-}

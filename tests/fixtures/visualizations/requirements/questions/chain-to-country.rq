@@ -1,3 +1,0 @@
-# question: In which countries are the organisations that operate the sites of the equipment a work order concerns?
-PREFIX ex: <https://example.com/complex/>
-SELECT * WHERE { ?wo a ex:WorkOrder ; ex:concerns ?eq . ?eq ex:locatedIn ?site . ?site a ex:Site ; ex:operatedBy ?org . ?org ex:country ?c . }

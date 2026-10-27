@@ -1,6 +1,0 @@
-# question: Which hardware and which services does a supplier deliver?
-PREFIX ex: <https://example.com/fixture/>
-SELECT ?hardware ?service WHERE {
-  ?hardware a ex:Hardware ; ex:hasSupplier ?supplier .
-  ?service a ex:Service ; ex:hasSupplier ?supplier .
-}

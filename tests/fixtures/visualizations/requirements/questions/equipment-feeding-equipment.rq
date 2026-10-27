@@ -1,3 +1,0 @@
-# question: Which equipment feeds which other equipment of the same plant?
-PREFIX ex: <https://example.com/complex/>
-SELECT * WHERE { ?a a ex:Equipment ; ex:feeds ?b ; ex:partOf ?plant . ?b ex:partOf ?plant . }
