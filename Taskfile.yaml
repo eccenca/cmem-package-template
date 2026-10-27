@@ -124,6 +124,16 @@ tasks:
     cmds:
       - cd {{.TEST_CASE}}_dir && ../scripts/check-property-icons.py
 
+  check:tags:case:
+    desc: assert bin/task_tags.py holds a register to the tag axes of the build-projects skill
+    summary: |
+      A generated package has no build project, so its own tags:check passes
+      whatever the checker does. This drives the rendered package's
+      bin/task_tags.py over a register that keeps every rule, and one planted
+      fault per rule.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-task-tags.py
+
   check:validate:case:
     desc: validate a project test case
     preconditions:
@@ -145,6 +155,8 @@ tasks:
       - task: check:offline:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - task: check:icons:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:tags:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - cd {{.TEST_CASE}}_dir && task check
 
