@@ -86,19 +86,30 @@ shape catalog or a plain dataset silently registers no prefix.
 
 Ownership is what makes uninstall clean. A graph that only a workflow creates
 appears in no manifest, so uninstalling the package leaves it behind as an
-orphan that nothing will ever remove.
+orphan that nothing will ever remove. And `cmemc package install --replace` -
+which is what an update runs - writes **every** graph of the manifest again.
+So what a graph holds decides whether it ships:
 
-**Ship every graph the package writes to**, even one with no content of its
-own - a file holding nothing but the graph's own description is enough. The
-graph is then created at install time and removed again on uninstall.
+- **The package's own content** - the vocabulary, the shape catalog, the
+  queries, the views, reference lists, the findings its checks use - ships
+  filled. Every update replaces it with the newest version, which is what it
+  is for.
+- **Data the package can rebuild** - what its workflows write from their
+  sources - ships holding nothing but the graph's own description. The graph
+  is created at install time and removed on uninstall; installing creates it
+  **empty**, and re-installing with `--replace` empties it again, so the
+  populating workflow has to run after both. Say so in `DOCUMENTATION.md`.
+- **Data only its users can produce** - a library someone catalogued, the
+  receipts of a household book, the categorisation users curate in a form even
+  where the package seeds its first version - is **not shipped**. In the manifest it would
+  be emptied by every update. A workflow creates such a graph instead, and
+  uninstalling leaves it behind on purpose; `DOCUMENTATION.md` says how to
+  remove it.
 
-Two consequences follow, and both belong in `DOCUMENTATION.md` because they
-are things a user has to do:
-
-- installing creates that graph **empty**, so the populating workflow has to
-  be run afterwards;
-- re-installing with `--replace` resets it to the shipped state, so the
-  workflow has to be run again.
+**Ship every graph the package owns**, even one with no content of its own - a
+file holding nothing but the graph's own description is enough. *The test: an
+update that replaces the graph must lose nothing anyone but the package
+wrote.*
 
 For the graph layout a package shipping instance data wants, and what the
 pipeline then has to assert for itself, see
