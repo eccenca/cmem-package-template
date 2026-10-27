@@ -94,3 +94,40 @@ antialiases at natural size, where a heavy stroke on a small viewBox goes
 blurry instead of crisp. Keep stroked shapes at **1.6** on a 24-unit viewBox
 and **2** on a 32-unit one, and verify in the running UI rather than in a
 blown-up PNG.
+
+## Property icons
+
+The Business Knowledge Editor draws a property's `foaf:depiction` on its box,
+so a drawing of the model can say what each relation and attribute is about
+instead of showing one built-in icon for all. *A reviewer reading a drawing of
+a competency question sees "located in" and "email" at a glance.*
+
+- **A relation shows its kind and its direction**: an arrow into a glyph -
+  `part-of`, `located-in`, `supplied-by`, `categorised-as`, `made-by`,
+  `member-of`, `owned-by`, `in-series`, `copy-of`, `seen-on`,
+  `record-elsewhere`, `set-aside-for`, `preceded-by` - or `range`, the range
+  class's own icon behind the arrow, for a relation named after the role its
+  range plays (`hasSupplier`). It takes the range class's colour. A relation
+  you do not map keeps Corporate Memory's built-in icon: a glyph that
+  contradicts the name is worse than none.
+- **An attribute shows its meaning and never an arrow** - `email`, `name`,
+  `address`, `title`, `identifier`, `amount`, `quantity`, `due-date` - and
+  takes its domain class's colour, so a class and its attributes read as one
+  unit. Every attribute gets one: where you map none, the kind of its value
+  stands in, read from its range - `text`, `number`, `count`, `date`, `time`,
+  `year`, `yes-no`, `link`, `location`.
+- Map them in `icons/property-icons.json` (property IRI to glyph name, under
+  `relations` and `attributes`) and run `task icons`: `bin/property_icons.py`
+  writes each icon into the property's block as one line ending in
+  `# property-icons: <glyph>`, and `task check:offline` fails when one is
+  missing, stale or not drawing only. A depiction you drew by hand on a
+  property stays, and the property gets none from the script.
+- The shared glyphs are in `bin/glyphs/` and come with template updates, so the
+  same meaning looks the same in every package. Draw a glyph of your own domain
+  (flow rate, failure mode) into `icons/glyphs/relations/` or
+  `icons/glyphs/attributes/` - stroked line art on a 24-unit viewBox in
+  `currentColor`, a relation's glyph within x 10-22, right of the arrow. Every
+  glyph must be drawing only: a script, an event handler or a reference outside
+  the SVG is refused, because the icon is shown inside Corporate Memory's pages.
+- Only the package's own properties get icons, as only its own classes do.
+
