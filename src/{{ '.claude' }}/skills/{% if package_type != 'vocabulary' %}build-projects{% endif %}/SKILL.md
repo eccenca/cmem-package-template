@@ -153,9 +153,10 @@ axis exists because someone searches by it, across all packages of a workspace.
 | writes (workflows) | `writes-<graph role>`: `writes-term`, `-entity`, `-rule`, `-inference`, `-categorization`, `-relation`, `-integration`, `-settings`, `-views`, `-shapes` (the roles of the `package-content` graph table), one per role the workflow writes - a parent carries the union of its phases; none for temporary graphs | find every workflow that writes a kind of graph, in every package - a workflow writing three roles is found by each of the three |
 | warning (datasets) | `reads-imports` - the dataset's graph imports others, so a read expands every import, whatever the graph's role | see at a glance which reads see more than one graph, and are expensive |
 | lifetime | `temporary` (not persistent: in-memory or cleared per run, no position tags), `rebuilt` (a persistent graph every build clears and writes again; keeps `source`/`target`), `clean-up` | find what may be cleared without loss; everything without a lifetime tag must survive a release |
-| data kind | `master-data`, `production-data`, `demo-data` | find all data of one kind - every demo source, say - whatever the build does with it |
+| data kind | `master-data`, `production-data`, and `<role>-data` for every role kept away from production (`demo-data`, `training-data` …) | find all data of one kind - every demo source, say - whatever the build does with it |
+| subject (datasets) | one topic from the register's `topics` (`localization`, `product-range`) | find every dataset about one subject; a transformation or workflow takes its subject from its datasets, so only datasets carry it |
 | started by | `by-person`, `by-skill`, `by-form` (a form save or button), `by-schedule`, `by-workflow` (only nested), `by-api` (an external system through the REST API or cmemc) | know who runs it before changing it |
-| lifecycle | `bootstrap`, `run-after-import`, `migration`, `demo` | find what runs once, after an import, or never in production |
+| lifecycle | `bootstrap`, `run-after-import`, `migration`, and every role kept away from production (`demo`, plus what the register's `roles` declare: `training`, `test` …) | find what runs once, after an import, or never in production |
 | external systems | `consume`, `produce`, plus the system's name (an input delivered through the MCP is `consume`) | find everything touching one external system |
 | bookkeeping | `metadata`, `generated` (written by a script, not to be edited in the UI), `shared-logic` (rule blocks) | know what not to edit by hand |
 
@@ -174,11 +175,20 @@ axis exists because someone searches by it, across all packages of a workspace.
   search filters on the flag, and the flag also refuses a write; a tag next to
   it is a second source that drifts.*
 - **The project carries its own tags**: the package's tag (the package id's
-  infix, as in the project prefix), its role - `bootstrap`, `demo` or
-  `operational`, after the lifecycle split above - and `from-repository`.
+  infix, as in the project prefix), its role - `bootstrap`, `operational`,
+  `demo` or another role the register declares, after the lifecycle split
+  above - and `from-repository`.
   *In a workspace with several packages, the workbench groups a package's
   projects by the package tag and tells set-up, demo and operations apart by the
   role, without opening a project.*
+- **Roles and topics are declared, each with its use case.** The register's
+  `roles` adds roles kept away from production next to `demo`, each a project
+  role, a lifecycle tag and, as `<role>-data`, a data kind; the prod guard
+  holds for every one. Its `topics` lists the subjects datasets carry. *A tag nobody
+  declared is a typo or a new kind - the checker makes you say which.*
+- **A placeholder dataset names the graph it stands for** in the register's
+  `graph-roles` (`"<project>/<dataset>": "entity"`), so the workflow writing
+  through it carries the right `writes-` although its export shows no graph.
 - **Keep the tags in one register**, `task-tags.json` at the repository root:
   the tags of every task per project, the projects' own tags, and under
   `systems` the names of the external systems. `task tags` writes them into the
