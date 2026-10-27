@@ -88,6 +88,48 @@ the package's to change or remove, so ordering is the lever; check with
 `GET /dataplatform/api/explore/resource/nodeshapeforms/byresource` that the
 package's shape comes first for an instance of each such class.
 
+**Several packages adding to the page of one class attach their rows to one
+node shape.** A class several packages use - a domain ontology's asset, a
+reference package's country - shows one page. A package that wants something
+more on it, say the festivals in a country, can attach its own read-only rows
+to the node shape another package ships for that class, and then depends on
+that package:
+
+```turtle
+<https://example.org/countries/shacl/Country-NodeShape> shacl:property gigos:Country-festivals .
+```
+
+With a node shape of its own for the same class instead, each package's rows
+land on a form of their own: Explore offers a form per node shape and opens the
+page on the first (see `shacl:order 0` above), so a reader sees one set of rows
+unless they switch forms. Attached rows only add - they change no triple of the
+other catalog - so either package installs and uninstalls on its own, and the
+dependency makes sure the node shape is there: without it the rows show nowhere,
+though Explore keeps working. Which package ships the node shape is the authors'
+choice. (Observed on CMEM 26.2 through
+`GET /dataplatform/api/explore/resource/nodeshapeforms/byresource`: attached rows
+appear on the other catalog's form; a second node shape for the class adds a
+second form with only its own rows; without the other catalog, no form.)
+
+**A row on one of Corporate Memory's own forms** - the form for classes, for
+object properties, for graphs - is attached the same way, to the system node
+shape (`https://vocab.eccenca.com/shacl/OwlClassNodeShape`,
+`…/OwlObjectPropertyNodeShape`, …). That changes the form for every resource of
+that class on the instance, whichever package is installed, so:
+
+- **Read only, and no `shui:showAlways`**: the row shows only where it has a
+  value, and every other form stays as Corporate Memory draws it.
+- **One row per instance.** Two packages attaching their own rows show two
+  rows. Where several packages need the same row, they ship the same triples
+  under one neutral IRI (`https://vocab.eccenca.com/shared-shapes/…`), copied
+  unchanged from one master - its query, placeholder and group included, its
+  values query naming no graph of one package.
+- **Validating the catalog on its own** reports the references to the system
+  node shape and its groups as violations, by design: they are defined in
+  Corporate Memory's own catalog.
+- **Check it on the stack**: the form shows the row once, and a query counting
+  the row per node shape across all graphs (`COUNT(DISTINCT ?row)`) finds one.
+
 **A resource is edited only where it lives.** When other graphs import a
 resource, its node shape carries `shui:askIfEditableQuery`, so the form offers
 editing only in the graph that holds the resource's statements; opened through
