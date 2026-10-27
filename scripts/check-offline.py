@@ -44,6 +44,7 @@ CHECKERS = (
     "audit_queries.py",
     "check_all.py",
     "check_dangling.py",
+    "check_names.py",
     "check_paths.py",
     "check_placeholders.py",
     "check_skill_map.py",
@@ -166,10 +167,11 @@ def main():
         fail(f"the bad fixture passed, so a checker stopped detecting:\n{output}")
 
     # Each checker has to be the one that caught its own planted fault. A
-    # single checker failing on all four would satisfy the exit code above
+    # single checker failing on all five would satisfy the exit code above
     # while three others had quietly gone blind.
     for name in ("check_dangling.py", "check_placeholders.py", "check_paths.py",
-                 "audit_queries.py", "check_path_builder_queries.py"):
+                 "audit_queries.py", "check_path_builder_queries.py",
+                 "check_names.py"):
         # The summary pads names to the longest checker name, so match the
         # line by name and verdict rather than by column width.
         if not re.search(rf"^\s+{re.escape(name)}\s+FAIL\s*$", output, re.MULTILINE):

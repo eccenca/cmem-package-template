@@ -43,3 +43,9 @@ example:bookedAt a owl:ObjectProperty ;
   rdfs:domain example:Band ;
   rdfs:range example:Venue ;
   rdfs:label "booked at"@en .
+
+# check_names.py: an attribute named like a relation
+example:hasFoundingYear a owl:DatatypeProperty ;
+  rdfs:domain example:Band ;
+  rdfs:range xsd:gYear ;
+  rdfs:label "has founding year"@en .
