@@ -42,6 +42,10 @@ def export(root: Path) -> dict[str, Path]:
     (folder / "config.xml").write_text("<ProjectConfig/>")
     for name in ("terms", "staged", "scratch"):
         (folder / "dataset" / f"{name}.xml").write_text("<Dataset/>")
+    (folder / "workflow").mkdir()
+    (folder / "workflow" / "load.xml").write_text(
+        '<Workflow id="load"><Operator task="map" inputs="terms" outputs="staged-node" id="map"/>'
+        '<Dataset task="staged" id="staged-node"/></Workflow>')
     return {"translations": folder}
 
 
@@ -55,7 +59,7 @@ PACKAGE = {
         "terms": ["source", "master-data", "localization"],
         "staged": ["target", "training-data"],
         "scratch": ["temporary"],
-        "load": ["by-schedule", "consume", "kafka", "training"],
+        "load": ["by-schedule", "consume", "kafka", "training", "writes-entity"],
     }},
 }
 def planted(base: dict, change) -> dict:
@@ -81,6 +85,11 @@ FAULTS = [
 ]
 
 
+WRITES_FAULT = ("a workflow writing into a placeholder without its writes-",
+                lambda s: s["projects"]["translations"]["load"].remove("writes-entity"),
+                "lacks writes-entity")
+
+
 def main():
     if not SCRIPT.is_file():
         fail(f"{SCRIPT} does not exist - the template did not ship it")
@@ -88,14 +97,18 @@ def main():
     with tempfile.TemporaryDirectory() as tmp:
         projects = export(Path(tmp))
         for name, spec in (("package", PACKAGE),):
-            errors = tags.axis_errors(spec, projects)
+            errors = tags.axis_errors(spec, projects) + tags.writes_errors(spec, projects)
             if errors:
                 fail(f"the good {name} register was refused: {errors[0]}")
         for name, base, change, expected in FAULTS:
             errors = tags.axis_errors(planted(base, change), projects)
             if not any(expected in e for e in errors):
                 fail(f"{name} passed (expected an error with \"{expected}\", got {errors})")
-    print(f"check-task-tags: ok (a package register passes, {len(FAULTS)} planted faults "
+        name, change, expected = WRITES_FAULT
+        errors = tags.writes_errors(planted(PACKAGE, change), projects)
+        if not any(expected in e for e in errors):
+            fail(f"{name} passed (expected \"{expected}\", got {errors})")
+    print(f"check-task-tags: ok (a package register passes, {len(FAULTS) + 1} planted faults "
           "caught)")
 
 

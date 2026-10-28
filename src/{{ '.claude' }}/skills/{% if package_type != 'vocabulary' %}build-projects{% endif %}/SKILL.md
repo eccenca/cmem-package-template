@@ -188,7 +188,8 @@ axis exists because someone searches by it, across all packages of a workspace.
   declared is a typo or a new kind - the checker makes you say which.*
 - **A placeholder dataset names the graph it stands for** in the register's
   `graph-roles` (`"<project>/<dataset>": "entity"`), so the workflow writing
-  through it carries the right `writes-` although its export shows no graph.
+  through it carries the right `writes-` although its export shows no graph;
+  `task tags:check` reports a workflow writing into it without that tag.
 - **Keep the tags in one register**, `task-tags.json` at the repository root:
   the tags of every task per project, the projects' own tags, and under
   `systems` the names of the external systems. `task tags` writes them into the
