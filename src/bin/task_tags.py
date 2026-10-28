@@ -36,7 +36,8 @@ Every mode but --from-exports first checks the register against the tag axes of 
 skill and stops when it fails: every tag on an axis, at most one tag per axis (except position and
 writes-), every persistent dataset with a position (source, target or both) and a temporary one
 without, a subject only on a dataset, no read-only tag (DataIntegration's readOnly flag says it), a
-graph role that names a writes- role, and a project with exactly one role and from-repository.
+graph role that names a writes- role, a workflow writing into a placeholder dataset that carries
+the writes- of the graph it stands for, and a project with exactly one role and from-repository.
 """
 import json
 import re
@@ -136,6 +137,27 @@ def axis_errors(spec: dict, projects: dict[str, Path]) -> list[str]:
     return errors
 
 
+def writes_errors(spec: dict, projects: dict[str, Path]) -> list[str]:
+    """A workflow writing into a placeholder dataset must carry the writes- of the graph it stands for."""
+    roles = spec.get("graph-roles", {})
+    errors = []
+    for project, folder in projects.items():
+        register = spec.get("projects", {}).get(project, {})
+        for path in sorted((folder / "workflow").glob("*.xml")):
+            text = path.read_text()
+            task_of = dict(re.findall(r'<Dataset\b[^>]*?\btask="([^"]+)"[^>]*?\bid="([^"]+)"', text))
+            task_of = {node: task for task, node in task_of.items()}
+            outputs = {o for found in re.findall(r'<Operator\b[^>]*?\boutputs="([^"]*)"', text)
+                       for o in re.split(r"[,\s]+", found) if o}
+            tags = set(register.get(path.stem, []))
+            for node in sorted(outputs):
+                role = roles.get(f"{project}/{task_of.get(node, node)}")
+                if role and f"writes-{role}" not in tags:
+                    errors.append(f"{project}/{path.stem}: writes into {task_of.get(node, node)}, which stands for "
+                                  f"a {role} graph, but lacks writes-{role}")
+    return errors
+
+
 def tags_block(tags: list[str]) -> str:
     if not tags:
         return "<Tags> </Tags>"
@@ -182,7 +204,7 @@ def main() -> None:
         print(f"no {register}: the tags are kept in the exports only - nothing to check")
         return
     spec = json.loads(register.read_text())
-    errors = axis_errors(spec, projects)
+    errors = axis_errors(spec, projects) + writes_errors(spec, projects)
     for project in sorted(set(projects) - set(spec.get("projects", {}))):
         errors.append(f"{project}: a build project the register does not list")
     for project in sorted(set(spec.get("projects", {})) - set(projects)):
