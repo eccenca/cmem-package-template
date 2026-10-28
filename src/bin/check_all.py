@@ -33,6 +33,10 @@ It also validates the project's own skill map, `.claude/skill-map.custom.json`, 
 `check_skill_map.py`, and names it in the combined summary: a broken rule there takes
 the skill check hook's reminders away without a word in the session.
 
+And it runs `check_construct_graphs.py` over the exported build projects: a SPARQL Construct
+reading a Knowledge Graph dataset without naming its graph copies the whole store, and the run
+that does it succeeds.
+
 Exits non-zero if any check fails.
 """
 
@@ -111,6 +115,21 @@ def check_skill_map(root):
     return None
 
 
+def check_construct(root):
+    """Run check_construct_graphs.py over the build projects; None when there are none.
+
+    Not about RDF either: a Construct on a Knowledge Graph input that names no graph reads
+    the whole store, and nothing fails - the foreign triples land in the package's graph.
+    Silent on success, so it prints only what is wrong.
+    """
+    if not any((root / top).is_dir() for top in ("projects", "build")):
+        return None
+    code, output = run("check_construct_graphs.py", [root], quiet=True)
+    if code != 0:
+        print(output.rstrip())
+    return "check_construct_graphs.py", code
+
+
 def passed_early(extra, message):
     """The end of a run with no catalog checks: the other checks' verdict decides."""
     failed = [s for s, code in extra if code != 0]
@@ -124,8 +143,7 @@ def passed_early(extra, message):
 
 def check(directory, quiet=False):
     root = Path(directory)
-    skill_map = check_skill_map(root)
-    extra = [skill_map] if skill_map else []
+    extra = [c for c in (check_skill_map(root), check_construct(root)) if c]
     turtle = sorted(p for p in root.rglob("*.ttl") if p.is_file())
     if not turtle:
         print(f"{root}")

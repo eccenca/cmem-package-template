@@ -67,7 +67,7 @@ migrations, and the export round trip; this skill holds the flow.
   workflow-scoped in-memory dataset is shared with nested workflows for the
   same task id and removed after the run. Limits: default graph only,
   `maxInMemorySize` fails the run when exceeded, and anything read after the run
-  must be persistent.
+  must be persistent. What the SPARQL tasks do with one is below.
 - A dataset with `clearGraphBeforeExecution` clears once per run, not in each
   nested workflow that writes it.
 
@@ -77,6 +77,8 @@ migrations, and the export round trip; this skill holds the flow.
 2. **Stage, then publish.** A transform writing straight into a Knowledge Graph
    dataset can leave partial results despite `abortIfErrorsOccur`. Map into an
    in-memory dataset, check, then copy into the graph.
+   Only queries that name no graph work on an in-memory dataset - see
+   [SPARQL tasks and the dataset kind](#sparql-tasks-and-the-dataset-kind).
 3. **A workflow that clears a graph restores what the package ships in it** (the
    graph description, a scheme, an icon) - only where people look; scratch
    graphs read only by workflows need none.
@@ -101,6 +103,27 @@ migrations, and the export round trip; this skill holds the flow.
    touches it, and the migration's report names it and how to delete it once
    checked. *A fault found a week after a migration still has its way back,
    across an uninstall.*
+
+## SPARQL tasks and the dataset kind
+
+The SPARQL Select, Update and Construct tasks behave differently on a Knowledge
+Graph dataset and an in-memory one (measured on Corporate Memory 26.2):
+
+- **A Construct on a Knowledge Graph input names its graph** with `FROM` or
+  `GRAPH`, written into the query - Construct takes no `{{ }}` templates.
+  *Unlike Select, it does not restrict itself to its input's graph: `CONSTRUCT
+  { ?s ?p ?o } WHERE { ?s ?p ?o }` reads the whole store, and the run succeeds
+  with every other package's triples in the output.* `task check:offline`
+  reports such a Construct (`bin/check_construct_graphs.py`).
+- **A query on an in-memory input names no graph.** The dataset is one default
+  graph; `FROM` or `GRAPH <…>` against it returns nothing, **without an
+  error**, and an Update that inserts into a named graph fails the run.
+- **`{{ input.config.graph }}` and `{{ output.config.graph }}` need a Knowledge
+  Graph dataset**: an in-memory dataset has no `graph` parameter, and the run
+  fails.
+- **A Select writes into no RDF dataset**: its result is a table. Feed it to an
+  Update, which writes. Likewise an Update reads its entities from a Select or a
+  transform, not straight from an RDF dataset.
 
 ## Sticky notes
 
