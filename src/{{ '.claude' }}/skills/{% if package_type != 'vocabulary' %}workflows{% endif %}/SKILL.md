@@ -115,6 +115,17 @@ Graph dataset and an in-memory one (measured on Corporate Memory 26.2):
   { ?s ?p ?o } WHERE { ?s ?p ?o }` reads the whole store, and the run succeeds
   with every other package's triples in the output.* `task check:offline`
   reports such a Construct (`bin/check_construct_graphs.py`).
+- **A Select keeps to its input's graph only while its query names none.** It
+  adds `FROM <graph>` itself, but not when the word `GRAPH` or `FROM` appears
+  anywhere in the query - even inside a `FILTER EXISTS`; every triple pattern
+  outside a `GRAPH` then reads the whole store. *A Select that names one other
+  graph for a lookup and leaves its main pattern unwrapped counts every
+  package's triples.* Name every graph, or none.
+- **An Update clears its output dataset's graph when that dataset has
+  `clearGraphBeforeExecution`** - whatever graph its query writes, even one it
+  never names. Its input is never cleared, and an Update writes nothing of its
+  own into the output graph. Give an Update as output the dataset of a graph it
+  writes.
 - **A query on an in-memory input names no graph.** The dataset is one default
   graph; `FROM` or `GRAPH <…>` against it returns nothing, **without an
   error**, and an Update that inserts into a named graph fails the run.
