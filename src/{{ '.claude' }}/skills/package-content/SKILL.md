@@ -156,6 +156,18 @@ An internal package therefore declares `LicenseRef-scancode-unknown` and ships
 **no** `LICENSE` file in the package directory - the notice stays at the
 repository root. The `README.md` and `CHANGELOG.md` symlinks are unaffected.
 
+**A package that redistributes outside content declares that content's
+licence** - a published ontology, a unit catalogue, a code list - whenever the
+identifier is in the list, and always for share-alike content (CC BY-SA, ODbL,
+CDLA-Sharing), whose derivatives must carry it. A user reads
+`metadata.license` as the licence of what they install. Answer the template's
+`license` question with it, so the manifest and every later `copier update`
+follow it. The template carries the text of `Apache-2.0` and `CC-BY-4.0`
+only; for any other answer `LICENSE` starts as a placeholder, `task build`
+refuses to run until the source's own text replaces it, and an update never
+writes over that text again. Content without an open licence is not copied
+into a package at all - link it instead.
+
 Nothing technical stops an internal package from being published. Whether the
 pipeline has a publish job at all depends on how `marketplace` was answered when
 this package was generated; where it exists, publication happens on

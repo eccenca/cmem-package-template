@@ -36,6 +36,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - `build-projects` names `projects/<project-id>.zip` and exports into `projects/`; `shapes` wires the catalog as `graphs/shapes.ttl`
   - `package-content` and the README say where a file goes and that a vocabulary package may stay flat; the README states the marketplace's path rule
   - the layout is a recommendation: a package laid out otherwise still builds, and `.claude/skill-map.json` maps both `*/projects/**` and `*/build/**` to `build-projects`, so a package that has not moved keeps its reminders
+- Generated packages are asked for their licence, and a vocabulary package now defaults to `CC-BY-4.0` instead of `Apache-2.0`
+  - an ontology is content rather than software, and CC BY is what vocabularies are usually published under; a project package bundles workflows and shapes with its data and keeps `Apache-2.0`
+  - the `LICENSE` file and `metadata.license` in `cpa-manifest.json` both follow the answer
+  - **a `copier update` of an existing vocabulary package asks the new question**, and accepting the default switches its licence; answer `Apache-2.0` to keep the old one
+- The `license` question offers every identifier the marketplace accepts, so a package that redistributes outside content declares that content's licence (the `package-content` skill says when)
+  - `Apache-2.0` and `CC-BY-4.0` get their `LICENSE` text from the template; for any other answer `LICENSE` starts as a placeholder for the source's own text, `task build` refuses to run while it is there, and later updates never write over the text
+  - **a package that already replaced `LICENSE` by hand** (a W3C or CC BY 1.0 mirror, say) answers its identifier on the next update and gets a conflict in `LICENSE` once: keep its own text
+  - **a package whose `license` answer was dropped** by an update to a release without the question (seen on 1.8.0) is asked again, and the default would switch it back; answer the identifier in its manifest
+  - `LicenseRef-scancode-unknown` makes an internal package: no `LICENSE`, no manifest entry for it; an update to that answer deletes the root `LICENSE` but leaves the package directory's `LICENSE` link behind - delete it
 
 ## [1.8.0] 2026-10-18
 

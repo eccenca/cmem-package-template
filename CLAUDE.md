@@ -205,7 +205,7 @@ The full procedure — preflight checks, version derivation, commit and tag mess
 ## Conventions
 
 - `CHANGELOG.md` follows [Keep a Changelog](http://keepachangelog.com/) and [Semantic Versioning](https://semver.org/); every user-visible change gets an entry before release.
-- Generated packages default to `Apache-2.0`.
+- Generated packages ask for their licence from the marketplace's identifier list: vocabulary packages default to `CC-BY-4.0`, project packages to `Apache-2.0`. The `LICENSE` template holds those two texts and a placeholder for every other answer, which `_skip_if_exists` protects once the package has replaced it - rendering nothing instead would make copier delete the package's own text on update. `LicenseRef-scancode-unknown` renders no `LICENSE` at all.
 - `package_id` is validated by a regex in `copier.yaml`: lowercase, 2–5 hyphen-separated segments.
 - CI runs Python 3.13, while the README states Python 3.8+ as the user-facing prerequisite.
 
