@@ -58,13 +58,13 @@ ex:isTouring a owl:DatatypeProperty ;
 ex:memberCount a owl:DatatypeProperty ;
   rdfs:label "member count"@en ;
   rdfs:domain ex:Band ;
-  rdfs:range xsd:integer ;
+  rdfs:range xsd:nonNegativeInteger ;
   rdfs:isDefinedBy <https://example.org/icons/> .
 
 ex:capacity a owl:DatatypeProperty ;
   rdfs:label "capacity"@en ;
   rdfs:domain ex:Venue ;
-  rdfs:range xsd:integer ;
+  rdfs:range xsd:nonNegativeInteger ;
   rdfs:isDefinedBy <https://example.org/icons/> .
 
 ex:stageName a owl:DatatypeProperty ;
