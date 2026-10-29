@@ -58,7 +58,8 @@ SHUI = Namespace("https://vocab.eccenca.com/shui/")
 TRUE = {"true", "1"}
 
 PREFIX_LINE = re.compile(r"^\s*PREFIX\s+([\w-]*):\s*<([^>]*)>", re.IGNORECASE | re.MULTILINE)
-SELECT_CLAUSE = re.compile(r"\bSELECT\b(.*?)(?:\bWHERE\b|\bFROM\b|\{)", re.IGNORECASE | re.DOTALL)
+# A brace ends the clause only outside a {{placeholder}}: (<{{shuiGraph}}> AS ?graph) projects ?graph.
+SELECT_CLAUSE = re.compile(r"\bSELECT\b(.*?)(?:\bWHERE\b|\bFROM\b|(?<!\{)\{(?!\{))", re.IGNORECASE | re.DOTALL)
 TYPE_TEST = re.compile(r"\s(?:a|rdf:type|<http://www\.w3\.org/1999/02/22-rdf-syntax-ns#type>)\s+(<[^>]+>|[\w-]*:[\w-]+)")
 
 
