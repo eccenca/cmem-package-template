@@ -13,10 +13,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
+- `thesauri`: a scheme's icon shows the class it collects and a project carries one class glyph, drawn the package's way (eccenca's drawing is in ecc-services' `thesauri-internal`); the curated categorization graph is named by its role; a notation names its source by a link to the external concept where the classification publishes IRIs, inside the string where it does not - a typed notation shows a "?" badge and cannot be saved in the concept form
+- `vocabulary` depictions name the palette as Corporate Memory's interface palette; `shapes`' validation reference writes `shacl:` like the rest of the skill
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
-- The `shapes` skill carries the shape-catalog rules the eccenca packages settled on
-  - one set of sections (property groups) per package, used on every form in steps of 100, findings first, the overview last, none by link direction; recommended common sections at fixed positions keep packages alike, replacing the fixed house-style groups and the advice to give each form its own group
-  - rows numbered in steps of 10, editable before read-only before computed; row names in sentence case, plural for several values; every form text in every language of the vocabulary; a renamed row takes its slug, label and query along; embedding rows and embedded node shapes take no group
+- The `shapes` skill carries the shape-catalog rules every package needs; eccenca's house style - the `shacl:` prefix, the slug table, the section set with its orders, sentence case, roles in parentheses, the shape label scheme, English catalog labels - is in ecc-services' `shapes-internal`
+  - one set of sections (property groups) per package, used on every form at the same order, a status section first, the overview last, none by link direction, replacing the fixed house-style groups and the advice to give each form its own group
+  - rows numbered in steps of 10, editable before read-only before computed; row names in the user's words - no internal abbreviation, an abbreviation users know a thing by stays - and plural for several values; every form text in every language of the vocabulary; a renamed row takes its slug, label and query along; embedding rows and embedded node shapes take no group
   - a computed *Type* row shows only the most specific classes
   - a package class whose instances another node shape also reaches - through `rdfs:subClassOf` or a second type - gets `shacl:order 0`, so its form opens first
   - `askIf…` queries edit and remove a resource only in the graph that holds it, with string placeholders and an empty guard because Explore also runs them without a resource; clone and create decide by graph alone, since Explore passes them no resource
