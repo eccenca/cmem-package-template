@@ -14,9 +14,10 @@ FAIL  an Update whose output is a Knowledge Graph dataset with clearGraphBeforeE
       before it runs, whatever it writes (measured on Corporate Memory 26.2) - the graph is emptied
       by a task that only meant to use it as an anchor.
 WARN  a clearing Knowledge Graph dataset that workflows sharing no parent write, or that a
-      workflow with a replaceable input or output both writes and reads. Such runs overlap, and the
-      run that starts last wipes what the others staged; stage in a workflow-scoped in-memory
-      dataset instead.
+      workflow with a replaceable input or output both writes and reads - a staging graph, or a
+      persistent graph rebuilt and read back in place. Such runs overlap: the run that starts last
+      wipes what the others staged, or the graph ends as a mix of two runs. Stage each run apart (a
+      workflow-scoped in-memory dataset, or a graph per run) and write the graph once at the end.
 WARN  a dataset that is in no workflow and named by no other file of its project. It ships with
       the package and shows as a graph nobody fills; a dataset used only from outside (a form,
       cmemc) says so in its description.
@@ -156,8 +157,9 @@ def check(package: Path) -> int:
                                 f"which share no parent - their runs overlap, the last to start wins")
             for w in writers:
                 if workflows[w]["payload"] and ds in workflows[w]["reads"]:
-                    warnings.append(f"{where}/{ds}: staged in {w}, which has a replaceable input or output - "
-                                    f"its runs overlap; stage in a workflow-scoped in-memory dataset")
+                    warnings.append(f"{where}/{ds}: written and read back in {w}, which has a replaceable input "
+                                    f"or output - its runs overlap and can leave a mix of two runs in the graph; "
+                                    f"stage each run apart (in-memory, or a graph per run) and write the graph once")
         others = [p for p in folder.rglob("*.xml") if p.parent.name != "dataset"]
         texts = "\n".join(p.read_text() for p in others)
         for ds in datasets:
