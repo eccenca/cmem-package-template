@@ -157,9 +157,9 @@ gives is one place to keep them:
   kind - the check makes you say which.*
 - **Keep the tags in the same register**: the tags of every task per project, and
   the projects' own tags. `task tags` writes them into the exports and `task
-  tags:check` reports drift; both first refuse a tag declared on no axis, a tag on
-  an axis that does not tag that kind, two tags on an axis that allows one, and an
-  axis or value without its use case. Run `task tags` after every export. *A task
+  tags:check` reports drift; both first refuse a tag declared on no axis, a tag
+  on an axis that does not tag that kind, two tags on an axis that allows one,
+  and an axis or value without its use case. Run `task tags` after every export. *A task
   created through the API often loses its tags on export, and a tag edited in
   forty task files drifts; the register is the one place a reviewer reads, and
   one command repairs an export.*
