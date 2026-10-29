@@ -24,6 +24,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
+- `build-projects` and `workflows` keep what ids, labels, descriptions, variables, migrations, working properties, notes and the layout serve, and leave their spelling to the organisation (eccenca's in ecc-services' `build-projects-internal` and `workflows-internal`): a project id names its package and lifecycle, a hand-run workflow's description covers input, preconditions, what it does, result and what to do on failure, the demo refuses production by a variable the bootstrap sets; a graph's label carries the role word of its file
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 - The `shapes` skill carries the shape-catalog rules the eccenca packages settled on
   - one set of sections (property groups) per package, used on every form in steps of 100, findings first, the overview last, none by link direction; recommended common sections at fixed positions keep packages alike, replacing the fixed house-style groups and the advice to give each form its own group
