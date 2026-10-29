@@ -157,6 +157,23 @@ Graph dataset and an in-memory one (measured on Corporate Memory 26.2):
   workflow has no replaceable input or output, the dataset clears at the start,
   and the last step of a successful run empties it. A failed run leaves it filled
   for the diagnosis.
+- **A workflow with a replaceable input stages in a graph per run** where its
+  queries must name graphs: `<package prefix>staging/<workflow-id>/<key>`, the key
+  taken from the input (`{{ copy | md5 }}` in an Evaluate template fed by the
+  replaceable input). The template's output goes into the configuration input of
+  *every* node of the staging dataset - a node without it falls back to the
+  dataset's fixed graph; the tasks name the graph as `{{ input.config.graph }}` or
+  `{{ output.config.graph }}`, and the last step drops it (`DROP SILENT GRAPH`).
+  A `<Template name="graph">` cannot take a per-run value: it resolves when the
+  task is saved. Two runs for the same key share the graph, so the description
+  says that one runs at a time per key. *Overlapping runs for different records
+  each see only their own (measured on Corporate Memory 26.2, payload and
+  multipart starts alike); a graph rebuilt in place by such a workflow is staged
+  this way too and written once at the end.*
+- **Order steps through the dataset a step wrote**, not through the operator: a
+  dependency on the operator alone let a later step run first. An Update needs an
+  output dataset to run at all; an Update that writes only by name gets a
+  non-clearing anchor dataset.
 - **When one workflow overlaps itself depends on how it starts.** The workflow
   editor's run button, `cmemc workflow execute` and a scheduler start it as one
   activity: a second start is refused while it runs, a scheduler waits. Explore's
@@ -173,8 +190,9 @@ Graph dataset and an in-memory one (measured on Corporate Memory 26.2):
 
 `task check:offline` (`bin/check_workflow_datasets.py`) fails on an Update
 whose clearing output dataset stands for a graph its query never names, and
-warns about a clearing dataset written by workflows that share no parent, staging
-in a workflow with a replaceable input or output, and a dataset nothing uses.
+warns about a clearing dataset written by workflows that share no parent, a
+clearing dataset written and read back in a workflow with a replaceable input or
+output, and a dataset nothing uses.
 
 ## Sticky notes
 
