@@ -5,7 +5,7 @@
 `task check:offline` needs no instance and no credentials, and it catches two
 things that are invisible until after an install:
 
-- **A dangling `sh:property` / `sh:node` / `sh:group` / `sh:sparql` reference
+- **A dangling `shacl:property` / `shacl:node` / `shacl:group` / `shacl:sparql` reference
   makes the SHACL service answer HTTP 500 for every graph**, with nothing in
   the response naming the cause. Audit for these after any edit that removes or
   renames a shape.
