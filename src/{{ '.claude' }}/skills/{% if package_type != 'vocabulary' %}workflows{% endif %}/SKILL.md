@@ -165,8 +165,14 @@ Graph dataset and an in-memory one (measured on Corporate Memory 26.2):
   dataset's fixed graph; the tasks name the graph as `{{ input.config.graph }}` or
   `{{ output.config.graph }}`, and the last step drops it (`DROP SILENT GRAPH`).
   A `<Template name="graph">` cannot take a per-run value: it resolves when the
-  task is saved. Two runs for the same key share the graph, so the description
-  says that one runs at a time per key. *Overlapping runs for different records
+  task is saved. The key must follow from the input alone - the template is
+  evaluated once per node it configures, so a random value gives the writer and
+  each reader a different graph. An Evaluate template reads fields of a JSON or
+  CSV input, not an XML attribute: a transform in front lifts the attribute. The
+  staging dataset does not clear (an Update writing into a clearing dataset
+  empties the run's graph first); drop the graph at the start as well, for what
+  a failed run left. Two runs for the same key share the graph, so the
+  description says that one runs at a time per key. *Overlapping runs for different records
   each see only their own (measured on Corporate Memory 26.2, payload and
   multipart starts alike); a graph rebuilt in place by such a workflow is staged
   this way too and written once at the end.*
