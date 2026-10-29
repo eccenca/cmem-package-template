@@ -74,17 +74,16 @@ A package ships up to three build projects, split where the lifecycle differs:
 
 | project | holds | runs |
 | --- | --- | --- |
-| `<prefix>-bootstrap` | setting up an environment: master data and curated graphs' first fill, a taxonomy from its SKOS XML, migrations | once per environment, again after a reset |
-| `<prefix>-demo` | the example files, their transforms, learning demos, the count tests | on demand, never in production |
-| `<prefix>` | the operational workflows: consume (read sources) and produce (inference, checks, exports) | all the time |
+| bootstrap | setting up an environment: master data and curated graphs' first fill, a taxonomy from its SKOS XML, migrations | once per environment, again after a reset |
+| demo | the example files, their transforms, learning demos, the count tests | on demand, never in production |
+| operational | the operational workflows: consume (read sources) and produce (inference, checks, exports) | all the time |
 
-- **The prefix is the package id's infix without a trailing `-demo`**: package
-  `acme-orders-project` → `orders`, `orders-bootstrap`, `orders-demo`. *Whoever meets a project in the workspace knows which
-  package it belongs to; the demo is a project of its own, so a `-demo` in the
-  prefix would read `…-demo-demo`.*
+- **A project's id names its package and its lifecycle**, the same way in all
+  three. *Whoever meets a project in the workspace knows which package it
+  belongs to and whether it may run in production.*
 - Consume and produce stay together: they share datasets and rule blocks, and
   tags tell them apart.
-- **Several operational projects** `<prefix>-<purpose>` only where each serves a
+- **Several operational projects**, each id naming its purpose, only where each serves a
   usage context that is called by name from outside - a trigger, an assistant
   skill, an instance. *Renaming a project breaks every trigger and skill that
   calls it.* Bootstrap and demo stay one each.
@@ -100,10 +99,11 @@ A package ships up to three build projects, split where the lifecycle differs:
     check reads), with every count that moves with it re-measured.
   - **A documented flaw counted exactly is a real violation**: it may show up in
     validation; the exact count makes any further violation fail the test.
-- **The demo is guarded**: its entry workflow first reads a global or project
-  variable `environment` (`dev`, `qa`, `stage`, `prod`; set by the bootstrap)
-  and cancels on `prod`, with the reason in the report. Migrations and checks
-  may read it too.
+- **The demo is guarded**: the bootstrap records in a global or project
+  variable which environment the instance is, and the demo's entry workflow
+  reads it first and cancels in production, with the reason in the report.
+  Migrations and checks may read it too. *Demo data never lands in production,
+  whoever installs the package.*
 
 ## A project maintained from the repository says so
 
@@ -121,7 +121,7 @@ other tasks of the same project look safe to edit, and they are not.*
   (`staged-book`). No `WF_` prefix.
 - **Ids and labels name the intention**, not the format: `staged-book`, not
   `book-json`.
-- Labels are sentence case and use the same words as the id.
+- Labels use the same words as the id.
 - Rename a generated id only while nothing outside the project references it.
 - **Never give a workflow and a task the same id**, even of different types: the
   project can no longer be loaded.
@@ -133,8 +133,10 @@ other tasks of the same project look safe to edit, and they are not.*
   - A task: that sentence plus at most one paragraph on why it exists and what
     breaks without it. A SPARQL task says why no construct does the job.
   - A workflow run by hand: its full instruction set - the first sentence, then
-    plain-text sections `Input:`, `Preconditions:`, `What it does:`, `Result:`,
-    `On failure:`; lists with `- `.
+    what goes in, what must hold before it starts, what it does, what comes
+    out, and what to do when it fails. *Whoever starts it in Build reads only
+    the description; without these they start it on the wrong input, or cannot
+    recover from a half-done run.*
 - **A workflow run by hand gets a skill of exactly the same name.** The skill
   never repeats the description; it only adds the decision, the confirmation
   and the check.
@@ -176,7 +178,7 @@ A package without a register writes a first one from its exports with
 ## Namespaces in one place
 
 - Every namespace **decided per instance** is a **project variable**: one base
-  variable (`dataNamespace`), graph variables as templates over it
+  variable (for example `dataNamespace`), graph variables as templates over it
   (`{{project.dataNamespace}}entities/`). A shipped graph's IRI,
   fixed by the manifest, stays written out. *Whoever installs on a new instance
   changes one place instead of searching the tasks; what never changes gets no
@@ -206,8 +208,8 @@ A package without a register writes a first one from its exports with
 
 ## Migrations
 
-A migration is a DataIntegration workflow, one per migration, id
-`migrate-<NNN>-<what-it-migrates>`, in the bootstrap project:
+A migration is a DataIntegration workflow, one per migration, in the bootstrap
+project, its id numbered so the order is visible and naming what it migrates:
 
 1. **check** - ASK whether it is needed (old pattern present, not yet recorded
    in the graph description); otherwise end with the reason in the report;
@@ -217,7 +219,7 @@ A migration is a DataIntegration workflow, one per migration, id
 4. **verify** - counts before and after, and validation, both in the report;
 5. **record** the id and date in the graph description.
 
-A parent workflow `migrate` runs them all in order.
+A parent workflow runs them all in order.
 Test each twice from a pre-change backup: the results must be isomorphic.
 Production data and master data maintained by users always get a migration;
 package definition is replaced by the release, demo data by re-running the demo,

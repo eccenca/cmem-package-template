@@ -21,7 +21,7 @@ migrations, and the export round trip; this skill holds the flow.
   expands every import. Where a task needs data from several graphs, stage it
   with constructs (a transform into an in-memory dataset).
 - **Link natively instead of joining in SPARQL**: let the transform write the
-  raw key as a working property (`urn:<project>:working:<key>`), let a linking
+  raw key as a working property in a namespace of the project's own, let a linking
   task (`equality`) write the real link, and delete the working property in a
   final clean-up step.
 
@@ -182,14 +182,15 @@ in a workflow with a replaceable input or output, and a dataset nothing uses.
   information, workarounds and complex patterns. A parent holds at most one
   note, explaining its crossings.
 - **A read-back gets one note**: a workflow that reads a graph it wrote earlier
-  in the same run shows the dataset twice in that graph's lane. One yellow note
+  in the same run shows the dataset twice in that graph's lane. One read-this note
   per workflow says why it reads back (what the later step needs from the
   earlier one) - no note per node, no second dataset for the same graph. *Someone
   reading the canvas tells the read from the write and does not remove the
   read-back as a mistake; the edge direction already shows that it reads.*
-- **Two colours**: yellow `#ffd54f` = read this; a warning colour = temporary (a
+- **Two kinds of note, told apart by colour**: read this; and temporary (a
   workaround with its ticket: key, what it works around, what to do once fixed,
-  the ticket as a Markdown link). In a note a Markdown link and a bare URL are
+  the ticket as a Markdown link). *A workaround is found and removed once its
+  ticket is fixed.* In a note a Markdown link and a bare URL are
   clickable.
 
 ## Canvas layout: a waterfall
@@ -203,7 +204,8 @@ review the diff - a deliberate arrangement is yours to keep. A package that
 wants the layout as a gate adds `task: layout:check` to its `check:custom`.
 
 - **x = order**: column = longest path over data, config and dependency edges,
-  so every edge points right; 300 px columns, 200 px rows.
+  so every edge points right, on a fixed grid of columns and rows (the
+  script's defaults).
 - **y = tier, then lane.** Tiers top to bottom: *input* (read from outside the
   run - a read of a graph the same workflow writes sits in that graph's lane
   instead) → *working* → *target* (persistent graphs written). Within the target
@@ -215,13 +217,13 @@ wants the layout as a gate adds `task: layout:check` to its `check:custom`.
   its own lane at the very bottom, in the last column.
 - **No edge runs upward within a lane.**
 - **Planarity is the goal within those rules**: a crossing that survives is
-  accepted by `layout:check`, and a yellow note explains it.
+  accepted by `layout:check`, and a read-this note explains it.
 - **Port order counts as a crossing**: the predecessor feeding the first input
   port sits above the one feeding the second.
 - **Rule canvases too**: place the node of the first port above the node of the
   second. A comparison with `reverse=true` draws the source into the second
   port.
-- **Sticky notes** sit 50 px above the lane of the step they explain.
+- **Sticky notes** sit just above the lane of the step they explain.
 
 ## Testing
 
@@ -254,7 +256,7 @@ The commands for running a workflow against an instance are in the
 - **An object mapping's link is evaluated from the parent's side**: a child URI
   rule with backward paths (`\../key`) mints the right child IRIs, but the
   parent→child link hashes differently. Give the object mapping a working
-  property as target (`urn:<project>:working:<name>`), let the child state the
+  property as target (in the project's working namespace), let the child state the
   link back from `\../` values, and remove the working property before
   publishing. *Never an empty target: DataIntegration resolves it against its
   working directory and writes a `file:` predicate into the data.*
