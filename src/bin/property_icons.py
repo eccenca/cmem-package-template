@@ -236,14 +236,14 @@ def place(text, prop, uri, name):
     if marked:
         i = marked[0]
         last = code(body[i]).endswith(".")
-        body[i] = f"  {predicate} <{uri}> {'.' if last else ';'} {MARK} {name}"
+        indent = re.match(r"\s*", body[i]).group(0) or "  "
+        body[i] = f"{indent}{predicate} <{uri}> {'.' if last else ';'} {MARK} {name}"
     else:
-        after = next((i for i, line in enumerate(body) if "rdfs:isDefinedBy" in line), 0)
-        if code(body[after]).endswith("."):
-            body[after] = re.sub(r"\s*\.(\s*(#.*)?)$", r" ;\1", body[after], count=1)
-            body.insert(after + 1, f"  {predicate} <{uri}> . {MARK} {name}")
-        else:
-            body.insert(after + 1, f"  {predicate} <{uri}> ; {MARK} {name}")
+        # Last in the block, where the OWL API writes it: annotations sort by their full IRI, and
+        # foaf:depiction (http://xmlns.com/...) sorts after rdfs:, skos:, dcterms: and owl:.
+        indent = next((re.match(r"\s+", line).group(0) for line in body[1:] if re.match(r"\s+\S", line)), "  ")
+        body[-1] = re.sub(r"\s*\.(\s*(#.*)?)$", r" ;\1", body[-1], count=1)
+        body.append(f"{indent}{predicate} <{uri}> . {MARK} {name}")
     return "\n".join(lines[:start] + body + lines[end + 1:])
 
 

@@ -22,9 +22,10 @@ behind Protégé and ROBOT (measured with ROBOT 1.10):
 2. the logical axioms in a fixed order per kind - a class `owl:equivalentClass`,
    `rdfs:subClassOf`, `owl:disjointWith`; a property `rdfs:subPropertyOf`,
    `owl:inverseOf`, `rdfs:domain`, `rdfs:range`;
-3. the annotations sorted by their full IRI: `dcterms:modified`,
+3. the annotations sorted by their full IRI, not by prefix: `dcterms:modified`,
    `rdfs:comment`, `rdfs:isDefinedBy`, `rdfs:label`, `skos:altLabel`,
-   `skos:definition`, `foaf:depiction`.
+   `skos:definition`, `foaf:depiction` - so `vann:` (`http://purl.org/...`)
+   comes before `rdfs:` (`http://www.w3.org/...`) in the ontology's header.
 
 The OWL API also groups the terms by kind (object properties, data properties,
 classes), sorts them by IRI and heads each with a `###` comment.

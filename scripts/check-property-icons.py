@@ -25,6 +25,7 @@ Exits non-zero with a one-line reason on the first failure.
 
 import base64
 import json
+import re
 import shutil
 import subprocess
 import sys
@@ -101,6 +102,11 @@ def main():
             fail("an unmapped relation got an icon; it keeps the built-in one")
         if len(drawn.get("stageName", [])) != 1 or 'class="property-icon"' in drawn["stageName"][0]:
             fail("the depiction drawn by hand was replaced or doubled")
+
+        # the icon line closes its block, where the OWL API writes foaf:depiction (vocabulary skill)
+        for line in written.splitlines():
+            if "# property-icons:" in line and not re.sub(r"\s+#.*$", "", line).rstrip().endswith("."):
+                fail(f"an icon line is not the last of its block: {line[:60]}...")
 
         # planted: an icon edited by hand
         start = written.index("# property-icons: email")
