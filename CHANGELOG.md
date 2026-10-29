@@ -29,6 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
+- `catalog-queries` names a query by its role and lets the slug say it; the exact suffixes are eccenca's (ecc-services' `catalog-queries-internal`)
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 - The `shapes` skill carries the shape-catalog rules the eccenca packages settled on
   - one set of sections (property groups) per package, used on every form in steps of 100, findings first, the overview last, none by link direction; recommended common sections at fixed positions keep packages alike, replacing the fixed house-style groups and the advice to give each form its own group
