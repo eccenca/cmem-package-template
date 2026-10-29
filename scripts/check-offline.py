@@ -120,8 +120,12 @@ def check_task_tags():
             (project / name).write_text(text)
         register = Path(tmpdir) / "task-tags.json"
         register.write_text(json.dumps({
-            "project-tags": {"demo": ["demo", "from-repository"]}, "systems": [],
-            "projects": {"demo": {"books": ["source", "demo-data"], "books-to-library": ["generated"],
+            "axes": {"role": {"use": "find what a task is for", "several": True,
+                              "on": ["project", "dataset", "transform", "linking"],
+                              "values": {"demo": "example data", "source": "read by a build",
+                                         "generated": "written by a script, not edited in the UI"}}},
+            "project-tags": {"demo": ["demo"]},
+            "projects": {"demo": {"books": ["source", "demo"], "books-to-library": ["generated"],
                                   "link-authors": ["generated"]}}}))
         tool = [str(BIN / "task_tags.py")]
         write = subprocess.run(tool + ["--write", str(Path(tmpdir) / "package"), str(register)],

@@ -8,20 +8,22 @@
   task_tags.py [--write | --check | --from-exports] <package-dir> [<register>]
 
 The register (default: task-tags.json in the working directory, the repository root - the package
-directory may hold only files the manifest declares) lists the tags of every dataset, transform,
-linking task, custom task and workflow per project, the project's own tags, and the names of the
-external systems the package talks to:
+directory may hold only files the manifest declares) declares the package's tag axes and lists the
+tags of every dataset, transform, linking task, custom task and workflow per project, and the
+project's own tags:
 
-  {"project-tags": {"<project>": ["<package tag>", "operational", "from-repository"]},
-   "systems": ["<system>"],
-   "projects": {"<project>": {"<task id>": ["source", "production-data"]}}}
+  {"include": ["<preset>.json"],
+   "axes": {"<axis>": {"use": "<who searches by it, for what>",
+                       "on": ["dataset", "custom", "workflow", "transform", "linking", "project"],
+                       "several": false,
+                       "values": {"<tag>": "<one-line use case>"}}},
+   "project-tags": {"<project>": ["<tag>"]},
+   "projects": {"<project>": {"<task id>": ["<tag>"]}}}
 
-Optional, each with a one-line use case per entry:
-
-  "roles":  {"training": "data for training people"}   roles next to bootstrap and operational;
-            demo is always one. Each is a project role, a lifecycle tag and, as <role>-data, a data kind.
-  "topics": {"localization": "everything about translations"}   the subject axis of datasets
-  "graph-roles": {"<project>/<dataset>": "entity"}   the kind of graph a placeholder dataset stands for
+The template declares no axis: which tags a package uses, and what they mean, is the package's (or
+its organisation's) convention. "include" merges the axes of preset files, relative to the register,
+so several packages share one convention; an axis the register declares again adds its values to the
+preset's.
 
 --write sets the <Tags> of every task in the exports under <package-dir>/projects/*/ (and build/*/) to
 what the register lists for it (none when not listed), the project's <Tags> in config.xml to its
@@ -29,15 +31,12 @@ project tags, and each project's tags.xml to the tags it uses. A task created th
 loses its tags on export, so run it after every export.
 --check writes nothing and exits 1 when an export differs from the register. Tags are a set: an
 export that only reorders them does not differ.
---from-exports writes a first register from the tags the exports carry today, for a package that
-starts using one. Review it: --check then reports every tag that breaks the axes.
+--from-exports writes a first register from the tags the exports carry today, all on one axis to
+sort; --check then reports every tag without its use case.
 
-Every mode but --from-exports first checks the register against the tag axes of the build-projects
-skill and stops when it fails: every tag on an axis, at most one tag per axis (except position and
-writes-), every persistent dataset with a position (source, target or both) and a temporary one
-without, a subject only on a dataset, no read-only tag (DataIntegration's readOnly flag says it), a
-graph role that names a writes- role, a workflow writing into a placeholder dataset that carries
-the writes- of the graph it stands for, and a project with exactly one role and from-repository.
+Every mode but --from-exports first checks the register against its axes and stops when it fails:
+every axis and every value has a use case, every tag is a value of an axis declared for that kind of
+task (or for projects), and at most one tag per axis unless the axis allows several.
 """
 import json
 import re
@@ -48,39 +47,23 @@ TAG = "urn:silkframework:tag:"
 TAGS = re.compile(r"(<MetaData>.*?)<Tags>.*?</Tags>", re.S)
 TAG_URI = re.compile(r"<Tag>" + re.escape(TAG) + r"([^<]+)</Tag>")
 
-GRAPH_ROLES = ("term", "entity", "rule", "inference", "categorization", "relation", "integration",
-               "settings", "views", "shapes")
-SEVERAL = {"position", "writes", "system"}
-KINDS = ("dataset", "custom", "workflow")
-DEFAULT_ROLES = {"demo": "example data for showing the package; never runs in production"}
-
-
-def axes(spec: dict) -> dict[str, set[str]]:
-    """The tag axes, with the roles and topics the register declares."""
-    roles = set(DEFAULT_ROLES) | set(spec.get("roles", {}))
-    return {
-        "position": {"source", "target"},
-        "writes": {f"writes-{r}" for r in GRAPH_ROLES},
-        "warning": {"reads-imports"},
-        "lifetime": {"temporary", "rebuilt", "clean-up"},
-        "data kind": {"master-data", "production-data"} | {f"{r}-data" for r in roles},
-        "subject": set(spec.get("topics", {})),
-        "started by": {"by-person", "by-skill", "by-form", "by-schedule", "by-workflow", "by-api"},
-        "lifecycle": {"bootstrap", "run-after-import", "migration"} | roles,
-        "external": {"consume", "produce"},
-        "bookkeeping": {"metadata", "generated", "shared-logic"},
-        "entry": {"entry-point"},
-        "system": set(spec.get("systems", [])),
-    }
-
-
-def project_roles(spec: dict) -> set[str]:
-    return {"bootstrap", "operational"} | set(DEFAULT_ROLES) | set(spec.get("roles", {}))
-
-
 KINDS = ("dataset", "custom", "workflow")
 # a transform or linking task is a directory of its own; its tags sit in the first <MetaData> of this file
 TASK_DIRS = {"transform": "rules.xml", "linking": "linkSpec.xml"}
+ON = set(KINDS) | set(TASK_DIRS) | {"project"}
+
+
+def axes(spec: dict, base: Path = Path(".")) -> dict[str, dict]:
+    """The axes of the register's includes, then its own. An axis declared again adds its values to the
+    earlier one and replaces what else it says, so a package extends a preset's axis."""
+    merged: dict[str, dict] = {}
+    sources = [axes(json.loads((base / i).read_text()), (base / i).parent) for i in spec.get("include", [])]
+    for source in sources + [spec.get("axes", {})]:
+        for name, decl in source.items():
+            earlier = merged.get(name, {})
+            merged[name] = {**earlier, **decl,
+                            "values": {**earlier.get("values", {}), **decl.get("values", {})}}
+    return merged
 
 
 def project_dirs(package: Path) -> dict[str, Path]:
@@ -88,10 +71,11 @@ def project_dirs(package: Path) -> dict[str, Path]:
             if (p / "config.xml").exists()}
 
 
-def task_files(folder: Path) -> dict[str, Path]:
-    files = {p.stem: p for kind in KINDS for p in sorted((folder / kind).glob("*.xml"))}
+def task_files(folder: Path) -> dict[str, tuple[str, Path]]:
+    """Task id -> (kind, the file holding its tags)."""
+    files = {p.stem: (kind, p) for kind in KINDS for p in sorted((folder / kind).glob("*.xml"))}
     for kind, name in TASK_DIRS.items():
-        files.update({p.parent.name: p for p in sorted((folder / kind).glob(f"*/{name}"))})
+        files.update({p.parent.name: (kind, p) for p in sorted((folder / kind).glob(f"*/{name}"))})
     return files
 
 
@@ -100,61 +84,46 @@ def tags_in(text: str) -> list[str]:
     return TAG_URI.findall(block.group(0)) if block else []
 
 
-def axis_errors(spec: dict, projects: dict[str, Path]) -> list[str]:
-    axes_of = axes(spec)
-    roles = project_roles(spec)
-    errors = [f"{name}: \"{key}\" needs a one-line use case per entry"
-              for key in ("roles", "topics") for name, case in spec.get(key, {}).items()
-              if not str(case).strip()]
-    for project, tags in spec.get("project-tags", {}).items():
-        if len([t for t in tags if t in roles]) != 1:
-            errors.append(f"{project}: the project needs exactly one role of {', '.join(sorted(roles))}")
-        if "from-repository" not in tags:
-            errors.append(f"{project}: the project lacks the tag from-repository")
-    for key, role in spec.get("graph-roles", {}).items():
-        if role not in GRAPH_ROLES:
-            errors.append(f"{key}: graph role {role} is none of {', '.join(GRAPH_ROLES)}")
-    for project, register in spec.get("projects", {}).items():
-        folder = projects.get(project)
-        datasets = {p.stem for p in (folder / "dataset").glob("*.xml")} if folder else set()
-        for task in sorted(set(register) | datasets):
-            tags = register.get(task, [])
-            if "read-only" in tags:
-                errors.append(f"{project}/{task}: read-only is no tag - set the dataset's readOnly flag")
-                tags = [t for t in tags if t != "read-only"]
-            on = [next((a for a, known in axes_of.items() if t in known), None) for t in tags]
-            errors += [f"{project}/{task}: {t} is on no axis (a system name goes into \"systems\", a role "
-                       f"into \"roles\", a topic into \"topics\")" for t, a in zip(tags, on) if a is None]
-            errors += [f"{project}/{task}: two tags on the {a} axis"
-                       for a in sorted(set(on) - SEVERAL - {None}) if on.count(a) > 1]
-            if "subject" in on and task not in datasets:
-                errors.append(f"{project}/{task}: a subject belongs on a dataset - a task's subject follows "
-                              f"from its datasets")
-            if task in datasets and "temporary" in tags and "position" in on:
-                errors.append(f"{project}/{task}: a temporary dataset with source or target")
-            if task in datasets and "temporary" not in tags and "position" not in on:
-                errors.append(f"{project}/{task}: a persistent dataset without source or target")
+def declaration_errors(axes_of: dict[str, dict]) -> list[str]:
+    errors = []
+    for axis, decl in axes_of.items():
+        if not str(decl.get("use", "")).strip():
+            errors.append(f"axis {axis}: needs \"use\" - who searches by it, for what")
+        unknown = set(decl.get("on", [])) - ON
+        if not decl.get("on") or unknown:
+            errors.append(f"axis {axis}: \"on\" lists what it tags, out of {', '.join(sorted(ON))}")
+        errors += [f"axis {axis}: {tag} needs a one-line use case"
+                   for tag, case in decl.get("values", {}).items() if not str(case).strip()]
     return errors
 
 
-def writes_errors(spec: dict, projects: dict[str, Path]) -> list[str]:
-    """A workflow writing into a placeholder dataset must carry the writes- of the graph it stands for."""
-    roles = spec.get("graph-roles", {})
-    errors = []
-    for project, folder in projects.items():
-        register = spec.get("projects", {}).get(project, {})
-        for path in sorted((folder / "workflow").glob("*.xml")):
-            text = path.read_text()
-            task_of = dict(re.findall(r'<Dataset\b[^>]*?\btask="([^"]+)"[^>]*?\bid="([^"]+)"', text))
-            task_of = {node: task for task, node in task_of.items()}
-            outputs = {o for found in re.findall(r'<Operator\b[^>]*?\boutputs="([^"]*)"', text)
-                       for o in re.split(r"[,\s]+", found) if o}
-            tags = set(register.get(path.stem, []))
-            for node in sorted(outputs):
-                role = roles.get(f"{project}/{task_of.get(node, node)}")
-                if role and f"writes-{role}" not in tags:
-                    errors.append(f"{project}/{path.stem}: writes into {task_of.get(node, node)}, which stands for "
-                                  f"a {role} graph, but lacks writes-{role}")
+def tag_errors(where: str, kind: str, tags: list[str], axes_of: dict[str, dict]) -> list[str]:
+    errors, on = [], []
+    for tag in tags:
+        holding = [a for a, d in axes_of.items() if tag in d.get("values", {})]
+        fitting = [a for a in holding if kind in axes_of[a].get("on", [])]
+        if not holding:
+            errors.append(f"{where}: {tag} is declared on no axis")
+        elif not fitting:
+            errors.append(f"{where}: {tag} is on the {', '.join(holding)} axis, which tags no {kind}")
+        # a value may sit on several axes - one for tasks, one for projects; the one tagging this kind counts
+        on.append(fitting[0] if fitting else None)
+    errors += [f"{where}: two tags on the {a} axis" for a in sorted(set(on) - {None})
+               if on.count(a) > 1 and not axes_of[a].get("several")]
+    return errors
+
+
+def axis_errors(spec: dict, projects: dict[str, Path], base: Path = Path(".")) -> list[str]:
+    axes_of = axes(spec, base)
+    errors = declaration_errors(axes_of)
+    for project, tags in spec.get("project-tags", {}).items():
+        errors += tag_errors(project, "project", tags, axes_of)
+    for project, register in spec.get("projects", {}).items():
+        files = task_files(projects[project]) if project in projects else {}
+        for task, tags in register.items():
+            kind = files[task][0] if task in files else None
+            if kind:
+                errors += tag_errors(f"{project}/{task}", kind, tags, axes_of)
     return errors
 
 
@@ -174,17 +143,18 @@ def declared(path: Path) -> set[str]:
 
 
 def from_exports(projects: dict[str, Path], register: Path) -> None:
-    spec = {"project-tags": {}, "systems": [], "projects": {}}
-    known = set().union(*axes({}).values()) | {"read-only"}
+    spec = {"axes": {}, "project-tags": {}, "projects": {}}
+    found = set()
     for project, folder in projects.items():
         spec["project-tags"][project] = tags_in((folder / "config.xml").read_text())
-        tasks = {task: tags_in(path.read_text()) for task, path in task_files(folder).items()}
+        tasks = {task: tags_in(path.read_text()) for task, (_, path) in task_files(folder).items()}
         spec["projects"][project] = {task: tags for task, tags in tasks.items() if tags}
-    unknown = {t for p in spec["projects"].values() for tags in p.values() for t in tags} - known
-    spec["systems"] = sorted(unknown)
+        found |= {t for tags in tasks.values() for t in tags} | set(spec["project-tags"][project])
+    spec["axes"]["unsorted"] = {"use": "", "on": sorted(ON), "several": True,
+                                "values": {t: "" for t in sorted(found)}}
     register.write_text(json.dumps(spec, indent=2, ensure_ascii=False) + "\n")
-    print(f"wrote {register} from {len(projects)} project(s); every tag on no axis is listed under "
-          f"\"systems\" - move what is no system name onto an axis")
+    print(f"wrote {register} from {len(projects)} project(s); every tag sits on the axis \"unsorted\" - "
+          f"sort them onto axes of your own, or include a preset, and give each a use case")
 
 
 def main() -> None:
@@ -204,7 +174,7 @@ def main() -> None:
         print(f"no {register}: the tags are kept in the exports only - nothing to check")
         return
     spec = json.loads(register.read_text())
-    errors = axis_errors(spec, projects) + writes_errors(spec, projects)
+    errors = axis_errors(spec, projects, register.parent)
     for project in sorted(set(projects) - set(spec.get("projects", {}))):
         errors.append(f"{project}: a build project the register does not list")
     for project in sorted(set(spec.get("projects", {})) - set(projects)):
@@ -216,7 +186,7 @@ def main() -> None:
     stale = []
     for project, folder in projects.items():
         register_tasks = spec["projects"][project]
-        files = task_files(folder)
+        files = {task: path for task, (_, path) in task_files(folder).items()}
         for task in sorted(set(register_tasks) - set(files)):
             print(f"{project}: {register} names {task}, which the export does not have", file=sys.stderr)
             stale.append(f"{project}/{task}")
