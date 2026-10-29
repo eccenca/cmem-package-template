@@ -35,7 +35,8 @@ the skill check hook's reminders away without a word in the session.
 
 And it runs `check_construct_graphs.py` over the exported build projects: a SPARQL Construct
 reading a Knowledge Graph dataset without naming its graph copies the whole store, and the run
-that does it succeeds.
+that does it succeeds; and `check_workflow_datasets.py`: an Update whose clearing output dataset
+stands for a graph it never writes, overlapping staging, and datasets nothing uses.
 
 Exits non-zero if any check fails.
 """
@@ -130,6 +131,21 @@ def check_construct(root):
     return "check_construct_graphs.py", code
 
 
+def check_datasets(root):
+    """Run check_workflow_datasets.py over the build projects; None when there are none.
+
+    An Update emptying a clearing dataset's graph it never writes succeeds silently; the
+    warnings (overlapping staging, dead datasets) are printed, and do not fail the gate.
+    """
+    if not any((root / top).is_dir() for top in ("projects", "build")):
+        return None
+    code, output = run("check_workflow_datasets.py", [root], quiet=True)
+    lines = [l for l in output.splitlines() if l.startswith(("WARN", "FAIL", "  !!"))]
+    if lines:
+        print("\n".join(lines))
+    return "check_workflow_datasets.py", code
+
+
 def passed_early(extra, message):
     """The end of a run with no catalog checks: the other checks' verdict decides."""
     failed = [s for s, code in extra if code != 0]
@@ -143,7 +159,7 @@ def passed_early(extra, message):
 
 def check(directory, quiet=False):
     root = Path(directory)
-    extra = [c for c in (check_skill_map(root), check_construct(root)) if c]
+    extra = [c for c in (check_skill_map(root), check_construct(root), check_datasets(root)) if c]
     turtle = sorted(p for p in root.rglob("*.ttl") if p.is_file())
     if not turtle:
         print(f"{root}")

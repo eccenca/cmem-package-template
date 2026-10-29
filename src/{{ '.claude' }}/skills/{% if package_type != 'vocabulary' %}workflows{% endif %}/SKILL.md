@@ -1,6 +1,6 @@
 ---
 name: workflows
-description: Design the DataIntegration workflows of a Corporate Memory package - CMEM constructs before SPARQL, the minimal input per task, linking natively, optimising a build, phases and in-memory hand-off, responsibilities between tasks and graphs, sticky notes, the waterfall canvas layout (task layout), testing, and the DataIntegration mechanics found on the way. Use when a workflow is created, split, laid out or reviewed, when a task is chosen or replaced, or when deciding how a build step gets its data into a graph.
+description: Design the DataIntegration workflows of a Corporate Memory package - CMEM constructs before SPARQL, the minimal input per task, linking natively, optimising a build, phases and in-memory hand-off, responsibilities between tasks and graphs, SPARQL tasks on Knowledge Graph and in-memory datasets, staging and runs that overlap, sticky notes, the waterfall canvas layout (task layout), testing, and the DataIntegration mechanics found on the way. Use when a workflow is created, split, laid out or reviewed, when a task is chosen or replaced, or when deciding how a build step gets its data into a graph.
 ---
 
 # Workflows in a package's build project
@@ -77,8 +77,8 @@ migrations, and the export round trip; this skill holds the flow.
 2. **Stage, then publish.** A transform writing straight into a Knowledge Graph
    dataset can leave partial results despite `abortIfErrorsOccur`. Map into an
    in-memory dataset, check, then copy into the graph.
-   Only queries that name no graph work on an in-memory dataset - see
-   [SPARQL tasks and the dataset kind](#sparql-tasks-and-the-dataset-kind).
+   Stage in a **workflow-scoped** in-memory dataset; where the queries must name
+   graphs, see [Staging, anchors and runs that overlap](#staging-anchors-and-runs-that-overlap).
 3. **A workflow that clears a graph restores what the package ships in it** (the
    graph description, a scheme, an icon) - only where people look; scratch
    graphs read only by workflows need none.
@@ -135,6 +135,46 @@ Graph dataset and an in-memory one (measured on Corporate Memory 26.2):
 - **A Select writes into no RDF dataset**: its result is a table. Feed it to an
   Update, which writes. Likewise an Update reads its entities from a Select or a
   transform, not straight from an RDF dataset.
+
+## Staging, anchors and runs that overlap
+
+- **A SPARQL task runs against the dataset of a real graph**: a Select against
+  the dataset of the graph it reads, an Update against the dataset of a graph it
+  writes - never against a clearing dataset of a graph it only reads. *The
+  canvas then shows what the task works on.*
+- **A handle only where the project has no dataset for any graph the task
+  touches** (a project working on other packages' graphs): a Knowledge Graph
+  dataset on `<package prefix>handle/<function>`, clearing off, never the output
+  of a Construct or a transform - those write into its graph. A handle graph that
+  holds triples is an error. *Whoever finds the graph in Explore reads what it
+  served, and `clean-up` covers its prefix.*
+- **Stage in a workflow-scoped in-memory dataset.** Each run gets its own, also
+  when one workflow runs several times at once; a project-wide in-memory dataset
+  and a fixed Knowledge Graph graph are shared by every run, and the run that
+  starts last wipes what the others staged (with `clearGraphBeforeExecution`).
+- **A Knowledge Graph staging graph only where the queries must name graphs**,
+  and then: one workflow writes it (`<package prefix>staging/<workflow-id>`), that
+  workflow has no replaceable input or output, the dataset clears at the start,
+  and the last step of a successful run empties it. A failed run leaves it filled
+  for the diagnosis.
+- **When one workflow overlaps itself depends on how it starts.** The workflow
+  editor's run button, `cmemc workflow execute` and a scheduler start it as one
+  activity: a second start is refused while it runs, a scheduler waits. Explore's
+  save trigger on an integration graph, `cmemc workflow io` and the REST payload
+  endpoints start a new instance per call: those runs overlap. Two different
+  workflows, and a nested workflow next to its own direct run, always overlap.
+  The store applies their updates one after the other - on a shared graph the
+  last writer wins, without an error.
+- **A workflow started from Explore runs with the permissions of the user who
+  saved the form.** Every graph it reads or writes is readable, or writable, by
+  everyone allowed to start it; otherwise one user's run fails or reads less than
+  another's. Where the result is meant to depend on the user, its description
+  says so.
+
+`task check:offline` (`bin/check_workflow_datasets.py`) fails on an Update
+whose clearing output dataset stands for a graph its query never names, and
+warns about a clearing dataset written by workflows that share no parent, staging
+in a workflow with a replaceable input or output, and a dataset nothing uses.
 
 ## Sticky notes
 
