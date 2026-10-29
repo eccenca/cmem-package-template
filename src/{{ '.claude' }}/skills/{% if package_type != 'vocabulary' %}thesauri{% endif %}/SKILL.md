@@ -184,27 +184,17 @@ stated only in an imported graph still gets its class icon.
   graph the project graph imports. Do not copy the icon onto each concept.
 - **A direct `foaf:depiction` on a concept** only where the concept means
   something of its own that the class icon cannot show.
-- **The scheme gets a direct `foaf:depiction`: a small tree whose root is the
-  glyph of the class it collects**, in that class's colour. A 24×24 viewBox,
-  strokes only, the root glyph within y ≈ 1.8–10.2 around (12, 6):
-
-  ```svg
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><g fill="none" stroke="COLOUR"
-    stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-    ROOT-GLYPH
-    <path d="M12 10.8v1.7M6 12.5h12M6 12.5v2.5M18 12.5v2.5"/>
-    <rect x="3.5" y="15" width="5" height="5" rx="1"/><rect x="15.5" y="15" width="5" height="5" rx="1"/>
-  </g></svg>
-  ```
+- **The scheme gets a direct `foaf:depiction` showing the glyph of the class it
+  collects**, in that class's colour, drawn so it reads as a tree of such
+  concepts. *Schemes are told apart in the editor by what they collect.*
 
 - Colours follow the `vocabulary` skill (`references/depictions.md`, *Colour*).
   Inline the SVG as a base64 `data:image/svg+xml` IRI, with a comment that says
   what it shows.
-- **The thesaurus project keeps the editor's book**: give the project graph a
-  direct `foaf:depiction` that redraws the book (Carbon's `Book`, 32×32, in the
-  palette's darkest grey - never `currentColor`, which changes on mouse-over)
-  with **one glyph on its right page** (x 17–28, y 7–25), in the schemes'
-  colour. The editor's project list shows it.
+- **The thesaurus project carries one class glyph**: give the project graph a
+  direct `foaf:depiction` with one glyph of the class its schemes collect, in
+  their colour - never `currentColor`, which changes on mouse-over. The
+  editor's project list shows it. *Projects are told apart in the list.*
 - Check it in the taxonomy editor: the project list, the scheme, a top concept,
   a leaf.
 
@@ -271,7 +261,18 @@ Package-specific data about a concept goes into SKOS terms:
   `related` and `^member`; it has no broader/narrower rows and no mapping
   properties.
 - Mapping to an external classification: its term names as `skos:hiddenLabel`,
-  its code as `skos:notation` with the source in the string (`"DNB-SG 640"`).
+  and its code so that a reader knows where it comes from:
+  - where the classification publishes IRIs, the bare code as `skos:notation`
+    and a `skos:closeMatch` (or `skos:exactMatch`) to its concept - a reader
+    and a query follow the link;
+  - where it publishes none, the source inside the string (`"DNB-SG 640"`);
+  - a package's own codes stay bare, and the scheme's `rdfs:comment` says
+    where they come from.
+
+  *The source cannot go into a datatype*: a notation typed with a custom
+  `rdfs:Datatype` (SKOS's idiom) shows a "?" badge in the concept form, and an
+  edit cannot be saved - the form expects `xsd:string` and asks to re-enter
+  the value, which drops the datatype (observed on CMEM 26.2).
 - **A term that names a narrower concept belongs to that concept**: drop a
   hidden label from a broader concept when a narrower one has that name; the
   import checks it on every sync. A hidden label is a label of the concept
@@ -279,7 +280,7 @@ Package-specific data about a concept goes into SKOS terms:
   label (an own label ranks above a hidden label); the taxonomy editor no longer
   shows the children's names on the parent.*
 - **One notation per concept**: the system shape for `skos:notation` has
-  `sh:maxCount 1` and applies to every `skos:Concept`. Keep the one code that
+  `shacl:maxCount 1` and applies to every `skos:Concept`. Keep the one code that
   actually decides; a finer code goes on a narrower concept. Never put the same
   code on two concepts.
 
@@ -292,8 +293,8 @@ The link from a resource to a concept is curated data, not a build product:
   `void:propertyPartition [ void:property <categorizing property> ]`, so the
   graph says which links it holds. Links minted into a graph the build clears are lost on
   the next run.
-- Name it after gist: a *categorization* graph (gist's `isCategorizedBy` links a
-  thing to a `Category`).
+- Name it by the role it plays for the user - *categorization*, for example -
+  so whoever opens the graph list knows which graph holds the curated links.
 - **Where a form save writes**:
   - a new value goes into the graph the form is open in - unless the node shape
     has a `shui:targetGraphTemplate`, then into the property shape's template if
