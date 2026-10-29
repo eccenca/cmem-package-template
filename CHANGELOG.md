@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
+- The `vocabulary` skill orders a term's predicates as the OWL API writes them (measured with ROBOT 1.10), so a vocabulary saved in Protégé or ROBOT shows no reordering; label casing is eccenca's (ecc-services' `vocabulary-internal`)
 - The `vocabulary` skill names every relation (object property) as a verb phrase read from its domain to its range - a verb such as `manages`, or `has` / `is … of` with the role the range plays, such as `hasProductManager` - never as a bare class or role name
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 
