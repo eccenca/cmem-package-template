@@ -16,8 +16,9 @@ model shows what each relation and attribute is about instead of one built-in ic
   Corporate Memory's built-in icon.
 * An **attribute** shows its meaning and never an arrow (``email``, ``due-date``, ``quantity``,
   ...). Every attribute gets one: where the mapping names none, the kind of its value stands in,
-  read from its declared range - ``text``, ``number``, ``date``, ``time``, ``year``, ``yes-no``,
-  ``link``, ``location`` (and ``count`` for a name ending in Count). Its colour is the domain
+  read from its declared range - ``text``, ``number``, ``count`` (a non-negative or positive
+  integer), ``date``, ``time`` (a time or a point in time), ``year``, ``yes-no``, ``link``,
+  ``location``; the name plays no part. Its colour is the domain
   class's colour, so a class and its attributes read as one unit.
 
 A colour is read off the class's own foaf:depiction; without one it is neutral grey.
@@ -64,15 +65,15 @@ ALLOWED = {"svg", "g", "path", "rect", "circle", "ellipse", "line", "polyline", 
            "defs", "clipPath", "mask", "linearGradient", "radialGradient", "stop", "marker",
            "title", "desc"}
 GEO_WKT = URIRef("http://www.opengis.net/ont/geosparql#wktLiteral")
-KINDS = [  # value kind of an attribute without a mapped glyph, by declared range
+KINDS = [  # value kind of an attribute without a mapped glyph, by declared range alone
     ({XSD.boolean}, "yes-no"),
-    ({XSD.date, XSD.dateTime, XSD.dateTimeStamp}, "date"),
-    ({XSD.time}, "time"),
+    ({XSD.date}, "date"),
+    ({XSD.dateTime, XSD.dateTimeStamp, XSD.time}, "time"),
     ({XSD.gYear, XSD.gYearMonth}, "year"),
     ({XSD.anyURI}, "link"),
     ({GEO_WKT}, "location"),
-    ({XSD.integer, XSD.int, XSD.long, XSD.short, XSD.nonNegativeInteger, XSD.positiveInteger,
-      XSD.decimal, XSD.double, XSD.float}, "number"),
+    ({XSD.nonNegativeInteger, XSD.positiveInteger}, "count"),
+    ({XSD.integer, XSD.int, XSD.long, XSD.short, XSD.decimal, XSD.double, XSD.float}, "number"),
 ]
 
 ET.register_namespace("", SVG)
@@ -147,12 +148,8 @@ def colour(graph, cls):
 
 def value_kind(prop, ranges):
     """The glyph standing in for an attribute's meaning: the kind of its value."""
-    if str(prop).endswith("Count"):
-        return "count"
     for types, name in KINDS:
         if ranges & types:
-            if name == "date" and str(prop).endswith("Time"):
-                return "time"
             return name
     return "text"
 

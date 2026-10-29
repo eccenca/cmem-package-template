@@ -88,8 +88,10 @@ a competency question sees "located in" and "email" at a glance.*
   `address`, `title`, `identifier`, `amount`, `quantity`, `due-date` - and
   takes its domain class's colour, so a class and its attributes read as one
   unit. Every attribute gets one: where you map none, the kind of its value
-  stands in, read from its range - `text`, `number`, `count`, `date`, `time`,
-  `year`, `yes-no`, `link`, `location`.
+  stands in, read from its range alone - `text`, `number`, `count` (a
+  non-negative or positive integer), `date`, `time` (a time or a point in time),
+  `year`, `yes-no`, `link`, `location`. *A range says what the value is in every
+  naming convention; a name does not.*
 - Map them in `icons/property-icons.json` (property IRI to glyph name, under
   `relations` and `attributes`) and run `task icons`: `bin/property_icons.py`
   writes each icon into the property's block as one line ending in
