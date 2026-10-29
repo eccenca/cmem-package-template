@@ -155,14 +155,14 @@ gives is one place to keep them:
   a one-line use case. `"include"` pulls in a preset file, so packages sharing a
   convention keep it in one place. *A tag nobody declared is a typo or a new
   kind - the check makes you say which.*
-- **Keep the tags in the same register**: the tags of every task per project, and
-  the projects' own tags. `task tags` writes them into the exports and `task
+- **Keep the tags in the same register**: the tags of every task per project,
+  and the projects' own tags. `task tags` writes them into the exports and `task
   tags:check` reports drift; both first refuse a tag declared on no axis, a tag
   on an axis that does not tag that kind, two tags on an axis that allows one,
-  and an axis or value without its use case. Run `task tags` after every export. *A task
-  created through the API often loses its tags on export, and a tag edited in
-  forty task files drifts; the register is the one place a reviewer reads, and
-  one command repairs an export.*
+  and an axis or value without its use case. Run `task tags` after every export.
+  *A task created through the API often loses its tags on export, and a tag
+  edited in forty task files drifts; the register is the one place a reviewer
+  reads, and one command repairs an export.*
 - **Tags are a set**: a checker compares sets; no rule fixes an order.
 - **No tag for what a flag already says**: a dataset the build only reads gets
   DataIntegration's `readOnly="true"`. *The workbench search filters on the flag,
