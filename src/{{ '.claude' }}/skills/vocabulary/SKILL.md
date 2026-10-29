@@ -15,12 +15,24 @@ The graph declares an `owl:Ontology` **at the graph IRI** with
 
 ## Predicate order
 
-Structural axioms first (`rdfs:subClassOf`, `rdfs:domain`, `rdfs:range`,
-`rdfs:subPropertyOf`), then `rdfs:label`, `skos:definition`, `rdfs:comment`,
-`rdfs:isDefinedBy`, `foaf:depiction`, `dcterms:modified`.
+Write a term's predicates in the order the OWL API writes them - the library
+behind Protégé and ROBOT (measured with ROBOT 1.10):
 
-A consistent order makes a diff readable: a term that gained a constraint looks
-different from one that gained prose.
+1. `rdf:type` (`a`);
+2. the logical axioms in a fixed order per kind - a class `owl:equivalentClass`,
+   `rdfs:subClassOf`, `owl:disjointWith`; a property `rdfs:subPropertyOf`,
+   `owl:inverseOf`, `rdfs:domain`, `rdfs:range`;
+3. the annotations sorted by their full IRI: `dcterms:modified`,
+   `rdfs:comment`, `rdfs:isDefinedBy`, `rdfs:label`, `skos:altLabel`,
+   `skos:definition`, `foaf:depiction`.
+
+The OWL API also groups the terms by kind (object properties, data properties,
+classes), sorts them by IRI and heads each with a `###` comment.
+
+*A vocabulary opened and saved in Protégé or ROBOT then shows no reordering in
+its diff, a hand edit lands where a tool would put it, and a term that gained a
+constraint still looks different from one that gained prose.* The OWL API drops
+`#` comments: a note that has to survive goes into `skos:editorialNote`.
 
 ## `skos:definition` is the definition, `rdfs:comment` is everything else
 
@@ -49,8 +61,8 @@ rather than the definition.
 
 ## Naming
 
-- Class labels are sentence case (`"Feature value"`, not `"FeatureValue"`);
-  property labels are lowercase words (`"selects material"`).
+- Labels are words a reader reads, not the IRI's spelling (`"Feature value"`,
+  not `"FeatureValue"`).
 - **A relation is named as a verb phrase**, read from its domain to its range:
   a verb (`manages`, `appliesTo`, `standsInFor`), or `has` / `is … of` with the
   role the range plays (`hasProductManager`, `isMemberOf`). Never a bare class or
