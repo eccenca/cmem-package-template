@@ -100,12 +100,14 @@ def declaration_errors(axes_of: dict[str, dict]) -> list[str]:
 def tag_errors(where: str, kind: str, tags: list[str], axes_of: dict[str, dict]) -> list[str]:
     errors, on = [], []
     for tag in tags:
-        axis = next((a for a, d in axes_of.items() if tag in d.get("values", {})), None)
-        if axis is None:
+        holding = [a for a, d in axes_of.items() if tag in d.get("values", {})]
+        fitting = [a for a in holding if kind in axes_of[a].get("on", [])]
+        if not holding:
             errors.append(f"{where}: {tag} is declared on no axis")
-        elif kind not in axes_of[axis].get("on", []):
-            errors.append(f"{where}: {tag} is on the {axis} axis, which tags no {kind}")
-        on.append(axis)
+        elif not fitting:
+            errors.append(f"{where}: {tag} is on the {', '.join(holding)} axis, which tags no {kind}")
+        # a value may sit on several axes - one for tasks, one for projects; the one tagging this kind counts
+        on.append(fitting[0] if fitting else None)
     errors += [f"{where}: two tags on the {a} axis" for a in sorted(set(on) - {None})
                if on.count(a) > 1 and not axes_of[a].get("several")]
     return errors

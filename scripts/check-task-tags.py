@@ -90,6 +90,10 @@ FAULTS = [
     ("a value added to a preset axis that tags no project",
      lambda s: s["axes"].__setitem__("position", {"values": {"read-back": "read again later"}})
      or s["project-tags"]["translations"].append("read-back"), "which tags no project"),
+    ("a value on a task axis and a project axis, used on a project where only the task axis fits",
+     lambda s: s["axes"].__setitem__("lifecycle", {"use": "find what runs once", "on": ["workflow"],
+                                                     "values": {"demo-pkg": "x"}})
+     or s["projects"]["translations"]["terms"].append("demo-pkg"), "which tags no dataset"),
     ("an axis without its use case",
      lambda s: s["axes"]["package"].__setitem__("use", ""), "needs \"use\""),
 ]
