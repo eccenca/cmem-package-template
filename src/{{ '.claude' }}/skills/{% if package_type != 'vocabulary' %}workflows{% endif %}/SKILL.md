@@ -91,7 +91,7 @@ migrations, and the export round trip; this skill holds the flow.
    source change.
 7. **Graphs created at run time sit under a package-owned IRI prefix** (one
    graph per product, its check graph). The package ships a workflow `clean-up`
-   (tag `clean-up`) that deletes every graph below the prefix the manifest does
+   that deletes every graph below the prefix the manifest does
    not ship. A stack test calls it **before the uninstall** - afterwards the
    workflow is gone with its project - and once more **right after every fresh
    install**, for graphs an older install left. *Uninstalling the package leaves

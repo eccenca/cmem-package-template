@@ -107,13 +107,12 @@ A package ships up to three build projects, split where the lifecycle differs:
 
 ## A project maintained from the repository says so
 
-Every build project carries, next to the package's tag, the project tag
-`from-repository`, and its description says in one line that it is maintained
-from the package's repository: edit it in the UI only if you export it back,
-because the next `task import` replaces the whole project. *In a workspace
-shared by people and an agent, the workbench filter shows which projects an
-import will overwrite. The unit is the project: a tag on single tasks would make
-the untagged tasks of the same project look safe to edit, and they are not.*
+Every build project's description says in one line that it is maintained from
+the package's repository: edit it in the UI only if you export it back, because
+the next `task import` replaces the whole project. *In a workspace shared by
+people and an agent, whoever opens the project reads that an import will
+overwrite it. The unit is the project: a note on single tasks would make the
+other tasks of the same project look safe to edit, and they are not.*
 
 ## Ids and labels
 
@@ -144,64 +143,35 @@ the untagged tasks of the same project look safe to edit, and they are not.*
 
 ## Task tags
 
-A tag names the role a task plays, never its content. Tags are filters: each
-axis exists because someone searches by it, across all packages of a workspace.
+DataIntegration attaches any tag to a task or project and keeps no order; which
+tags a package uses, and what each means, is the package's convention - or its
+organisation's, shared by several packages. The template declares none. What it
+gives is one place to keep them:
 
-| axis | tags | use case |
-| --- | --- | --- |
-| position (datasets) | `source`, `target` - both on a dataset the build reads and writes; only on persistent datasets, and by effect: a graph a SPARQL task writes gets `target` even when no workflow node uses its dataset as a target; a temporary dataset gets none (`temporary` says it) | find every dataset a build reads or writes persistently - including what SPARQL tasks write |
-| writes (workflows) | `writes-<graph role>`: `writes-term`, `-entity`, `-rule`, `-inference`, `-categorization`, `-relation`, `-integration`, `-settings`, `-views`, `-shapes` (the roles of the `package-content` graph table), one per role the workflow writes - a parent carries the union of its phases; none for temporary graphs | find every workflow that writes a kind of graph, in every package - a workflow writing three roles is found by each of the three |
-| warning (datasets) | `reads-imports` - the dataset's graph imports others, so a read expands every import, whatever the graph's role | see at a glance which reads see more than one graph, and are expensive |
-| lifetime | `temporary` (not persistent: in-memory or cleared per run, no position tags), `rebuilt` (a persistent graph every build clears and writes again; keeps `source`/`target`), `clean-up` | find what may be cleared without loss; everything without a lifetime tag must survive a release |
-| data kind | `master-data`, `production-data`, and `<role>-data` for every role kept away from production (`demo-data`, `training-data` …) | find all data of one kind - every demo source, say - whatever the build does with it |
-| subject (datasets) | one topic from the register's `topics` (`localization`, `product-range`) | find every dataset about one subject; a transformation or workflow takes its subject from its datasets, so only datasets carry it |
-| started by | `by-person`, `by-skill`, `by-form` (a form save or button), `by-schedule`, `by-workflow` (only nested), `by-api` (an external system through the REST API or cmemc) | know who runs it before changing it |
-| lifecycle | `bootstrap`, `run-after-import`, `migration`, and every role kept away from production (`demo`, plus what the register's `roles` declare: `training`, `test` …) | find what runs once, after an import, or never in production |
-| external systems | `consume`, `produce`, plus the system's name (an input delivered through the MCP is `consume`) | find everything touching one external system |
-| bookkeeping | `metadata`, `generated` (written by a script, not to be edited in the UI), `shared-logic` (rule blocks) | know what not to edit by hand |
-
-- **Graph roles, not graph names**, in `writes-`: the package is named by the
-  project tag. *A `writes-products` would filter together different graphs of
-  different packages.*
-- **Tags are a set**: DataIntegration keeps no tag order. A checker compares
-  sets; no rule fixes an order.
-- At most one tag per axis, except position (`source` + `target` on one dataset)
-  and `writes-` (one per role written): both describe what the task does, and a
-  task can do several things.
-- `entry-point` marks the workflow to open first. Processing steps stay
-  untagged.
+- **Declare the axes, each with its use case.** The register `task-tags.json` at
+  the repository root lists every axis - who searches by it, for what - with the
+  kinds it tags (`dataset`, `custom`, `workflow`, `transform`, `linking`,
+  `project`), whether a task may carry several of its values, and each value with
+  a one-line use case. `"include"` pulls in a preset file, so packages sharing a
+  convention keep it in one place. *A tag nobody declared is a typo or a new
+  kind - the check makes you say which.*
+- **Keep the tags in the same register**: the tags of every task per project, and
+  the projects' own tags. `task tags` writes them into the exports and `task
+  tags:check` reports drift; both first refuse a tag declared on no axis, a tag on
+  an axis that does not tag that kind, two tags on an axis that allows one, and an
+  axis or value without its use case. Run `task tags` after every export. *A task
+  created through the API often loses its tags on export, and a tag edited in
+  forty task files drifts; the register is the one place a reviewer reads, and
+  one command repairs an export.*
+- **Tags are a set**: a checker compares sets; no rule fixes an order.
 - **No tag for what a flag already says**: a dataset the build only reads gets
-  DataIntegration's `readOnly="true"`, never a `read-only` tag. *The workbench
-  search filters on the flag, and the flag also refuses a write; a tag next to
-  it is a second source that drifts.*
-- **The project carries its own tags**: the package's tag (the package id's
-  infix, as in the project prefix), its role - `bootstrap`, `operational`,
-  `demo` or another role the register declares, after the lifecycle split
-  above - and `from-repository`.
-  *In a workspace with several packages, the workbench groups a package's
-  projects by the package tag and tells set-up, demo and operations apart by the
-  role, without opening a project.*
-- **Roles and topics are declared, each with its use case.** The register's
-  `roles` adds roles kept away from production next to `demo`, each a project
-  role, a lifecycle tag and, as `<role>-data`, a data kind; the prod guard
-  holds for every one. Its `topics` lists the subjects datasets carry. *A tag nobody
-  declared is a typo or a new kind - the checker makes you say which.*
-- **A placeholder dataset names the graph it stands for** in the register's
-  `graph-roles` (`"<project>/<dataset>": "entity"`), so the workflow writing
-  through it carries the right `writes-` although its export shows no graph;
-  `task tags:check` reports a workflow writing into it without that tag.
-- **Keep the tags in one register**, `task-tags.json` at the repository root:
-  the tags of every task per project, the projects' own tags, and under
-  `systems` the names of the external systems. `task tags` writes them into the
-  exports and `task tags:check` reports drift; both first check the register
-  against the axes above and refuse a tag on no axis, two tags on one axis, a
-  persistent dataset without a position, a `read-only` tag, and a project
-  without exactly one role or without `from-repository`. Run `task tags` after
-  every export. *A task created through the API often loses its tags on export,
-  and a tag edited in forty task files drifts; the register is the one place a
-  reviewer reads, and one command repairs an export.* A package that has no
-  register yet writes a first one from its exports with `bin/task_tags.py
-  --from-exports <package dir>` and fixes what the check then reports.
+  DataIntegration's `readOnly="true"`. *The workbench search filters on the flag,
+  and the flag also refuses a write; a tag next to it is a second source that
+  drifts.*
+
+A package without a register writes a first one from its exports with
+`bin/task_tags.py --from-exports <package dir>`: every tag found lands on one axis
+`unsorted`, to be sorted onto declared axes, or replaced by an included preset.
 
 ## Namespaces in one place
 
@@ -237,7 +207,7 @@ axis exists because someone searches by it, across all packages of a workspace.
 ## Migrations
 
 A migration is a DataIntegration workflow, one per migration, id
-`migrate-<NNN>-<what-it-migrates>`, tag `migration`, in the bootstrap project:
+`migrate-<NNN>-<what-it-migrates>`, in the bootstrap project:
 
 1. **check** - ASK whether it is needed (old pattern present, not yet recorded
    in the graph description); otherwise end with the reason in the report;
@@ -247,7 +217,7 @@ A migration is a DataIntegration workflow, one per migration, id
 4. **verify** - counts before and after, and validation, both in the report;
 5. **record** the id and date in the graph description.
 
-A parent workflow `migrate`, tagged `run-after-import`, runs them all in order.
+A parent workflow `migrate` runs them all in order.
 Test each twice from a pre-change backup: the results must be isomorphic.
 Production data and master data maintained by users always get a migration;
 package definition is replaced by the release, demo data by re-running the demo,
