@@ -114,8 +114,8 @@ ex-shapes:Department-responsibleForHardware a shacl:PropertyShape ;
   evaluates it as the specification says (verified 2026-10-07: min, max and
   disjointness, reported with the constraint `UNKNOWN`); a form save that
   violates it is **not** blocked (verified), so it reports, it does not enforce.
-- Names: `<Class>-<property><Leaf>`, the path builder query `…Query`, the
-  selectable resources query `…ChoiceQuery` - the three sort together.
+- Names: the row's slug names the class, the property and the leaf, and its two
+  queries are named after it, so the three sort together.
 
 ### The two queries
 
