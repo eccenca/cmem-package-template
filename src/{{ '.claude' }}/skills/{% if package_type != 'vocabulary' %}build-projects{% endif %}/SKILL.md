@@ -17,6 +17,14 @@ but what the repository holds is the **extracted** directory
 build` and `package install` re-zip it on the fly. Do not commit the `.zip`, and
 do not change the manifest to point at the directory.
 
+**A project id over 30 characters needs a shorter folder.** The manifest allows at
+most 30 characters per path segment before `.zip`, so `projects/<project-id>.zip`
+fails validation for a longer id. Name the folder after the project's role -
+`projects/bootstrap.zip`, `"project_id": "<the long id>"` - and keep the id
+everywhere else: `bin/task_tags.py` reads the manifest, so the register names
+the project by its id, the one the workbench shows. *A register keyed by folders
+names projects nobody finds in the workbench.*
+
 ## The live instance is the source of truth
 
 These files are exports. Authoring happens in the Corporate Memory UI, and the
@@ -158,7 +166,7 @@ gives is one place to keep them:
   convention keep it in one place. *A tag nobody declared is a typo or a new
   kind - the check makes you say which.*
 - **Keep the tags in the same register**: the tags of every task per project,
-  and the projects' own tags. `task tags` writes them into the exports and `task
+  and the projects' own tags, each project under its id. `task tags` writes them into the exports and `task
   tags:check` reports drift; both first refuse a tag declared on no axis, a tag
   on an axis that does not tag that kind, two tags on an axis that allows one,
   and an axis or value without its use case. Run `task tags` after every export.
