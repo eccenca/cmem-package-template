@@ -10,7 +10,8 @@
 The register (default: task-tags.json in the working directory, the repository root - the package
 directory may hold only files the manifest declares) declares the package's tag axes and lists the
 tags of every dataset, transform, linking task, custom task and workflow per project, and the
-project's own tags:
+project's own tags. A project is named by the project_id the manifest gives its export, or by the
+export's folder when the manifest does not list it:
 
   {"include": ["<preset>.json"],
    "axes": {"<axis>": {"use": "<who searches by it, for what>",
@@ -66,9 +67,20 @@ def axes(spec: dict, base: Path = Path(".")) -> dict[str, dict]:
     return merged
 
 
+def project_ids(package: Path) -> dict[str, str]:
+    """Export folder (relative to the package) -> the project id the manifest gives it."""
+    manifest = package / "cpa-manifest.json"
+    files = json.loads(manifest.read_text()).get("files", []) if manifest.exists() else []
+    return {f["file_path"].removesuffix(".zip"): f["project_id"] for f in files
+            if f.get("file_type") == "project" and f.get("project_id") and f.get("file_path")}
+
+
 def project_dirs(package: Path) -> dict[str, Path]:
-    return {p.name: p for top in ("projects", "build") for p in sorted((package / top).glob("*/"))
-            if (p / "config.xml").exists()}
+    """Project id -> its export. The manifest's project_id wins: a manifest path segment holds at most 30
+    characters, so a longer id sits in a shorter folder. An export the manifest does not list goes by its folder."""
+    ids = project_ids(package)
+    return {ids.get(f"{top}/{p.name}", p.name): p for top in ("projects", "build")
+            for p in sorted((package / top).glob("*/")) if (p / "config.xml").exists()}
 
 
 def task_files(folder: Path) -> dict[str, tuple[str, Path]]:

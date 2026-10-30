@@ -114,8 +114,16 @@ def main():
             errors = tags.axis_errors(planted(PACKAGE, change), projects, root)
             if not any(expected in e for e in errors):
                 fail(f"{name} passed (expected an error with \"{expected}\", got {errors})")
+        # a project id longer than a manifest path segment allows sits in a shorter folder
+        long_id = "translations-of-the-demo-package-bootstrap"
+        (root / "cpa-manifest.json").write_text(json.dumps({"files": [
+            {"file_path": "projects/translations.zip", "file_type": "project", "project_id": long_id}]}))
+        found = tags.project_dirs(root)
+        if list(found) != [long_id]:
+            fail(f"an export in a shorter folder is not named by the manifest's project_id: {list(found)}")
+        (root / "cpa-manifest.json").unlink()
     print(f"check-task-tags: ok (a register with an included preset passes, {len(FAULTS)} planted faults "
-          "caught)")
+          "caught, an export is named by the manifest's project_id)")
 
 
 if __name__ == "__main__":
