@@ -121,6 +121,26 @@ tasks:
     cmds:
       - cd {{.TEST_CASE}}_dir && ../scripts/check-task-tags.py
 
+  check:construct:case:
+    desc: assert bin/check_construct_graphs.py catches a Construct reading the whole store
+    summary: |
+      A generated package has no build project, so its own check:offline passes
+      whatever this checker does. This drives the rendered package's
+      bin/check_construct_graphs.py over small exports: three that pass and two
+      planted faults.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-construct-graphs.py
+
+  check:datasets:case:
+    desc: assert bin/check_workflow_datasets.py catches an update clearing a graph it does not write
+    summary: |
+      A generated package has no build project, so its own check:offline passes
+      whatever this checker does. This drives the rendered package's
+      bin/check_workflow_datasets.py over small exports: a failure, two passes
+      and two warnings.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-workflow-datasets.py
+
   check:validate:case:
     desc: validate a project test case
     preconditions:
@@ -142,6 +162,10 @@ tasks:
       - task: check:offline:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - task: check:tags:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:construct:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:datasets:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - cd {{.TEST_CASE}}_dir && task check
 

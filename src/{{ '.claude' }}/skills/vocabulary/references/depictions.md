@@ -31,10 +31,10 @@ shape catalog - see its `shapes` skill.
 
 ## Colour
 
-**Colours come from a fixed palette** - for eccenca packages the layout colours
-of the eccenca palette, defined in `@eccenca/gui-elements`
+**Colours come from a fixed palette** - the layout colours of Corporate
+Memory's own interface, defined in `@eccenca/gui-elements`
 (`src/configuration/_palettes.scss`, five tones per hue) - so packages installed
-side by side look like one product. Take the values from there rather than
+side by side look like one product with the interface they appear in. Take the values from there rather than
 copying them. The palette's semantic colours (success, info, warning, danger, a
 separate group in the same file) are reserved for badges and marks, and a class
 hue keeps at least 26° away from them: a class drawn in the warning colour reads

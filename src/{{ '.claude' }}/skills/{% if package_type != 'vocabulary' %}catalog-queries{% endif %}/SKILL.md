@@ -10,8 +10,8 @@ A shipped query is a `shui:SparqlQuery` in the shape catalog, carrying its
 `shui:valueQuery`), the picker of a row (a **selectable resources query**,
 `shui:uiQuery`), a widget, or a parameter picker (a **placeholder values
 query**, `shui:QueryPlaceholder_valueQuery`). Name them by role, never "value
-query" - the word would mean two things. Slug suffixes: `…Query`,
-`…ChoiceQuery`, `…PlaceholderValuesQuery`.
+query" - the word would mean two things - and let the slug say the role too,
+so a reader of the catalog tells them apart without opening them.
 
 The SPARQL is the smaller half of the job: Corporate Memory reads the *shape*
 of the projection, and a reader of the catalog has only the
