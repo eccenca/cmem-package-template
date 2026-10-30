@@ -108,6 +108,22 @@ def main():
             if "# property-icons:" in line and not re.sub(r"\s+#.*$", "", line).rstrip().endswith("."):
                 fail(f"an icon line is not the last of its block: {line[:60]}...")
 
+        # planted: an icon line an older release wrote in the middle of its block
+        lines = written.split("\n")
+        at = next(i for i, line in enumerate(lines) if "# property-icons: email" in line)
+        icon = re.sub(r"\s*\.(\s*#)", r" ;\1", lines[at])
+        moved = lines[:at] + lines[at + 1:]
+        moved[at - 1] = re.sub(r"\s*;(\s*(#.*)?)$", r" .\1", moved[at - 1])
+        start = max(i for i in range(at) if moved[i] and not moved[i][0].isspace())
+        moved.insert(start + 1, icon)
+        vocab.write_text("\n".join(moved))
+        if run(root, "--check")[0] == 0:
+            fail("an icon line in the middle of its block passed the check")
+        run(root)
+        if vocab.read_text() != written:
+            fail("task icons did not move an icon line back to the end of its block")
+        vocab.write_text(written)
+
         # planted: an icon edited by hand
         start = written.index("# property-icons: email")
         line_start = written.rindex("\n", 0, start) + 1

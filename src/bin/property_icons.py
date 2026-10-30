@@ -234,16 +234,17 @@ def place(text, prop, uri, name):
     body = lines[start:end + 1]
     marked = [i for i, line in enumerate(body) if MARK in line]
     if marked:
+        # an icon written earlier, wherever it stands: taken out, the block closed again before it
         i = marked[0]
-        last = code(body[i]).endswith(".")
-        indent = re.match(r"\s*", body[i]).group(0) or "  "
-        body[i] = f"{indent}{predicate} <{uri}> {'.' if last else ';'} {MARK} {name}"
-    else:
-        # Last in the block, where the OWL API writes it: annotations sort by their full IRI, and
-        # foaf:depiction (http://xmlns.com/...) sorts after rdfs:, skos:, dcterms: and owl:.
-        indent = next((re.match(r"\s+", line).group(0) for line in body[1:] if re.match(r"\s+\S", line)), "  ")
-        body[-1] = re.sub(r"\s*\.(\s*(#.*)?)$", r" ;\1", body[-1], count=1)
-        body.append(f"{indent}{predicate} <{uri}> . {MARK} {name}")
+        was_last = code(body[i]).endswith(".")
+        del body[i]
+        if was_last:
+            body[-1] = re.sub(r"\s*;(\s*(#.*)?)$", r" .\1", body[-1], count=1)
+    # Last in the block, where the OWL API writes it: annotations sort by their full IRI, and
+    # foaf:depiction (http://xmlns.com/...) sorts after rdfs:, skos:, dcterms: and owl:.
+    indent = next((re.match(r"\s+", line).group(0) for line in body[1:] if re.match(r"\s+\S", line)), "  ")
+    body[-1] = re.sub(r"\s*\.(\s*(#.*)?)$", r" ;\1", body[-1], count=1)
+    body.append(f"{indent}{predicate} <{uri}> . {MARK} {name}")
     return "\n".join(lines[:start] + body + lines[end + 1:])
 
 
