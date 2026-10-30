@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.10"
-# dependencies = []
+# dependencies = ["rdflib"]
 # ///
 """Assert that the offline RDF checkers a generated package ships still bite.
 
@@ -28,6 +28,7 @@ a sound one passes.
 Exits non-zero with a one-line reason on the first failure.
 """
 
+import importlib.util
 import json
 import os
 import re
@@ -120,8 +121,12 @@ def check_task_tags():
             (project / name).write_text(text)
         register = Path(tmpdir) / "task-tags.json"
         register.write_text(json.dumps({
-            "project-tags": {"demo": ["demo", "from-repository"]}, "systems": [],
-            "projects": {"demo": {"books": ["source", "demo-data"], "books-to-library": ["generated"],
+            "axes": {"role": {"use": "find what a task is for", "several": True,
+                              "on": ["project", "dataset", "transform", "linking"],
+                              "values": {"demo": "example data", "source": "read by a build",
+                                         "generated": "written by a script, not edited in the UI"}}},
+            "project-tags": {"demo": ["demo"]},
+            "projects": {"demo": {"books": ["source", "demo"], "books-to-library": ["generated"],
                                   "link-authors": ["generated"]}}}))
         tool = [str(BIN / "task_tags.py")]
         write = subprocess.run(tool + ["--write", str(Path(tmpdir) / "package"), str(register)],
@@ -134,6 +139,18 @@ def check_task_tags():
             text = (project / name).read_text()
             if "urn:silkframework:tag:generated" not in text.split("</MetaData>")[0]:
                 fail(f"task_tags.py --write left {name} untagged")
+
+
+def check_graph_projection():
+    """A ?graph bound in the SELECT clause from a placeholder still counts as projected."""
+    spec = importlib.util.spec_from_file_location("pbq", BIN / "check_path_builder_queries.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    placeholder = "SELECT ?link (<{{shuiGraph}}> AS ?graph)\nFROM NAMED <{{shuiGraph}}>\nWHERE { ?s ?p ?link }"
+    if not module.projects_graph(placeholder):
+        fail("check_path_builder_queries.py misses a ?graph bound from {{shuiGraph}} in the SELECT clause")
+    if module.projects_graph("SELECT ?link WHERE { GRAPH ?graph { ?s ?p ?link } }"):
+        fail("check_path_builder_queries.py counts a ?graph used only in the WHERE clause as projected")
 
 
 def main():
@@ -179,6 +196,8 @@ def main():
     # the subclass-split fault would keep the checker red while the graph rule had gone blind.
     if "projects no ?graph" not in output:
         fail(f"check_path_builder_queries.py did not report the row without a ?graph column:\n{output}")
+
+    check_graph_projection()
 
     # The package as generated has no catalog, which is a pass with a note
     # rather than a failure - otherwise every new package starts red.

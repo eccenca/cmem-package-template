@@ -48,8 +48,6 @@ gigos:Festival a shacl:NodeShape ;
   shui:navigationListQuery gigos:navlist-festival .
 ```
 
-Note the prefix: these catalogs write `shacl:`, not `sh:`.
-
 **A node shape's user-facing text is `rdfs:comment`, not `shacl:description`.**
 `shacl:description` is the help text of a single *property* shape. The
 platform's own catalog settles it - 21 of its node shapes use `rdfs:comment` and
@@ -234,31 +232,21 @@ every cross-reference, and a local name starting with a digit - which two
 thirds of them do - is legal Turtle that breaks syntax highlighting. The
 platform's own built-in queries use slugs such as `total-number-of-triples`.
 
-The scheme, by how widely the resource is shared:
-
-| resource | slug |
-|---|---|
-| property shape on one class | `<Class>-<camelCased row name>` |
-| shape shared by subclasses of one class | `<Superclass>-<row>` |
-| shape shared by unrelated classes | `<row>` |
-| property group | the same, plus `Group` |
-| path builder query | the using shape's slug, plus `Query` |
-
-Naming a query after the shape that uses it keeps the pair adjacent when the
-file is sorted, and a query with no matching shape then stands out as an
-orphan.
+**Give the package one slug scheme and keep to it**: a slug unique in the
+catalog, that says which class a row belongs to and how widely a shape is
+shared, with a query named after the shape that uses it. The pair then sorts
+together, and a query with no matching shape stands out as an orphan. The
+examples here use `<Class>-<row>` (`Festival-startDate`).
 
 **A renamed row takes its slug, its `rdfs:label` and the query named after it
-along**, so the three stay findable from each other. A role in parentheses goes
-into the slug camel-cased: *Acts (headliner)* becomes
-`Festival-actsHeadliner`.
+along**, so the three stay findable from each other.
 
 ## Sections: one set per package, the same on every form
 
 A form's sections are its property groups. **A package defines one set of
 sections and uses it on all its forms**: each section has a one-sentence
-`rdfs:comment`, its `shacl:order` is the same on every form, in steps of 100,
-and a form shows only the sections it has rows for. Someone who has learned
+`rdfs:comment`, its `shacl:order` is the same on every form, with gaps left
+between sections, and a form shows only the sections it has rows for. Someone who has learned
 where a section sits on one form then finds it there on the next. `shacl:order`
 belongs to the group, not to the form, so one shared group per section is what
 keeps its height fixed; give every group an explicit order, since without one
@@ -269,24 +257,13 @@ its position is undefined.
   "Related" section collecting back-links, which would split one topic across
   two places.
 - **At most one status section comes first** - findings or status widgets (a
-  table report, an action button), no charts.
+  table report, an action button), no charts. *A user opening a resource sees
+  what needs attention before scrolling.*
 - **The overview with charts goes last**, after everything that is edited.
+  *Charts do not push the fields to edit below the fold.*
 
-Packages stay alike through these recommended sections. Use them where they
-fit and put the package's own sections between them, in the range 400-700:
-
-| order | section | holds |
-|---|---|---|
-| 50 | Findings | the rule check's results for this resource |
-| 100 | Identity | name, type, identifiers, notation |
-| 200 | Description | definition, comment, notes |
-| 300 | Classification | concepts, categories, kinds |
-| 400-700 | the package's own | e.g. *Line-up*, *Tickets* |
-| 800 | External sources | links out: `rdfs:seeAlso`, `skos:closeMatch`, a source's page |
-| 900 | Overview | widgets, charts, table reports |
-
-A user who knows one package then finds *Identity* at the top and *Overview* at
-the bottom of the next one, while each domain keeps its own sections.
+Packages of one organisation may share a set of sections, so that a user who
+knows one package finds the same sections at the same height in the next.
 
 The gig package defines its set once and uses it on the Festival form and on
 the Band form:
@@ -343,18 +320,20 @@ The two serve different readers and therefore follow different conventions.
   "property shape"**. Putting `"Product Node Shape"` in `shacl:name` and hiding
   the plain name in `rdfs:label` is the wrong way round.
 
-  Row names are **sentence case, without acronyms, and plural for a row that can
-  hold several values**. Name a row after the class it lists where that reads
-  well ("Venues"), otherwise by its relation read from the form's resource
-  ("Played at"). Two rows on one form that would get the same name are told
-  apart by a role in parentheses ("Acts (headliner)", "Acts (support)").
+  Row names are **in the user's words, and plural for a row that can hold
+  several values**: no internal or technical abbreviation ("BOM ref", "QC
+  flag"), while an abbreviation that is the name users know a thing by stays
+  (*ISBN*, a standard such as *QUDT*, an authority such as *GND*) - spelling it
+  out would hide the term they search for. Name a row after the class it lists
+  where that reads well ("Venues"), otherwise by its relation read from the
+  form's resource ("Played at"). Two rows on one form that would get the same
+  name are told apart by their role.
 - **`rdfs:label`** is how the shape itself appears in a catalog listing, so it
   must **distinguish one shape from another**. Many `shacl:name`s repeat by
   design, so a bare label identifies nothing.
 
-Derive `rdfs:label` from the slug, which is unique by construction:
-`<Class>-NodeShape` → `"<Class> node shape"`; `<Class>-<row>` →
-`"<Class>: <Row> property shape"`; a shared `<row>` → `"<Row> property shape"`.
+Derive `rdfs:label` from the slug, which is unique by construction, and let it
+say whether it names a node shape or a property shape.
 
 Property **groups** are the exception: SHACL renders a group's `rdfs:label` as
 the block heading, so there it *is* the UI text and stays short
@@ -376,19 +355,18 @@ own.
 How to write and document the query itself - the header comment, the
 projection, placeholders, the `?graph` column - is the `catalog-queries` skill.
 
-## House style
+## Languages
 
-The conventions below are what the eccenca packages converged on. They are
-recommended defaults - a package with a good reason may depart from them.
+Recommended defaults - a package with a good reason may depart from them.
 
 - **Everything a form shows exists in every language the vocabulary has**:
   section titles and descriptions, row names and descriptions, node shape
   descriptions and messages. A user switching the UI language otherwise meets a
-  form in two languages. The shapes' own `rdfs:label` stays English - it names
-  the shape in the catalog, not on the form.
+  form in two languages. The shapes' own `rdfs:label` names the shape in the
+  catalog, not on the form, so one language - the maintainers' - is enough.
 - Design reasoning lives on the term it concerns as `skos:editorialNote`, in
-  English only, even where labels and comments are bilingual: it is for whoever
-  maintains the vocabulary, and a translated argument drifts.
+  one language even where labels and comments are multilingual: it is for
+  whoever maintains the vocabulary, and a translated argument drifts.
 - Labels come from a few shared label shapes rather than one copy per node
   shape, using `shacl:uniqueLang` instead of `shacl:maxCount` so a second
   language stays possible.
