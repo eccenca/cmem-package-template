@@ -141,6 +141,16 @@ tasks:
     cmds:
       - cd {{.TEST_CASE}}_dir && ../scripts/check-workflow-datasets.py
 
+  check:layout:case:
+    desc: assert one task layout satisfies task layout:check wherever a sticky note sits
+    summary: |
+      A generated package has no build project, so nothing in its own checks
+      lays out a workflow. This drives the rendered package's
+      bin/layout_workflows.py over a small export with one sticky note at each
+      point of a grid: a single --write must leave nothing for --check.
+    cmds:
+      - cd {{.TEST_CASE}}_dir && ../scripts/check-layout-workflows.py
+
   check:validate:case:
     desc: validate a project test case
     preconditions:
@@ -166,6 +176,8 @@ tasks:
       - task: check:construct:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - task: check:datasets:case
+        vars: {TEST_CASE: '{{.TEST_CASE}}'}
+      - task: check:layout:case
         vars: {TEST_CASE: '{{.TEST_CASE}}'}
       - cd {{.TEST_CASE}}_dir && task check
 
