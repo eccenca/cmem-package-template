@@ -257,20 +257,11 @@ wants the layout as a gate adds `task: layout:check` to its `check:custom`.
 
 ## Testing
 
-The commands for running a workflow against an instance are in the
-`build-projects` skill. What to test:
-
-- Test workflows on a test instance, never on production data.
-- On a shared development instance: point an instance-decided graph variable at
-  a throwaway graph for the run, restore it and delete the test graphs in a
-  `finally`, check that every rejected input leaves the triple count unchanged,
-  and run it from a task so others run the same thing.
-- After any URI rule touching a column path, count source rows against minted
-  entities.
-- **Demo sources come from a cached copy; live lookups get their own live
-  test.** *The demo and its counts run offline and repeatably; a workflow whose
-  job is to query a live service is tested against that service, outside the
-  demo counts.*
+- **Test every workflow a package ships before it is released, and again after
+  every change, on a test instance, never on production data.** *A workflow run
+  by a person or an assistant writes graphs others rely on; a change nobody
+  tested shows its fault there first.* How to run one against an instance is in
+  the `build-projects` skill; how far a test goes is the package's decision.
 - **A generator over a remote source checks against its cache**: without the
   cache its `--check` reports "not checked" and passes - it never queries the
   remote source. *`task check` runs offline and in CI.*
