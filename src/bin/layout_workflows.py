@@ -17,6 +17,9 @@ graph's lane) above working
 written, ordered by first write, above the result lane (replaceable outputs). An operator sits in the
 lane of what it writes. Within a lane, rows are permuted to minimise edge crossings; a crossing that
 survives is one the rules cannot avoid. --check reports avoidable differences and exits 1.
+A sticky note anchors to the node nearest it on the old canvas, so one pass can move a note onto
+another anchor; --write repeats the layout until the canvas no longer changes, so a package whose
+check:custom runs --check passes after a single `task layout`.
 """
 import itertools, re, sys
 from pathlib import Path
@@ -86,8 +89,7 @@ NOTE_GAP = 50
 NOTE_BOX = re.compile(r'<StickyNote [^>]*>.*?<Position x="(-?[\d.]+)" y="(-?[\d.]+)"/>\s*<Dimension width="([\d.]+)" height="([\d.]+)"', re.S)
 NOTE = re.compile(r'(<StickyNote [^>]*>.*?<Position x=")(-?[\d.]+)(" y=")(-?[\d.]+)("/>\s*<Dimension width="[\d.]+" height=")([\d.]+)(")', re.S)
 
-def layout(path, project):
-    text = path.read_text()
+def layout(text, project):
     head = re.search(r'<Workflow [^>]*>', text).group(0)
     rep_in, rep_out = set(attr(head, "replaceableInputs")), set(attr(head, "replaceableOutputs"))
     nodes, old, attr_of, flow_of, ports_of = {}, {}, {}, {}, {}
@@ -222,17 +224,27 @@ def layout(path, project):
     new = NODE.sub(lambda m: f'<{m.group(1)} posX="{pos[m.group(6)][0]}" posY="{pos[m.group(6)][1]}" task="{m.group(4)}" {m.group(5)}id="{m.group(6)}"{m.group(7)}/>', text)
     return new, pos, old, c, order, lane, col
 
+def settle(text, project):
+    """The layout applied until it no longer changes the canvas: notes re-anchor on the moved nodes."""
+    for _ in range(10):
+        result = layout(text, project)
+        if result[0] == text:
+            return result
+        text = result[0]
+    sys.exit("the layout does not settle: a sticky note keeps moving between anchors")
+
 def main():
     mode = sys.argv[1] if sys.argv[1] in ("--write", "--check") else None
     project = Path(sys.argv[-1])
     changed = 0
     for wf in sorted((project / "workflow").glob("*.xml")):
-        new, pos, old, c, order, lane, col = layout(wf, project)
+        text = wf.read_text()
+        new, pos, old, c, order, lane, col = settle(text, project)
         print(f"== {wf.stem}  ({c} unavoidable crossing{'s' if c != 1 else ''})")
         for l in order:
             members = sorted((n for n in pos if lane[n] == l), key=lambda n: pos[n])
             print(f"   {l[1]:52} " + "  ".join(f"{col[n]}:{n}" for n in members))
-        if pos != old:
+        if new != text:
             changed += 1
             if mode == "--write":
                 wf.write_text(new)
