@@ -51,6 +51,9 @@ publish:
       elif [ -z "${ECCENCA_MARKETPLACE_ACCOUNT}" ]; then
         echo "ECCENCA_MARKETPLACE_ACCOUNT not available ..."
         exit 1
+      elif [ -z "${ECCENCA_MARKETPLACE_URL}" ]; then
+        echo "ECCENCA_MARKETPLACE_URL not available: name the marketplace this package publishes to (https://eccenca.market for a public package) ..."
+        exit 1
       else
         task publish
       fi

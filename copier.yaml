@@ -75,9 +75,11 @@ marketplace:
   type: bool
   default: true
   help: >-
-    marketplace: Will this package be published to the eccenca marketplace?
-    Answer no for internal packages - the publish job is then left out of
-    the generated .gitlab-ci.yml.
+    marketplace: Will this package be published to a marketplace? The
+    publish job publishes to the marketplace ECCENCA_MARKETPLACE_URL names
+    (https://eccenca.market for a public package) and refuses to run without
+    it. Answer no for packages nobody publishes - the publish job is then
+    left out of the generated .gitlab-ci.yml.
 
 github_page:
   type: str
