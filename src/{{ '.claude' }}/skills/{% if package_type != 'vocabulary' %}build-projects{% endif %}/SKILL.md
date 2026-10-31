@@ -191,6 +191,15 @@ A package without a register writes a first one from its exports with
   fixed by the manifest, stays written out. *Whoever installs on a new instance
   changes one place instead of searching the tasks; what never changes gets no
   variable to misconfigure.*
+- **A template variable needs its `<Value>` in the export too.** A
+  `variables.xml` imported with a `<Template>` and no `<Value>` stores an empty
+  value, and task templates read that: every graph resolves to its bare suffix
+  (`entities/`), and neither `cmemc project reload` nor re-saving the task
+  repairs it. Change variables through `cmemc project variable` or the UI, which
+  evaluate the template, and edit an export by hand only with both elements
+  filled. A template names only variables defined before it in the project's
+  order. *Hand-writing the export looks like the quick way to add a variable; it
+  leaves a project whose first run fails on an invalid graph IRI.*
 - **Not the vocabulary namespace**: templates resolve only in plugin
   parameters, and the vocabulary's IRIs also sit in mapping targets, type URIs,
   source paths and restriction patterns. The vocabulary namespace stays written
