@@ -70,6 +70,12 @@ migrations, and the export round trip; this skill holds the flow.
   must be persistent. What the SPARQL tasks do with one is below.
 - A dataset with `clearGraphBeforeExecution` clears once per run, not in each
   nested workflow that writes it.
+- **It clears when the run starts, before any guard or check.** A workflow that
+  stops on a failed precondition has already emptied every clearing dataset it
+  names. *A load guarded by an environment check still empties the target on the
+  wrong instance, and a migration's backup written to a clearing dataset is gone
+  before the guard decides whether to migrate.* Clear with the Clear dataset
+  operator after the guard instead, and never make a backup a clearing dataset.
 
 ## Responsibilities
 
