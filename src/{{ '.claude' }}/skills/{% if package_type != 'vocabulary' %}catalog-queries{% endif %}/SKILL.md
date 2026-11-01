@@ -95,6 +95,8 @@ a plain text replace over the whole query text, comments included - see
 **The form renderer honours no markup datatype in an extra column.** Typing an
 extra column with `STRDT(…, rdf:HTML)` or `STRDT(…, sysont:Markdown)` does
 nothing: the value is rendered as text either way. Project the plain string.
+A column that names a thing is no string at all: project its IRI, one value per
+listed resource (the `shapes` skill, `path-builder-queries.md`, Extra columns).
 
 The value column behaves differently: a path builder query whose `?resource`
 is typed `sysont:Markdown` is rendered as markup - the product data demo's map
