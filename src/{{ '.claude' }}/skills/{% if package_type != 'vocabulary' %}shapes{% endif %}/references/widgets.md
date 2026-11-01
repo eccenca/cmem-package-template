@@ -59,7 +59,8 @@ embedded node shape that is the embedded resource; a widget about the page's own
 resource therefore goes on the page's own node shape. `{{shuiMainResource}}` is
 deprecated - don't use it (the `catalog-queries` skill, placeholders).
 
-Other widget types exist - `shui:ComplexResourceViewerWidget`,
-`shui:SimpleResourceViewerWidget`, `shui:ChartVisualization`,
-`shui:WorkflowTrigger`, and `shui:viewResourcesWithWidget` to attach one. A
+Other widget types exist - `shui:ChartVisualization` and `shui:WorkflowTrigger`.
+A property shape takes a resource viewer through `shui:viewResourcesWithWidget`:
+`shui:ComplexResourceViewerWidget` shows a path builder query's extra columns as
+a table (`path-builder-queries.md`, Extra columns). A
 table report is the one to reach for first because it is the most predictable.
