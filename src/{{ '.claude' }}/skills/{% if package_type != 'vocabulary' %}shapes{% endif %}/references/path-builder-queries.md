@@ -184,6 +184,34 @@ department splits only if the *departments* had leaf classes that need it. An
 inverse row on the abstract superclass's node shape would be inherited by every
 subclass - but the abstract class has no node shape, so put it on each leaf.
 
+## Extra columns
+
+Use cases 2 to 5 show more than the value: every further projected variable is a
+column beside it. This holds for a node shape's navigation list query too
+(`navigation.md`).
+
+**A column that names a thing projects the thing, not its label.** A genre, a
+list term, a place or a person goes out as its IRI; Explore then shows its label,
+icon and link in the reader's language, so the query picks no language. A label
+projected as a string loses the link and fixes one language. Literal values -
+a date, a number, a note - stay plain strings (`catalog-queries`, extra columns).
+
+**One row per listed resource.** A column with several values - two labels, two
+authors, several fitting categories - repeats the row once per value, and the
+reader sees duplicate entries. Group by the listed resource and reduce every
+other column to one value: `SAMPLE(?x)` where any one will do,
+`IRI(MIN(STR(?x)))` where the pick must stay the same between loads, or the best
+by `MAX(CONCAT(STR(?score), STR(?x)))` cut back with `SUBSTR`. Where several
+values matter, add a count beside it (`COUNT(DISTINCT ?author)`).
+
+**A read-only row that compares candidates reads as a table.** A row listing
+several candidates side by side - every place that fits, with the properties
+that decide between them - is readable only when its columns line up. Attach
+`shui:viewResourcesWithWidget shui:ComplexResourceViewerWidget` to the property
+shape: the extra columns then show as a table by default (observed by the user,
+2026-11-01). `shui:SimpleResourceViewerWidget` is its sibling; both are
+`shui:ResourceViewerWidget`s, the range of `viewResourcesWithWidget`.
+
 ## What the checker enforces
 
 `bin/check_path_builder_queries.py` (part of `check_all.py`) classifies every
