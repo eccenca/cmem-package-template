@@ -7,8 +7,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- Property icons: `task icons` (`bin/property_icons.py`) gives every attribute of the package an icon for its meaning - mapped in `icons/property-icons.json`, else the kind of its value, read from its declared range alone - and every mapped relation an icon for its kind with an arrow for its direction, coloured after the domain or range class, embedded in the vocabulary; the shared glyphs ship in `bin/glyphs/`, a package draws its own into `icons/glyphs/`, every glyph is refused unless it is drawing only, and `task check:offline` fails on a missing or stale icon; the `vocabulary` skill's depictions reference describes it, and the template's `check:icons:case` holds it on a fixture
+
 ### Changed
 
+- The `vocabulary` skill orders a term's predicates as the OWL API writes them (measured with ROBOT 1.10), so a vocabulary saved in Protégé or ROBOT shows no reordering; label casing is the organisation's
+- The `vocabulary` skill names every relation (object property) as a verb phrase read from its domain to its range - a verb such as `manages`, or `has` / `is … of` with the role the range plays, such as `hasProductManager` - never as a bare class or role name
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 
 ## [1.8.0] 2026-10-18

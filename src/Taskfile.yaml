@@ -49,8 +49,9 @@ tasks:
     summary: |
       Runs the checks in bin/ over the package directory: dangling shape,
       group and query references, the query placeholder declarations, every
-      property shape's shacl:path against the vocabulary, and the shipped
-      queries against the documenting-a-query convention.
+      property shape's shacl:path against the vocabulary, the shipped
+      queries against the documenting-a-query convention, and the names of the
+      package's own attributes against the vocabulary skill's naming rules.
 
       These need no instance, no credentials and no install - and two of the
       mistakes they catch stay invisible until after one. A dangling
@@ -60,14 +61,30 @@ tasks:
       every cardinality on that row with nothing to check, so validation passes
       and proves nothing.
 
-      A package with no shape catalog passes with a note: every check here is
-      catalog-driven. The project's own skill map, .claude/skill-map.custom.json,
+      A package with no shape catalog passes with a note once its names are
+      checked: every other check here is catalog-driven. The project's own skill map, .claude/skill-map.custom.json,
       is validated too, so a broken rule cannot switch its reminders off unseen.
     preconditions:
       - sh: command -v uv
         msg: "The checks in bin/ run through uv (PEP 723 scripts). Install it: https://docs.astral.sh/uv/"
     cmds:
       - bin/check_all.py {{.PACKAGE_DIR}}
+
+  icons:
+    desc: Write the property icons the project maps in icons/property-icons.json into the vocabulary
+    summary: |
+      The Business Knowledge Editor draws a property's foaf:depiction on its
+      box. bin/property_icons.py gives every attribute an icon for its meaning
+      (or the kind of its value) and every mapped relation an icon for its kind
+      and direction, coloured after the classes, from the shared glyphs in
+      bin/glyphs/ and the project's own in icons/glyphs/ - each checked to be
+      drawing only. The vocabulary skill's depictions reference describes it.
+      task check:offline checks the result.
+    preconditions:
+      - sh: command -v uv
+        msg: "bin/property_icons.py runs through uv (PEP 723). Install it: https://docs.astral.sh/uv/"
+    cmds:
+      - bin/property_icons.py .
 
   build:
     desc: Build package archive

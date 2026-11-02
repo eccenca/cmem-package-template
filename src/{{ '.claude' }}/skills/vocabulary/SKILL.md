@@ -15,12 +15,25 @@ The graph declares an `owl:Ontology` **at the graph IRI** with
 
 ## Predicate order
 
-Structural axioms first (`rdfs:subClassOf`, `rdfs:domain`, `rdfs:range`,
-`rdfs:subPropertyOf`), then `rdfs:label`, `skos:definition`, `rdfs:comment`,
-`rdfs:isDefinedBy`, `foaf:depiction`, `dcterms:modified`.
+Write a term's predicates in the order the OWL API writes them - the library
+behind Protégé and ROBOT (measured with ROBOT 1.10):
 
-A consistent order makes a diff readable: a term that gained a constraint looks
-different from one that gained prose.
+1. `rdf:type` (`a`);
+2. the logical axioms in a fixed order per kind - a class `owl:equivalentClass`,
+   `rdfs:subClassOf`, `owl:disjointWith`; a property `rdfs:subPropertyOf`,
+   `owl:inverseOf`, `rdfs:domain`, `rdfs:range`;
+3. the annotations sorted by their full IRI, not by prefix: `dcterms:modified`,
+   `rdfs:comment`, `rdfs:isDefinedBy`, `rdfs:label`, `skos:altLabel`,
+   `skos:definition`, `foaf:depiction` - so `vann:` (`http://purl.org/...`)
+   comes before `rdfs:` (`http://www.w3.org/...`) in the ontology's header.
+
+The OWL API also groups the terms by kind (object properties, data properties,
+classes), sorts them by IRI and heads each with a `###` comment.
+
+*A vocabulary opened and saved in Protégé or ROBOT then shows no reordering in
+its diff, a hand edit lands where a tool would put it, and a term that gained a
+constraint still looks different from one that gained prose.* The OWL API drops
+`#` comments: a note that has to survive goes into `skos:editorialNote`.
 
 ## `skos:definition` is the definition, `rdfs:comment` is everything else
 
@@ -49,8 +62,16 @@ rather than the definition.
 
 ## Naming
 
-- Class labels are sentence case (`"Feature value"`, not `"FeatureValue"`);
-  property labels are lowercase words (`"selects material"`).
+- Labels are words a reader reads, not the IRI's spelling (`"Feature value"`,
+  not `"FeatureValue"`).
+- **A relation is named as a verb phrase**, read from its domain to its range:
+  a verb (`manages`, `appliesTo`, `standsInFor`), or `has` / `is … of` with the
+  role the range plays (`hasProductManager`, `isMemberOf`). Never a bare class or
+  role name: `productManager` reads like the class Product manager and hides
+  which way the relation runs. *A form row, a query and a Business Knowledge
+  Editor drawing show the label between two resources - "Product has product
+  manager Employee" says what it states, "Product product manager Employee" does
+  not.*
 - Class names are **head-final**: the last word says what the thing *is*.
   `ValuePrecondition` is a precondition; `ConditionValue` would wrongly name a
   value.
@@ -73,5 +94,6 @@ counts is participation - "contributes to".
 
 ## Going further
 
-- `references/depictions.md` - the `foaf:depiction` icon every class wants, and
-  the colour scheme that keeps a family recognisable
+- `references/depictions.md` - the `foaf:depiction` icon every class wants, the
+  colour scheme that keeps a family recognisable, and the icons of relations and
+  attributes (`task icons`)
