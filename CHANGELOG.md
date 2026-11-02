@@ -7,8 +7,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- A `thesauri` skill for project packages: the shape of a SKOS taxonomy that resources are categorized by, who maintains it (taxonomy editor, external term library, seed), linking a standard classification without copying it, what the taxonomy editor reads and writes, icons for schemes and concepts, typing editor-made concepts on use, concept forms, where categorization links are saved, importing a term library; a concept form whose thesaurus has another master answers every `askIf…` query false
+
 ### Changed
 
+- `thesauri`: a scheme's icon shows the class it collects and a project carries one class glyph, drawn the package's way; the curated categorization graph is named by its role; a notation names its source by a link to the external concept where the classification publishes IRIs, inside the string where it does not - a typed notation shows a "?" badge and cannot be saved in the concept form
 - `vocabulary` depictions name the palette as Corporate Memory's interface palette; `shapes`' validation reference writes `shacl:` like the rest of the skill
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 - The `shapes` skill carries the shape-catalog rules every package needs; an organisation's house style - the `shacl:` prefix, a slug table, a section set with fixed orders, sentence case, roles in parentheses, a shape label scheme, English catalog labels - is that organisation's to keep
