@@ -131,6 +131,13 @@ def check_edits(tmpdir: str) -> None:
     expect("package-content" in context(case.edit(manifest, tool="MultiEdit")), "said nothing on a MultiEdit")
     expect("vocabulary" in context(case.edit("my-pkg/data.ttl")),
            "did not remind of vocabulary on a .ttl whose text declares an owl:Ontology")
+    # The marketplace layout (#32) and the older build/ folder both reach build-projects.
+    if (case.root / ".claude" / "skills" / "build-projects").is_dir():
+        for export in ("my-pkg/projects/demo/config.xml", "my-pkg/build/demo/config.xml"):
+            expect("build-projects" in context(case.edit(export)), f"did not remind of build-projects on {export}")
+    if (case.root / ".claude" / "skills" / "shapes").is_dir():
+        expect("shapes" in context(case.edit("my-pkg/graphs/demo-shapes.ttl")),
+               "did not remind of shapes on a catalog under graphs/")
     expect(not case.edit("my-pkg/notes.txt"), "spoke on a file nothing maps")
     expect(not case.edit("/somewhere/else/my-pkg/cpa-manifest.json"), "spoke on a file outside any package")
 
