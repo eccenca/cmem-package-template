@@ -133,6 +133,9 @@ tasks:
     preconditions:
       - sh: git describe --tags --always --dirty 2>/dev/null
         msg: "Package directory must be a git repository. Run: git init; git add .; git commit -m 'init'"
+      # Shell builtins only, so the check runs in Task's own shell on every platform.
+      - sh: 'test ! -e LICENSE || { read -r first < LICENSE; case "$first" in "Replace this file"*) exit 1;; esac; }'
+        msg: "LICENSE still holds the template's placeholder. Replace it with the full text of the licence in cpa-manifest.json (metadata.license)."
     deps:
       - clean
     cmds:
