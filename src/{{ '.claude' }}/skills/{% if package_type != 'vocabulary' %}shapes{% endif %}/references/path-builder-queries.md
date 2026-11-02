@@ -96,13 +96,11 @@ ex-shapes:Department-responsibleForHardware a shacl:PropertyShape ;
   the property; the rows are named by the leaf ("Hardware", "Services") and
   ordered within it.
 - **Send the row's values to the graph that holds the link** with a
-  `shui:targetGraphTemplate` on the row. The backend writes a form value into
-  the property shape's template when the node shape has a template too, else
-  into the node shape's template, and into the form's graph only when the node
-  shape has none (Explore source, `ResourcePropertyInsert`; measured
-  2026-10-07: a value set on a form whose node shape names a build graph landed
-  in that build graph, whatever graph the form was open in). The frontend uses
-  the same templates only to decide whether the row is offered as writable.
+  `shui:targetGraphTemplate` on the row. A form value follows the graph
+  templates, not the graph the form was open in (measured 2026-10-07: a value
+  set on a form whose node shape names a build graph landed in that build
+  graph). Test where a value lands before relying on a template on the row
+  alone.
 - **No inline creation (`shui:denyNewResources`)** where the leaf instances
   belong to graphs a build rewrites: a resource created from the row goes to
   its own node shape's template graph and is gone after the next build. Create
@@ -160,8 +158,8 @@ WHERE {
 - **Wrap only the link in `GRAPH ?graph`**: `?graph` is where a removal through
   the form deletes the triple (`catalog-queries`, graph column), and the type
   sits in another graph than the link.
-- **The selectable resources query hides what the row already holds.** Explore's
-  picker does not (Explore source, `RelationManager`, read 2026-10-07).
+- **The selectable resources query hides what the row already holds**, so the
+  picker offers only what can still be added.
 - Declare `shuiGraph` and `shuiResource` placeholders so the queries run from the
   query editor (`catalog-queries`, placeholders).
 - A split doubles the queries per leaf; `bin/check_path_builder_queries.py`
