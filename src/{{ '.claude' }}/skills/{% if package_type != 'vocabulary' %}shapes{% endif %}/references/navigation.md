@@ -44,6 +44,10 @@ shown when that class is listed. A class does not have to be managed to carry
 one: navigation lists belong on whichever classes have distinct column sets, and
 subclasses of a managed root routinely have their own.
 
+Its columns follow the rules of a path builder query's extra columns
+(`path-builder-queries.md`, Extra columns): a column that names a thing projects
+its IRI, and every listed resource stays one row.
+
 ## Related properties
 
 - `shui:denyNewResources` - the UI lists the class but offers no create button

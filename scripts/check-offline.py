@@ -1,7 +1,7 @@
 #!/usr/bin/env -S uv run --script
 # /// script
 # requires-python = ">=3.10"
-# dependencies = []
+# dependencies = ["rdflib"]
 # ///
 """Assert that the offline RDF checkers a generated package ships still bite.
 
@@ -28,8 +28,10 @@ a sound one passes.
 Exits non-zero with a one-line reason on the first failure.
 """
 
+import importlib.util
 import json
 import os
+import re
 import shutil
 import stat
 import subprocess
@@ -46,6 +48,7 @@ CHECKERS = (
     "check_paths.py",
     "check_placeholders.py",
     "check_skill_map.py",
+    "check_path_builder_queries.py",
 )
 
 CUSTOM_MAP = Path(".claude") / "skill-map.custom.json"
@@ -138,6 +141,18 @@ def check_task_tags():
                 fail(f"task_tags.py --write left {name} untagged")
 
 
+def check_graph_projection():
+    """A ?graph bound in the SELECT clause from a placeholder still counts as projected."""
+    spec = importlib.util.spec_from_file_location("pbq", BIN / "check_path_builder_queries.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    placeholder = "SELECT ?link (<{{shuiGraph}}> AS ?graph)\nFROM NAMED <{{shuiGraph}}>\nWHERE { ?s ?p ?link }"
+    if not module.projects_graph(placeholder):
+        fail("check_path_builder_queries.py misses a ?graph bound from {{shuiGraph}} in the SELECT clause")
+    if module.projects_graph("SELECT ?link WHERE { GRAPH ?graph { ?s ?p ?link } }"):
+        fail("check_path_builder_queries.py counts a ?graph used only in the WHERE clause as projected")
+
+
 def main():
     if not BIN.is_dir():
         fail(f"{BIN} does not exist - the template did not ship the checkers")
@@ -171,9 +186,18 @@ def main():
     # single checker failing on all four would satisfy the exit code above
     # while three others had quietly gone blind.
     for name in ("check_dangling.py", "check_placeholders.py", "check_paths.py",
-                 "audit_queries.py"):
-        if f"  {name:21}  FAIL" not in output and f"{name}  FAIL" not in output:
+                 "audit_queries.py", "check_path_builder_queries.py"):
+        # The summary pads names to the longest checker name, so match the
+        # line by name and verdict rather than by column width.
+        if not re.search(rf"^\s+{re.escape(name)}\s+FAIL\s*$", output, re.MULTILINE):
             fail(f"{name} did not report its planted fault in the bad fixture:\n{output}")
+
+    # The bad fixture plants two path builder faults; the ?graph one must be named on its own, or
+    # the subclass-split fault would keep the checker red while the graph rule had gone blind.
+    if "projects no ?graph" not in output:
+        fail(f"check_path_builder_queries.py did not report the row without a ?graph column:\n{output}")
+
+    check_graph_projection()
 
     # The package as generated has no catalog, which is a pass with a note
     # rather than a failure - otherwise every new package starts red.

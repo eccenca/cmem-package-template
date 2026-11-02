@@ -27,8 +27,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - every build project carries the package's tag and its role (`bootstrap`, `demo` or `operational`) as project tags, so the workbench groups a package's projects and tells them apart
   - every build project carries the project tag `from-repository` and says in its description that the next `task import` replaces it, so people sharing a workspace with an agent see which projects an import overwrites
 
+- `shapes` gained `references/path-builder-queries.md`: the seven uses of a path builder query (subclass split, enriched stored relation, derived shortcut, back-link listing, read-only split, and the catalogued anti-patterns computed link and embedded widget), each with its row, query, validation treatment and `?graph` handling
+  - extra columns of a path builder or navigation list query: a column that names a thing projects its IRI, so Explore shows label, icon and link in the reader's language; every listed resource stays one row (group and reduce, a count where several values matter); `shui:ComplexResourceViewerWidget` shows a row comparing candidates as a table
+  - the **subclass split** in full - one property, one editable row per leaf class of its range, `shacl:class` at the range, one group per split property, a path builder query and a selectable resources query per row, no inline creation, curated links kept in a graph the build does not clear - grilled and measured on the product data demo (2026-10-07)
+- `bin/check_path_builder_queries.py`, run by `check_all.py`: classifies every path builder query row into the seven uses and fails a subclass split whose rows drift from their queries - a missing query, a query not mentioning the path, the leaf as `shacl:class`, `?graph` not bound through `FROM NAMED`/`GRAPH`, rows not sharing one group of their own, or a leaf of the range without a row; warns on inline creation, on a selectable resources query that offers held values, and on the two anti-patterns
+  - it fails every path builder query, of any use, that projects no `?graph` column: without it the Business Knowledge Editor's relation lookup fails with HTTP 500 for every resource on its canvas, read-only and derived rows included; `catalog-queries` makes the column a rule instead of a convention
+
 ### Changed
 
+- `catalog-queries` names a query by its role and lets the slug say it; the exact suffixes are the organisation's
 - `workflows`: a workflow with a replaceable input stages in a graph per run where its queries must name graphs - the key from the input, the graph through every staging node's configuration input, dropped at the end (measured: overlapping runs see only their own); steps are ordered through the dataset a step wrote; `bin/check_workflow_datasets.py` also names a graph rebuilt and read back in such a workflow
 - `build-projects` and `workflows` keep what ids, labels, descriptions, variables, migrations, working properties, notes and the layout serve, and leave their spelling to the organisation: a project id names its package and lifecycle, a hand-run workflow's description covers input, preconditions, what it does, result and what to do on failure, the demo refuses production by a variable the bootstrap sets; a graph's label carries the role word of its file
 - `thesauri`: a scheme's icon shows the class it collects and a project carries one class glyph, drawn the package's way; the curated categorization graph is named by its role; a notation names its source by a link to the external concept where the classification publishes IRIs, inside the string where it does not - a typed notation shows a "?" badge and cannot be saved in the concept form
@@ -56,6 +63,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - **a package that already replaced `LICENSE` by hand** (a W3C or CC BY 1.0 mirror, say) answers its identifier on the next update and gets a conflict in `LICENSE` once: keep its own text
   - **a package whose `license` answer was dropped** by an update to a release without the question (seen on 1.8.0) is asked again, and the default would switch it back; answer the identifier in its manifest
   - `LicenseRef-scancode-unknown` makes an internal package: no `LICENSE`, no manifest entry for it; an update to that answer deletes the root `LICENSE` but leaves the package directory's `LICENSE` link behind - delete it
+- `catalog-queries` and `shapes` drop `{{shuiMainResource}}`: always `{{shuiResource}}`, and a widget about the page's own resource sits on the page's own node shape
+- the strip rule in `shapes/references/validation.md` keeps the subclass split and the enriched stored relation: their path is honest, and a split row's qualified value shape counts would otherwise never be checked
+- `shapes/references/paths.md` names the subclass split as the intended subset, not the "they differ" fault
+- `catalog-queries` names the three query roles - path builder query, selectable resources query, placeholder values query - and drops "value query", which meant two things; `check_placeholders.py` reports in the same terms
+- `catalog-queries` limits "no markup datatype is honoured" to extra columns: a value column typed `sysont:Markdown` renders as markup (checked in the browser)
+- `scripts/check-offline.py` matches a checker's verdict by name, not by column width (the summary pads names to the longest checker)
 
 ## [1.8.0] 2026-10-18
 
