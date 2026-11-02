@@ -43,6 +43,17 @@ Otherwise read the *Package Manifest* section of the template's README:
 - only `.ttl`, `.zip` and `.png`, plus the three literal filenames `README.md`,
   `CHANGELOG.md` and `LICENSE`
 
+## Where a file goes
+
+A project package keeps its graphs in `graphs/`, its project exports in
+`projects/` and its images in `images/` - the layout the marketplace's
+`package_build_guide` describes, so an author, a reviewer or an agent who knows
+the marketplace finds a file where it expects it. A vocabulary package, one
+graph and an icon, may stay flat. Nothing enforces the folders: a package laid
+out otherwise still builds, and moves when its maintainer chooses (`git mv`,
+then the `file_path` of each entry, then every script and task that names the
+old path - `task check:offline` and `task build` before and after).
+
 ## The three kinds of entry, in short
 
 - **graph** - `file_type: graph` with a `graph_iri`, optional `import_into`
