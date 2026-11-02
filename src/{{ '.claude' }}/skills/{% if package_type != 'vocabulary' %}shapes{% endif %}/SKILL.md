@@ -3,6 +3,12 @@ name: shapes
 description: Author and maintain the SHACL/shui shape catalog a package ships - node shapes, property shapes, groups, URI templates, derived fields, widgets and navigation. Use when a class needs a form in the CMEM Explore UI, when a field does not appear or appears in the wrong place, or when the catalog has to be validated.
 ---
 
+<!--
+PREVIEW: not yet in the template's main branch. Open pull requests: #31,
+#34, #39, #45; merged to develop, not released: #30. From the branch
+preview/skills of eccenca/cmem-package-template.
+-->
+
 # The shape catalog
 
 A shape catalog is a graph typed `shui:ShapeCatalog`. It does two jobs at once,

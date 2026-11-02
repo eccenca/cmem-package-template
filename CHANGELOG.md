@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 
 - `package-content`: what bundling an ontology and giving it a package of its own each do, that a package id is the author's to structure beyond what the platform requires, and that an install replaces a graph under the same IRI - mint graph IRIs in the package's own namespace, compare before the first install
+- `shapes`: packages adding to the page of one class attach their rows to one node shape - with node shapes of their own each package's rows land on a form of their own, and Explore opens the first; rows on Corporate Memory's own forms - read only, one shared row per instance
 - `workflows`: a SPARQL task runs against the dataset of a real graph, a handle only where a project has none; staging in a workflow-scoped in-memory dataset, a Knowledge Graph staging graph only for one workflow without replaceable inputs; which ways of starting a workflow overlap; workflows started from Explore run with the user's permissions. `bin/check_workflow_datasets.py`, run by `check:offline`, reports an Update emptying a graph it does not write, overlapping staging and unused datasets
 - `workflows`: how the SPARQL Select, Update and Construct tasks behave on a Knowledge Graph and an in-memory dataset, measured - a Construct on a Knowledge Graph input reads the whole store unless its query names the graph, and `FROM`/`GRAPH` against an in-memory input returns nothing without an error; `bin/check_construct_graphs.py`, run by `check:offline`, reports such a Construct
 - The task tag register `task-tags.json` declares its own tag axes - each with its use case, the kinds it tags, whether several values may sit on one task, and each value's use case - and may include preset files that several packages share; the template declares no axis. `bin/task_tags.py` keeps the exports in step with it and refuses a tag declared on no axis, on an axis that does not tag that kind, two tags on an axis that allows one, and a missing use case
@@ -33,14 +34,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - the **subclass split** in full - one property, one editable row per leaf class of its range, `shacl:class` at the range, one group per split property, a path builder query and a selectable resources query per row, no inline creation, curated links kept in a graph the build does not clear - grilled and measured on the product data demo (2026-10-07)
 - `bin/check_path_builder_queries.py`, run by `check_all.py`: classifies every path builder query row into the seven uses and fails a subclass split whose rows drift from their queries - a missing query, a query not mentioning the path, the leaf as `shacl:class`, `?graph` not bound through `FROM NAMED`/`GRAPH`, rows not sharing one group of their own, or a leaf of the range without a row; warns on inline creation, on a selectable resources query that offers held values, and on the two anti-patterns
   - it fails every path builder query, of any use, that projects no `?graph` column: without it the Business Knowledge Editor's relation lookup fails with HTTP 500 for every resource on its canvas, read-only and derived rows included; `catalog-queries` makes the column a rule instead of a convention
+- Property icons: `task icons` (`bin/property_icons.py`) gives every attribute of the package an icon for its meaning - mapped in `icons/property-icons.json`, else the kind of its value, read from its declared range alone - and every mapped relation an icon for its kind with an arrow for its direction, coloured after the domain or range class, embedded in the vocabulary; the shared glyphs ship in `bin/glyphs/`, a package draws its own into `icons/glyphs/`, every glyph is refused unless it is drawing only, and `task check:offline` fails on a missing or stale icon; the `vocabulary` skill's depictions reference describes it, and the template's `check:icons:case` holds it on a fixture
 
 ### Changed
 
+- The `vocabulary` skill orders a term's predicates as the OWL API writes them (measured with ROBOT 1.10), so a vocabulary saved in Protégé or ROBOT shows no reordering; label casing is the organisation's
+- The `vocabulary` skill names every relation (object property) as a verb phrase read from its domain to its range - a verb such as `manages`, or `has` / `is … of` with the role the range plays, such as `hasProductManager` - never as a bare class or role name
+- `package-content` says which graphs a package ships by what they hold, since an update with `install --replace` writes every graph of the manifest again: its own content ships filled and is replaced by the newest version, data its workflows rebuild ships holding only its description, and data only its users produce - including a curated categorisation the package only seeds - is not shipped at all: a workflow creates it and uninstalling leaves it; "ship every graph the package writes to" becomes "every graph the package owns"
+- `package-content` now states that the integration graph is the package's read-only root: it holds nothing but its description and imports, and neither a workflow nor a form writes into it. Intermediate integration graphs between the data and the root - a product's graph importing its components, say - may hold data of their own and stay editable
 - `catalog-queries` names a query by its role and lets the slug say it; the exact suffixes are the organisation's
 - `workflows`: a workflow with a replaceable input stages in a graph per run where its queries must name graphs - the key from the input, the graph through every staging node's configuration input, dropped at the end (measured: overlapping runs see only their own); steps are ordered through the dataset a step wrote; `bin/check_workflow_datasets.py` also names a graph rebuilt and read back in such a workflow
 - `build-projects` and `workflows` keep what ids, labels, descriptions, variables, migrations, working properties, notes and the layout serve, and leave their spelling to the organisation: a project id names its package and lifecycle, a hand-run workflow's description covers input, preconditions, what it does, result and what to do on failure, the demo refuses production by a variable the bootstrap sets; a graph's label carries the role word of its file
 - `thesauri`: a scheme's icon shows the class it collects and a project carries one class glyph, drawn the package's way; the curated categorization graph is named by its role; a notation names its source by a link to the external concept where the classification publishes IRIs, inside the string where it does not - a typed notation shows a "?" badge and cannot be saved in the concept form
 - `vocabulary` depictions name the palette as Corporate Memory's interface palette; `shapes`' validation reference writes `shacl:` like the rest of the skill
+- The publish job and `task publish` refuse to run while `ECCENCA_MARKETPLACE_URL` is unset: without it `cmemc package publish` publishes to `https://eccenca.market`, so a package meant for a self-hosted marketplace went public on its first merge to main. A package published to eccenca.market sets `ECCENCA_MARKETPLACE_URL=https://eccenca.market` in its CI variables once
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 - The `shapes` skill carries the shape-catalog rules every package needs; an organisation's house style - the `shacl:` prefix, a slug table, a section set with fixed orders, sentence case, roles in parentheses, a shape label scheme, English catalog labels - is that organisation's to keep
   - one set of sections (property groups) per package, used on every form at the same order, a status section first, the overview last, none by link direction, replacing the fixed house-style groups and the advice to give each form its own group
@@ -237,7 +244,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Changed
 
-- gitlab: use cmemc 26.1.0rc6
 - publish to eccenca.market now
 
 
@@ -303,7 +309,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ### Fixed
 
-- tests
 - unneeded workflow parts
 
 

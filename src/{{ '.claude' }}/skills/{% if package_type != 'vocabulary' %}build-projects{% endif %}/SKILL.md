@@ -3,6 +3,11 @@ name: build-projects
 description: Work with the Corporate Memory DataIntegration projects a package ships - export one back into the repository, read the exported XML, split projects by lifecycle, name ids and labels, write descriptions, tag tasks, keep namespaces in project variables, write migrations, choose the right task, and test a workflow against an instance. Use when a build project is added, re-exported, edited, tagged, documented or debugged, when a namespace or a migration is needed, or when deciding how to get data into a graph. The design of the workflows themselves is the workflows skill.
 ---
 
+<!--
+PREVIEW: not yet in the template's main branch. Open pull requests: #34,
+#35. From the branch preview/skills of eccenca/cmem-package-template.
+-->
+
 # Build projects inside a package
 
 A package ships DataIntegration projects the way it ships graphs: as files

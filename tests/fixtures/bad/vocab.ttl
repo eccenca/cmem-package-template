@@ -43,3 +43,4 @@ example:bookedAt a owl:ObjectProperty ;
   rdfs:domain example:Band ;
   rdfs:range example:Venue ;
   rdfs:label "booked at"@en .
+
