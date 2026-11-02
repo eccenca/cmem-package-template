@@ -112,10 +112,48 @@ for **every** namespace the shipped graphs mention - `w3c-rdf-vocab`, `w3c-rdfs-
 `foaf-vocab` and so on. Without them the terms do not resolve on a bare
 instance, which is the deployment this package will eventually meet.
 
-**Prefer bundling to depending when the dependency is your own.** A package
-that bundles its vocabulary installs standalone; one that depends on a sibling
-cannot be installed without it, and cannot be uninstalled while anything else
-still needs it. Depend on what somebody else maintains, bundle what you do.
+## Bundling an ontology or giving it a package of its own
+
+Whether the ontology ships inside the package that uses it or as a vocabulary
+package of its own is the author's choice. What each way does:
+
+- **Bundled**, the package installs on its own, and the ontology changes in the
+  same commit as the forms, queries and data that use it.
+- **A vocabulary package of its own** can be installed without any of them, so
+  another package can build on the ontology without inheriting its forms or
+  data. A vocabulary package holds exactly one graph and declares no dependency;
+  the shape catalog, queries and everything else that works with the ontology
+  then live in project packages that depend on it.
+- **A dependency binds both ways**: a package cannot be installed without the
+  packages it depends on, and a package cannot be uninstalled while another
+  still depends on it.
+
+## Naming a package
+
+A `package_id` is two to five lowercase segments (the template's validator)
+and unique on the marketplace; the template derives it from the repository's
+name, `<package_id>-package`. Everything else is the author's: the id follows
+how the model is split into packages and how the publishing organisation names
+its products, and a first segment naming the publisher keeps it from colliding
+with another publisher's. *A partner's modelling method and a customer's
+repository conventions stay theirs.*
+
+## An install replaces a graph under the same IRI
+
+`cmemc package install --replace` writes every graph of the manifest, whatever
+the instance already holds under that IRI, and an uninstall deletes those
+graphs again. So a package replaces a graph somebody else made when its graph
+IRI is already in use on the instance - an ontology or shape catalog first made
+by hand there, a package built from an instance's own graphs, a graph under one
+of Corporate Memory's own IRIs. Shipping the system query catalog
+`https://ns.eccenca.com/data/queries/` replaces the instance's whole catalog.
+
+- **Mint every graph IRI in the package's own namespace.**
+- **Before the first install on an instance**, list its graphs
+  (`cmemc graph list`) and compare them with the manifest's `graph_iri`s. A
+  match this package did not install is somebody else's graph: take it over
+  only on purpose, after an export of it. (A guard in the template's install
+  task is issue #43.)
 
 ## Exporting from an instance leaves files you must not ship
 
