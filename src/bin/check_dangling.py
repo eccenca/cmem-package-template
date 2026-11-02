@@ -21,7 +21,7 @@ import sys
 from pathlib import Path
 
 from rdflib import Graph, URIRef
-from rdflib.namespace import Namespace
+from rdflib.namespace import RDF, Namespace
 
 SH = Namespace("http://www.w3.org/ns/shacl#")
 SHUI = Namespace("https://vocab.eccenca.com/shui/")
@@ -39,10 +39,15 @@ CHECKED = [
 
 
 def catalog_namespaces(graph):
-    """Namespaces this file defines terms in — the ones a reference can dangle within."""
+    """Namespaces this file defines terms in — the ones a reference can dangle within.
+
+    A subject counts only where the file types it: a catalog that attaches a row to one of
+    Corporate Memory's own node shapes (`<system shape> sh:property <row>`) names that shape as a
+    subject without defining it, and its namespace must not become the catalog's own.
+    """
     prefixed = {str(ns) for _, ns in graph.namespaces()}
     defined = set()
-    for subject in graph.subjects():
+    for subject in set(graph.subjects(RDF.type, None)):
         if not isinstance(subject, URIRef):
             continue
         for ns in prefixed:
