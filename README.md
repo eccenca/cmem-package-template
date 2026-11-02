@@ -91,7 +91,7 @@ copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-pack
 | `package_description` | Short description | - |
 | `python_dependencies` | Comma-separated Python package dependencies (project packages only) | - |
 | `vocab_dependencies` | Comma-separated vocabulary/project dependencies (project packages only) | - |
-| `marketplace` | Publish this package to the marketplace? A no leaves the publish job out of `.gitlab-ci.yml` | `true` |
+| `marketplace` | Publish this package to a marketplace? The publish job and `task publish` publish to the marketplace `ECCENCA_MARKETPLACE_URL` names and refuse to run without it; a no leaves the publish job out of `.gitlab-ci.yml` | `true` |
 | `github_page` | Link to GitHub page of the package | - |
 
 ## Generated Structure
