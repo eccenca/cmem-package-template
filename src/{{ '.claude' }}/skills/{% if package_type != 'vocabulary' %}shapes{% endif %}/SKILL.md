@@ -48,8 +48,6 @@ gigos:Festival a shacl:NodeShape ;
   shui:navigationListQuery gigos:navlist-festival .
 ```
 
-Note the prefix: these catalogs write `shacl:`, not `sh:`.
-
 **A node shape's user-facing text is `rdfs:comment`, not `shacl:description`.**
 `shacl:description` is the help text of a single *property* shape. The
 platform's own catalog settles it - 21 of its node shapes use `rdfs:comment` and
@@ -75,6 +73,50 @@ does not own, and the next update of the source would drop it. The depiction
 uses the FOAF namespace, so the manifest needs the `foaf-vocab` dependency (see
 the `package-content` skill on dependencies).
 
+**A package class whose instances another node shape also reaches gets
+`shacl:order 0` on its node shape** - because the class extends a class that
+Corporate Memory or another package already shapes (a domain's concepts under
+`skos:Concept`, a class under a gist, BFO or schema.org class), or because its
+instances carry such a type as well (a source that types its datatypes
+`rdfs:Datatype` too brings Corporate Memory's datatype form along). Explore
+offers a resource a form for every node shape whose target class it reaches
+through its types and `rdfs:subClassOf`, and opens the page on the first, so
+without the order the generic form can win. The other shape is not
+the package's to change or remove, so ordering is the lever; check with
+`GET /dataplatform/api/explore/resource/nodeshapeforms/byresource` that the
+package's shape comes first for an instance of each such class.
+
+**A resource is edited only where it lives.** When other graphs import a
+resource, its node shape carries `shui:askIfEditableQuery`, so the form offers
+editing only in the graph that holds the resource's statements; opened through
+an importing graph, the same form is read-only and nobody writes a copy into
+the wrong graph. Explore offers the edit control only when that query answers
+true; `{{shuiGraph}}` is the graph the form is opened in, `{{shuiResource}}` the
+resource. `shui:askIfRemovableQuery` takes the same query, so nobody removes the
+resource through an importing graph. `shui:askIfCloneableQuery` and
+`shui:askIfCreatableQuery` decide by graph alone and answer true only in the
+graphs that may hold the class: Explore fills `{{shuiResource}}` with an empty
+value for them, so the guarded query below would always hide Clone. A purely
+aggregating resource's form gets `ASK { FILTER(false) }` and keeps its widgets.
+
+```sparql
+ASK { FILTER("{{shuiGraph}}" = "https://example.org/library/") }
+```
+
+**Pass the placeholders as strings and guard the empty value.** Explore also
+runs the edit and remove queries without a resource; `<{{shuiResource}}>` then becomes `<>`,
+the request fails with HTTP 400 and the form shows "Validation completed with
+Unknown Error". An empty value has to answer false instead:
+
+```sparql
+ASK {
+  BIND(IRI("{{shuiResource}}") AS ?resource)
+  BIND(IRI("{{shuiGraph}}") AS ?graph)
+  FILTER("{{shuiResource}}" != "" && "{{shuiGraph}}" != "")
+  GRAPH ?graph { ?resource ?p ?o }
+}
+```
+
 ## Property shapes
 
 ```turtle
@@ -91,6 +133,13 @@ gigos:Festival-startDate a shacl:PropertyShape ;
 ```
 
 `shacl:group` points at a `shacl:PropertyGroup`; `shacl:order` sorts within it.
+
+**Number the rows of a section in steps of 10, without ties, and give every
+visible row an explicit order**: editable stored rows first, then read-only
+stored rows, then rows computed by a query. Ties and gaps in the numbering let
+the renderer decide, and a reader then meets the things to fill in after the
+things to look at.
+
 `shui:` adds the UI behaviour: `shui:showAlways` holds an empty row open,
 `shui:readOnly` forbids editing, `shui:markdown` and `shui:textarea` change the
 input widget, `shui:languageIn` restricts language tags.
@@ -106,6 +155,12 @@ shape.** Relaxing a constraint to make a validation run pass turns the catalog
 into a description of whatever the data happens to be. Where the choice is
 between a looser shape and a stricter one that still holds, take the stricter
 one: it is the only part of the package that can catch a regression.
+
+**A row that embeds a sub-shape (`shacl:node`) gets no group**, and neither do
+the embedded node shapes nor a hidden `shacl:maxCount 0` guard row. Ungrouped
+rows sort together with the groups by `shacl:order`, so give an embedding row
+an order between two sections (250, 260). An embedded node shape carries no
+description: the renderer repeats it under every embedded section.
 
 Reusing one property shape across many node shapes is normal where the path is
 a domain-free annotation - a shared `comment` or `editorialNote` field is the
@@ -133,6 +188,12 @@ reader of the form cannot fix, and `showAlways` holds open a row that fills
 itself or stays empty regardless. Put the expectation on the editable inputs the
 derivation reads from. An empty derived field simply reads as "not computed
 yet".
+
+**A computed *Type* row shows only the most specific classes**: its query leaves
+out every class that is a superclass of another listed one. A resource typed
+twice - its own class and, say, `skos:Concept` - would otherwise show *Concept*
+next to its own class on every form, and badges aggregated over all concepts
+with it.
 
 ## URI templates
 
@@ -164,25 +225,83 @@ every cross-reference, and a local name starting with a digit - which two
 thirds of them do - is legal Turtle that breaks syntax highlighting. The
 platform's own built-in queries use slugs such as `total-number-of-triples`.
 
-The scheme, by how widely the resource is shared:
+**Give the package one slug scheme and keep to it**: a slug unique in the
+catalog, that says which class a row belongs to and how widely a shape is
+shared, with a query named after the shape that uses it. The pair then sorts
+together, and a query with no matching shape stands out as an orphan. The
+examples here use `<Class>-<row>` (`Festival-startDate`).
 
-| resource | slug |
-|---|---|
-| property shape on one class | `<Class>-<camelCased row name>` |
-| shape shared by subclasses of one class | `<Superclass>-<row>` |
-| shape shared by unrelated classes | `<row>` |
-| property group | the same, plus `Group` |
-| path builder query | the using shape's slug, plus `Query` |
+**A renamed row takes its slug, its `rdfs:label` and the query named after it
+along**, so the three stay findable from each other.
 
-Naming a query after the shape that uses it keeps the pair adjacent when the
-file is sorted, and a query with no matching shape then stands out as an
-orphan.
+## Sections: one set per package, the same on every form
 
-Renaming exposes duplicates that UUIDs hide - but **duplicate group labels are
-often correct, not redundant**. `shacl:order` belongs to the group, not to the
-form, so placing one block at a different height on several forms requires one
-group per form, and merging them would force a single position everywhere. Give
-every group an explicit `shacl:order`; without one its position is undefined.
+A form's sections are its property groups. **A package defines one set of
+sections and uses it on all its forms**: each section has a one-sentence
+`rdfs:comment`, its `shacl:order` is the same on every form, with gaps left
+between sections, and a form shows only the sections it has rows for. Someone who has learned
+where a section sits on one form then finds it there on the next. `shacl:order`
+belongs to the group, not to the form, so one shared group per section is what
+keeps its height fixed; give every group an explicit order, since without one
+its position is undefined.
+
+- **Sections follow meaning, never link direction.** A row reached through an
+  inverse path goes into the section its meaning belongs to; there is no
+  "Related" section collecting back-links, which would split one topic across
+  two places.
+- **At most one status section comes first** - findings or status widgets (a
+  table report, an action button), no charts. *A user opening a resource sees
+  what needs attention before scrolling.*
+- **The overview with charts goes last**, after everything that is edited.
+  *Charts do not push the fields to edit below the fold.*
+
+Packages of one organisation may share a set of sections, so that a user who
+knows one package finds the same sections at the same height in the next.
+
+The gig package defines its set once and uses it on the Festival form and on
+the Band form:
+
+```turtle
+gigos:group-identity a shacl:PropertyGroup ;
+  rdfs:label "Identity"@en ;
+  rdfs:comment "What the festival or band is called."@en ;
+  shacl:order 100 .
+
+gigos:group-description a shacl:PropertyGroup ;
+  rdfs:label "Description"@en ;
+  rdfs:comment "What the festival or band is about."@en ;
+  shacl:order 200 .
+
+gigos:group-when a shacl:PropertyGroup ;
+  rdfs:label "When"@en ;
+  rdfs:comment "The days a festival takes place."@en ;
+  shacl:order 400 .
+
+gigos:group-lineup a shacl:PropertyGroup ;
+  rdfs:label "Line-up"@en ;
+  rdfs:comment "Who plays at a festival, and where a band plays."@en ;
+  shacl:order 500 .
+
+gigos:group-overview a shacl:PropertyGroup ;
+  rdfs:label "Overview"@en ;
+  rdfs:comment "Figures computed from the gigs."@en ;
+  shacl:order 900 .
+
+gigos:Band-playsAt a shacl:PropertyShape ;
+  shacl:name "Plays at"@en ;
+  shacl:path [ shacl:inversePath gigo:hasAct ] ;
+  shacl:nodeKind shacl:IRI ;
+  shacl:group gigos:group-lineup ;
+  shacl:order 10 .
+```
+
+The Festival form shows *Identity*, *When*, *Line-up* and *Overview*; the Band
+form has no row for *When* and so does not show it, but its *Line-up* sits at
+the same height as the festival's. *Plays at* reaches the band's festivals
+through the inverse of `gigo:hasAct` and still goes into *Line-up*, because
+sections follow meaning, not link direction. The row examples in this skill and
+its references - *First day* in *When*, the band's *Visitors per year* widget in
+*Overview* - use this set.
 
 ## `shacl:name` is the form, `rdfs:label` is the catalog
 
@@ -193,13 +312,21 @@ The two serve different readers and therefore follow different conventions.
   "Condition", never "hasCondition", and **must never contain "node shape" or
   "property shape"**. Putting `"Product Node Shape"` in `shacl:name` and hiding
   the plain name in `rdfs:label` is the wrong way round.
+
+  Row names are **in the user's words, and plural for a row that can hold
+  several values**: no internal or technical abbreviation ("BOM ref", "QC
+  flag"), while an abbreviation that is the name users know a thing by stays
+  (*ISBN*, a standard such as *QUDT*, an authority such as *GND*) - spelling it
+  out would hide the term they search for. Name a row after the class it lists
+  where that reads well ("Venues"), otherwise by its relation read from the
+  form's resource ("Played at"). Two rows on one form that would get the same
+  name are told apart by their role.
 - **`rdfs:label`** is how the shape itself appears in a catalog listing, so it
   must **distinguish one shape from another**. Many `shacl:name`s repeat by
   design, so a bare label identifies nothing.
 
-Derive `rdfs:label` from the slug, which is unique by construction:
-`<Class>-NodeShape` → `"<Class> node shape"`; `<Class>-<row>` →
-`"<Class>: <Row> property shape"`; a shared `<row>` → `"<Row> property shape"`.
+Derive `rdfs:label` from the slug, which is unique by construction, and let it
+say whether it names a node shape or a property shape.
 
 Property **groups** are the exception: SHACL renders a group's `rdfs:label` as
 the block heading, so there it *is* the UI text and stays short
@@ -221,18 +348,18 @@ own.
 How to write and document the query itself - the header comment, the
 projection, placeholders, the `?graph` column - is the `catalog-queries` skill.
 
-## House style
+## Languages
 
-The conventions below are what the eccenca packages converged on. They are
-recommended defaults - a package with a good reason may depart from them.
+Recommended defaults - a package with a good reason may depart from them.
 
-- Fixed property groups with stable orders, the resource's name at order 1 of
-  the first group: **Basics** (10), **When** (20), **Where** (30), then
-  domain-specific groups, **Stats** (60) for counted figures, **Related** (90)
-  for read-only back-links, always last.
+- **Everything a form shows exists in every language the vocabulary has**:
+  section titles and descriptions, row names and descriptions, node shape
+  descriptions and messages. A user switching the UI language otherwise meets a
+  form in two languages. The shapes' own `rdfs:label` names the shape in the
+  catalog, not on the form, so one language - the maintainers' - is enough.
 - Design reasoning lives on the term it concerns as `skos:editorialNote`, in
-  English only, even where labels and comments are bilingual: it is for whoever
-  maintains the vocabulary, and a translated argument drifts.
+  one language even where labels and comments are multilingual: it is for
+  whoever maintains the vocabulary, and a translated argument drifts.
 - Labels come from a few shared label shapes rather than one copy per node
   shape, using `shacl:uniqueLang` instead of `shacl:maxCount` so a second
   language stays possible.
