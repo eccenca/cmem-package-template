@@ -1,7 +1,15 @@
 # The `?graph` column of a path builder query
 
-A path builder query conventionally projects `(<{{shuiGraph}}> AS ?graph)` as a
-trailing column. Corporate Memory uses that attribution for two things:
+**Every path builder query projects a `?graph` column** - at least the echo
+`(<{{shuiGraph}}> AS ?graph)` as a trailing column, added to the `GROUP BY` where
+the query aggregates. Corporate Memory uses that attribution for three things:
+
+- **The Business Knowledge Editor's relations.** The BKE resolves the relations
+  between the resources on its canvas through every path builder row of their
+  node shapes. One row whose query projects no `?graph` makes that whole request
+  fail with HTTP 500, so the canvas shows no relation at all - read-only and
+  derived rows included (observed on CMEM 26.2.2). `task check:offline` fails on
+  such a row (`check_path_builder_queries.py`).
 
 - **Deletion.** When a value is removed through the form, `?graph` is what
   tells Corporate Memory which graph to delete the statement from.
@@ -64,5 +72,6 @@ hop.
   column's attribution is then a decision rather than a reading.
 
 A row marked `shui:readOnly true` cannot have values removed through the form
-at all, so the deletion half of the column does nothing there - the chip is the
-only thing it still drives.
+at all, so the deletion half of the column does nothing there - but the chip and
+the Business Knowledge Editor still need it, so the row keeps the column: the
+echo, where no stored triple underlies the value.

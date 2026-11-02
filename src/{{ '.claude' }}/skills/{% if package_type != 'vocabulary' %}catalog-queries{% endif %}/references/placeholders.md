@@ -18,28 +18,23 @@ not put one in `https://ns.eccenca.com/data/queries/`, which is Corporate
 Memory's system catalog, where its own `graph` placeholder lives marked
 `shui:isSystemResource true`.
 
-## `shuiResource` and `shuiMainResource` are not the same
+## Use `{{shuiResource}}`, never `{{shuiMainResource}}`
 
-Both name "the resource this is rendered for", and in most cases they resolve
-to the same IRI - which is exactly why the wrong one survives until somebody
-nests the shape.
+`{{shuiResource}}` is the resource the form or widget is rendered for. Inside a
+nested form it follows the nesting and names whatever that level is about - which
+is what a query on that level wants. `{{shuiMainResource}}` is deprecated: don't
+use it.
 
-- **`{{shuiResource}}` is the one to use normally.** It refers to the resource
-  being rendered in the *immediate* sub-shape, so inside a nested form it
-  follows the nesting and names whatever that level is about.
-- **`{{shuiMainResource}}` keeps a stable reference to the top-level origin
-  resource** of the entire structure, whatever depth the query runs at. Widgets
-  use it, because a widget reports on the page rather than on a level.
-
-Reach for `shuiMainResource` only where the query genuinely needs the origin
-rather than the current level, and say so in its `dcterms:description`.
+A widget follows the same rule: on an embedded node shape it reports on the
+embedded resource, so a widget about the page's own resource goes on the page's
+own node shape (the `shapes` skill, *widgets*).
 
 ## Declaring a built-in key does not hijack it
 
 `{{shuiGraph}}`, `{{shuiResource}}` and `{{shuiMainResource}}` are substituted
 by the form renderer from context. Declaring a placeholder of the same key does
 not override that - both were verified on a running instance to keep working
-unchanged, even with a concrete value query attached.
+unchanged, even with a concrete placeholder values query attached.
 
 So declaring a built-in is documentation plus an editor fallback: it records
 which queries take which parameter, and supplies values only where there is no
@@ -73,7 +68,7 @@ Measure the branches per class before splitting rather than assuming which
 belongs where; they are usually disjoint, and if they are not, the row means
 something other than it claims.
 
-## A value query has three constraints of its own
+## A placeholder values query has three constraints of its own
 
 Each was found by breaking it:
 
@@ -91,7 +86,7 @@ Each was found by breaking it:
 ## Never write a key in braces inside a comment
 
 Substitution is a plain text replace over the whole query text, **comments
-included**. A value query that mentions its own key in prose therefore becomes
+included**. A placeholder values query that mentions its own key in prose therefore becomes
 circular - Corporate Memory needs a value for the key in order to compute the
 list of values for it - and the picker cannot be filled.
 
