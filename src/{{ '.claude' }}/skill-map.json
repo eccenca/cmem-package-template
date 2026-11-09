@@ -5,6 +5,7 @@
     {"skill": "vocabulary", "paths": ["*/*vocab*.ttl"], "content": ["owl:Ontology", "owl:Class", "owl:ObjectProperty", "owl:DatatypeProperty"]},
     {"skill": "shapes", "paths": ["*/*shapes*.ttl", "*/*shacl*.ttl"], "content": ["shacl:NodeShape", "shacl:PropertyShape", "sh:NodeShape", "sh:PropertyShape"]},
     {"skill": "catalog-queries", "content": ["shui:queryText", "shui:SparqlQuery", "shui:valueQuery"]},
+    {"skill": "workflows", "paths": ["*/*/workflow/*.xml", "*/*/custom/*.xml", "*/*/transform/**", "*/*/linking/**"], "exclude": ["scripts/**"]},
     {"skill": "build-projects", "paths": ["*/projects/**", "*/build/**", "*/*/workflow/*.xml", "*/*/custom/*.xml", "*/*/dataset/*.xml", "*/*/transform/**", "*/*/linking/**"], "exclude": ["scripts/**"]}
   ]
 }

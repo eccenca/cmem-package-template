@@ -1,7 +1,11 @@
 # Graph architecture
 
-A package shipping instance data wants four graphs, each in its own file and
-each labelled after the file that ships it:
+A package shipping instance data wants four graphs, each in its own file, and
+each graph's label carrying the role word of its file (*vocabulary*, *shapes*,
+*settings*). *Whoever sees a graph in Explore's graph list finds the file that
+ships it, and whoever edits a file knows which graph a re-import replaces. The
+manifest ties file and graph IRI; nobody reads IRIs in the graph list, they
+read labels.*
 
 | graph | role |
 |---|---|

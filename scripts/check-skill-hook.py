@@ -135,6 +135,10 @@ def check_edits(tmpdir: str) -> None:
     if (case.root / ".claude" / "skills" / "build-projects").is_dir():
         for export in ("my-pkg/projects/demo/config.xml", "my-pkg/build/demo/config.xml"):
             expect("build-projects" in context(case.edit(export)), f"did not remind of build-projects on {export}")
+    if (case.root / ".claude" / "skills" / "workflows").is_dir():
+        reminder = context(case.edit("my-pkg/projects/demo/workflow/load.xml"))
+        expect("workflows" in reminder and "build-projects" in reminder,
+               "a workflow file did not remind of both workflows and build-projects", reminder)
     if (case.root / ".claude" / "skills" / "shapes").is_dir():
         expect("shapes" in context(case.edit("my-pkg/graphs/demo-shapes.ttl")),
                "did not remind of shapes on a catalog under graphs/")
