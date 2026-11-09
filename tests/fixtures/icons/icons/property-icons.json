@@ -1,0 +1,10 @@
+{
+  "relations": {
+    "https://example.org/icons/isBasedAt": "located-in",
+    "https://example.org/icons/hasHomeVenue": "range"
+  },
+  "attributes": {
+    "https://example.org/icons/email": "email",
+    "https://example.org/icons/capacity": "audience"
+  }
+}
