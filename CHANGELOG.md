@@ -23,6 +23,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - `askIf…` queries edit and remove a resource only in the graph that holds it, with string placeholders and an empty guard because Explore also runs them without a resource; clone and create decide by graph alone, since Explore passes them no resource
   - validate through the graph that imports what the shapes need, data must satisfy the system shapes, no managed class in a shipped graph users create in, table reports set both flags and carry counts of marks
 
+### Fixed
+
+- `task check:offline` no longer reports a catalog that adds a row to one of Corporate Memory's own forms (`<system node shape> sh:property <row>`, the row in a system group) as dangling: only namespaces the file types a resource in count as the catalog's own, whatever prefixes the file binds
+
 ## [1.8.0] 2026-10-18
 
 ### Added
