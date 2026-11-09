@@ -43,8 +43,12 @@ generated with:
   connection
 - `vocabulary` - the ontology: predicate order, definitions and comments,
   naming, and the icon every class wants
-- `build-projects` - DataIntegration project exports, their layout, which
-  workflow task to reach for, and how to test one
+- `build-projects` - DataIntegration project exports, their layout, projects
+  by lifecycle, ids, descriptions, tags, namespaces and migrations, which task to
+  reach for, and how to test one
+- `workflows` - the design of a workflow: constructs first, phases,
+  responsibilities, sticky notes, the waterfall layout (`task layout`) and the
+  mechanics found on the way
 - `shapes` - the shape catalog: node and property shapes, groups, URI
   templates, widgets, navigation and validation
 - `catalog-queries` - the SPARQL a catalog ships: the header comment, the

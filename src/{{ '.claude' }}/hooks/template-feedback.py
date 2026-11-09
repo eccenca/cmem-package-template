@@ -58,6 +58,7 @@ TEMPLATE_OWNED = (
     ".claude/skills/package-content/",
     ".claude/skills/shapes/",
     ".claude/skills/template-feedback/",
+    ".claude/skills/workflows/",
     ".claude/skills/vocabulary/",
     ".gitlab-ci.yml",
     "Taskfile.yaml",

@@ -1,6 +1,6 @@
 ---
 name: build-projects
-description: Work with the Corporate Memory DataIntegration projects a package ships - export one back into the repository, read the exported XML, choose the right workflow task, and test a workflow against an instance. Use when a build project is added, re-exported, edited or debugged, or when deciding how to get data into a graph.
+description: Work with the Corporate Memory DataIntegration projects a package ships - export one back into the repository, read the exported XML, split projects by lifecycle, name ids and labels, write descriptions, tag tasks, keep namespaces in project variables, write migrations, choose the right task, and test a workflow against an instance. Use when a build project is added, re-exported, edited, tagged, documented or debugged, when a namespace or a migration is needed, or when deciding how to get data into a graph. The design of the workflows themselves is the workflows skill.
 ---
 
 # Build projects inside a package
@@ -16,6 +16,14 @@ but what the repository holds is the **extracted** directory
 `projects/<project-id>/`, so that changes are diffable in git. `cmemc package
 build` and `package install` re-zip it on the fly. Do not commit the `.zip`, and
 do not change the manifest to point at the directory.
+
+**A project id over 30 characters needs a shorter folder.** The manifest allows at
+most 30 characters per path segment before `.zip`, so `projects/<project-id>.zip`
+fails validation for a longer id. Name the folder after the project's role -
+`projects/bootstrap.zip`, `"project_id": "<the long id>"` - and keep the id
+everywhere else: `bin/task_tags.py` reads the manifest, so the register names
+the project by its id, the one the workbench shows. *A register keyed by folders
+names projects nobody finds in the workbench.*
 
 ## The live instance is the source of truth
 
@@ -68,13 +76,183 @@ A workflow is a graph of `<Dataset>` and `<Operator>` elements, each with
 sequence two branches that exchange no data - the second operator waits for the
 first without reading from it.
 
+## Build projects by lifecycle
+
+A package ships up to three build projects, split where the lifecycle differs:
+
+| project | holds | runs |
+| --- | --- | --- |
+| bootstrap | setting up an environment: master data and curated graphs' first fill, a taxonomy from its SKOS XML, migrations | once per environment, again after a reset |
+| demo | the example files, their transforms, learning demos, the count tests | on demand, never in production |
+| operational | the operational workflows: consume (read sources) and produce (inference, checks, exports) | all the time |
+
+- **A project's id names its package and its lifecycle**, the same way in all
+  three. *Whoever meets a project in the workspace knows which package it
+  belongs to and whether it may run in production.*
+- Consume and produce stay together: they share datasets and rule blocks, and
+  tags tell them apart.
+- **Several operational projects**, each id naming its purpose, only where each serves a
+  usage context that is called by name from outside - a trigger, an assistant
+  skill, an instance. *Renaming a project breaks every trigger and skill that
+  calls it.* Bootstrap and demo stay one each.
+- **Example data has flaws**: one or more for every check the package shows,
+  each documented with its count (DOCUMENTATION.md) and guarded by the count
+  check. Record each flaw's provenance for maintainers - *generator* (which seed
+  or rule) or *source* (which source, which cached snapshot). *A demo shows the
+  checks working; when a count changes, the provenance tells a defect
+  (generator) from a changed source.*
+  - **Also a check that only guards against hand edits gets a flaw**, planted
+    needle-in-the-haystack style: one inconspicuous record deep inside an
+    otherwise normal source, placed where it stays local (on something no other
+    check reads), with every count that moves with it re-measured.
+  - **A documented flaw counted exactly is a real violation**: it may show up in
+    validation; the exact count makes any further violation fail the test.
+- **The demo is guarded**: the bootstrap records in a global or project
+  variable which environment the instance is, and the demo's entry workflow
+  reads it first and cancels in production, with the reason in the report.
+  Migrations and checks may read it too. *Demo data never lands in production,
+  whoever installs the package.*
+
+## A project maintained from the repository says so
+
+Every build project's description says in one line that it is maintained from
+the package's repository: edit it in the UI only if you export it back, because
+the next `task import` replaces the whole project. *In a workspace shared by
+people and an agent, whoever opens the project reads that an import will
+overwrite it. The unit is the project: a note on single tasks would make the
+other tasks of the same project look safe to edit, and they are not.*
+
+## Ids and labels
+
+- Ids are readable kebab-case, chosen at creation, never generated. Workflows
+  and processing tasks are verb-object (`create-entities`); datasets are a noun
+  (`staged-book`). No `WF_` prefix.
+- **Ids and labels name the intention**, not the format: `staged-book`, not
+  `book-json`.
+- Labels use the same words as the id.
+- Rename a generated id only while nothing outside the project references it.
+- **Never give a workflow and a task the same id**, even of different types: the
+  project can no longer be loaded.
+
+## Descriptions
+
+- **Every task and workflow has a description.** Its first sentence stands
+  alone - lists show only it.
+  - A task: that sentence plus at most one paragraph on why it exists and what
+    breaks without it. A SPARQL task says why no construct does the job.
+  - A workflow run by hand: its full instruction set - the first sentence, then
+    what goes in, what must hold before it starts, what it does, what comes
+    out, and what to do when it fails. *Whoever starts it in Build reads only
+    the description; without these they start it on the wrong input, or cannot
+    recover from a half-done run.*
+- **A workflow run by hand gets a skill of exactly the same name.** The skill
+  never repeats the description; it only adds the decision, the confirmation
+  and the check.
+- What no single node can say goes into a sticky note on the canvas (the
+  `workflows` skill).
+
+## Task tags
+
+DataIntegration attaches any tag to a task or project and keeps no order; which
+tags a package uses, and what each means, is the package's convention - or its
+organisation's, shared by several packages. The template declares none. What it
+gives is one place to keep them:
+
+- **Declare the axes, each with its use case.** The register `task-tags.json` at
+  the repository root lists every axis - who searches by it, for what - with the
+  kinds it tags (`dataset`, `custom`, `workflow`, `transform`, `linking`,
+  `project`), whether a task may carry several of its values, and each value with
+  a one-line use case. `"include"` pulls in a preset file, so packages sharing a
+  convention keep it in one place. *A tag nobody declared is a typo or a new
+  kind - the check makes you say which.*
+- **Keep the tags in the same register**: the tags of every task per project,
+  and the projects' own tags, each project under its id. `task tags` writes them into the exports and `task
+  tags:check` reports drift; both first refuse a tag declared on no axis, a tag
+  on an axis that does not tag that kind, two tags on an axis that allows one,
+  and an axis or value without its use case. Run `task tags` after every export.
+  *A task created through the API often loses its tags on export, and a tag
+  edited in forty task files drifts; the register is the one place a reviewer
+  reads, and one command repairs an export.*
+- **Tags are a set**: a checker compares sets; no rule fixes an order.
+- **No tag for what a flag already says**: a dataset the build only reads gets
+  DataIntegration's `readOnly="true"`. *The workbench search filters on the flag,
+  and the flag also refuses a write; a tag next to it is a second source that
+  drifts.*
+
+A package without a register writes a first one from its exports with
+`bin/task_tags.py --from-exports <package dir>`: every tag found lands on one axis
+`unsorted`, to be sorted onto declared axes, or replaced by an included preset.
+
+## Namespaces in one place
+
+- Every namespace **decided per instance** is a **project variable**: one base
+  variable (for example `dataNamespace`), graph variables as templates over it
+  (`{{project.dataNamespace}}entities/`). A shipped graph's IRI,
+  fixed by the manifest, stays written out. *Whoever installs on a new instance
+  changes one place instead of searching the tasks; what never changes gets no
+  variable to misconfigure.*
+- **A template variable needs its `<Value>` in the export too.** A
+  `variables.xml` imported with a `<Template>` and no `<Value>` stores an empty
+  value, and task templates read that: every graph resolves to its bare suffix
+  (`entities/`), and neither `cmemc project reload` nor re-saving the task
+  repairs it. Change variables through `cmemc project variable` or the UI, which
+  evaluate the template, and edit an export by hand only with both elements
+  filled. A template names only variables defined before it in the project's
+  order. *Hand-writing the export looks like the quick way to add a variable; it
+  leaves a project whose first run fails on an invalid graph IRI.*
+- **Not the vocabulary namespace**: templates resolve only in plugin
+  parameters, and the vocabulary's IRIs also sit in mapping targets, type URIs,
+  source paths and restriction patterns. The vocabulary namespace stays written
+  out.
+- Datasets take it as `<Template name="graph">`; SPARQL tasks as
+  `PREFIX x: <{{project.x}}>`; transforms as template constants.
+  A template inside a rule block's `constant` resolves; a changed value takes
+  effect after `cmemc project reload`; an export keeps
+  `{{project.x}}`.
+- Document instance-decided variables as preconditions of the workflows that
+  use them.
+- **Jinja trap**: a SPARQL task's text may contain no `{{`, `{%`
+  or `{#` besides the variables.
+- **Template trap**: give a task parameter's template in the task JSON's
+  `templates` field, not in `parameters`. A URI rule that is a bare
+  `concat(constant, path)` may lose its template; safe shape:
+  `concat(constantUri <graph>, urlEncode(path))` with the segment in `glue`, or a
+  namespace as `constantUri` in angle brackets. After a transform edit, export
+  and count the `<Template>` elements.
+- **Execution variables** resolve in SPARQL task templates per run, but not in a
+  task parameter template, which resolves when the task is saved. To use one
+  there, feed an Evaluate template task into the operator's configuration port.
+
+## Migrations
+
+A migration is a DataIntegration workflow, one per migration, in the bootstrap
+project, its id numbered so the order is visible and naming what it migrates:
+
+1. **check** - ASK whether it is needed (old pattern present, not yet recorded
+   in the graph description); otherwise end with the reason in the report;
+2. **back up** the affected graphs into a backup graph;
+3. **migrate** - constructs first (the `workflows` skill), SPARQL update only
+   where no construct can;
+4. **verify** - counts before and after, and validation, both in the report;
+5. **record** the id and date in the graph description.
+
+A parent workflow runs them all in order.
+Test each twice from a pre-change backup: the results must be isomorphic.
+Production data and master data maintained by users always get a migration;
+package definition is replaced by the release, demo data by re-running the demo,
+imported master data by re-import.
+
+**Applied migrations are history**: a migration already run as a script stays as
+it is; only new ones become workflows. *Nobody runs an applied migration again,
+so a workflow copy would only be maintained.*
+
 ## Choosing a task
 
 Custom tasks are `<CustomTask id="…" type="…">`. The types worth knowing:
 
 | `type` | Use it for |
 | --- | --- |
-| `sparqlCopyOperator` | a CONSTRUCT from one graph into another - the workhorse |
+| `sparqlCopyOperator` | a CONSTRUCT from one graph into another, where no construct does the job |
 | `sparqlUpdateOperator` | an INSERT/DELETE against a graph |
 | `tripleRequestOperator` | piping an RDF file or endpoint straight into a graph |
 | `clearDataset` | emptying a target before a rebuild |
@@ -84,11 +262,19 @@ A plugin contributes its own type (`cmem_plugin_nextcloud-List` and so on); the
 package must then declare that plugin as a `python-package` dependency in the
 manifest.
 
-**Avoid hand-authoring a transform.** A `transform/<rule-id>/rules.xml` mapping
-tree is the one part of DataIntegration authoring that is genuinely painful to
-write by hand. If the source can be produced as RDF - generated Turtle, an
-endpoint - `tripleRequestOperator` reaches the same result without a mapping
-tree. Build transforms in the UI and export them.
+**Constructs first** (the `workflows` skill): a transform, a linking task, a
+dataset and the Clear dataset operator before a SPARQL task, so a reader can
+follow and change the workflow in the workbench without code. A SPARQL task's
+description says why no construct does the job.
+
+**Build tasks in the UI and export them.** A `transform/<rule-id>/rules.xml`
+mapping tree is painful to write by hand. A script may generate a task only when
+the task is a construct and its source is a master in the repository that
+something else needs too - one mapping feeding several tasks, a catalog query
+copied into a workflow. The script uploads through the REST API, the export
+stays the copy, and the script's `--check` fails when the export drifts from the
+master. *The repository keeps one source for what two places use, and the
+export stays what ships.*
 
 ## A SPARQL finding worth not rediscovering
 
