@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- `shapes`: packages adding to the page of one class attach their rows to one node shape - with node shapes of their own each package's rows land on a form of their own, and Explore opens the first; rows on Corporate Memory's own forms - read only, one shared row per instance
+
 ### Changed
 
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
