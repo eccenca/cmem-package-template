@@ -43,6 +43,17 @@ Otherwise read the *Package Manifest* section of the template's README:
 - only `.ttl`, `.zip` and `.png`, plus the three literal filenames `README.md`,
   `CHANGELOG.md` and `LICENSE`
 
+## Where a file goes
+
+A project package keeps its graphs in `graphs/`, its project exports in
+`projects/` and its images in `images/` - the layout the marketplace's
+`package_build_guide` describes, so an author, a reviewer or an agent who knows
+the marketplace finds a file where it expects it. A vocabulary package, one
+graph and an icon, may stay flat. Nothing enforces the folders: a package laid
+out otherwise still builds, and moves when its maintainer chooses (`git mv`,
+then the `file_path` of each entry, then every script and task that names the
+old path - `task check:offline` and `task build` before and after).
+
 ## The three kinds of entry, in short
 
 - **graph** - `file_type: graph` with a `graph_iri`, optional `import_into`
@@ -69,19 +80,36 @@ shape catalog or a plain dataset silently registers no prefix.
 
 Ownership is what makes uninstall clean. A graph that only a workflow creates
 appears in no manifest, so uninstalling the package leaves it behind as an
-orphan that nothing will ever remove.
+orphan that nothing will ever remove. And `cmemc package install --replace` -
+which is what an update runs - writes **every** graph of the manifest again.
+So what a graph holds decides whether it ships:
 
-**Ship every graph the package writes to**, even one with no content of its
-own - a file holding nothing but the graph's own description is enough. The
-graph is then created at install time and removed again on uninstall.
+- **The package's own content** - the vocabulary, the shape catalog, the
+  queries, the views, reference lists, the findings its checks use - ships
+  filled. Every update replaces it with the newest version, which is what it
+  is for.
+- **Data the package can rebuild** - what its workflows write from their
+  sources - ships holding nothing but the graph's own description. The graph
+  is created at install time and removed on uninstall; installing creates it
+  **empty**, and re-installing with `--replace` empties it again, so the
+  populating workflow has to run after both. Say so in `DOCUMENTATION.md`.
+- **Data only its users can produce** - a library someone catalogued, the
+  receipts of a household book, the categorisation users curate in a form even
+  where the package seeds its first version - is **not shipped**. In the
+  manifest it would be emptied by every update. A workflow creates such a
+  graph instead, and uninstalling leaves it behind on purpose;
+  `DOCUMENTATION.md` says how to remove it.
 
-Two consequences follow, and both belong in `DOCUMENTATION.md` because they
-are things a user has to do:
+**Ship every graph the package owns**, even one with no content of its own - a
+file holding nothing but the graph's own description is enough.
 
-- installing creates that graph **empty**, so the populating workflow has to
-  be run afterwards;
-- re-installing with `--replace` resets it to the shipped state, so the
-  workflow has to be run again.
+`install --replace` uninstalls the installed version first, and that deletes
+every graph its manifest listed. So a graph you **stop** shipping is deleted
+one last time by the update that removes it from the manifest; a migration in
+the new version runs too late. Tell users in `CHANGELOG.md` to export it before
+that update and import it again afterwards. *The test: an
+update that replaces the graph must lose nothing anyone but the package
+wrote.*
 
 For the graph layout a package shipping instance data wants, and what the
 pipeline then has to assert for itself, see
@@ -101,10 +129,48 @@ for **every** namespace the shipped graphs mention - `w3c-rdf-vocab`, `w3c-rdfs-
 `foaf-vocab` and so on. Without them the terms do not resolve on a bare
 instance, which is the deployment this package will eventually meet.
 
-**Prefer bundling to depending when the dependency is your own.** A package
-that bundles its vocabulary installs standalone; one that depends on a sibling
-cannot be installed without it, and cannot be uninstalled while anything else
-still needs it. Depend on what somebody else maintains, bundle what you do.
+## Bundling an ontology or giving it a package of its own
+
+Whether the ontology ships inside the package that uses it or as a vocabulary
+package of its own is the author's choice. What each way does:
+
+- **Bundled**, the package installs on its own, and the ontology changes in the
+  same commit as the forms, queries and data that use it.
+- **A vocabulary package of its own** can be installed without any of them, so
+  another package can build on the ontology without inheriting its forms or
+  data. A vocabulary package holds exactly one graph and declares no dependency;
+  the shape catalog, queries and everything else that works with the ontology
+  then live in project packages that depend on it.
+- **A dependency binds both ways**: a package cannot be installed without the
+  packages it depends on, and a package cannot be uninstalled while another
+  still depends on it.
+
+## Naming a package
+
+A `package_id` is two to five lowercase segments (the template's validator)
+and unique on the marketplace; the template derives it from the repository's
+name, `<package_id>-package`. Everything else is the author's: the id follows
+how the model is split into packages and how the publishing organisation names
+its products, and a first segment naming the publisher keeps it from colliding
+with another publisher's. *A partner's modelling method and a customer's
+repository conventions stay theirs.*
+
+## An install replaces a graph under the same IRI
+
+`cmemc package install --replace` writes every graph of the manifest, whatever
+the instance already holds under that IRI, and an uninstall deletes those
+graphs again. So a package replaces a graph somebody else made when its graph
+IRI is already in use on the instance - an ontology or shape catalog first made
+by hand there, a package built from an instance's own graphs, a graph under one
+of Corporate Memory's own IRIs. Shipping the system query catalog
+`https://ns.eccenca.com/data/queries/` replaces the instance's whole catalog.
+
+- **Mint every graph IRI in the package's own namespace.**
+- **Before the first install on an instance**, list its graphs
+  (`cmemc graph list`) and compare them with the manifest's `graph_iri`s. A
+  match this package did not install is somebody else's graph: take it over
+  only on purpose, after an export of it. (A guard in the template's install
+  task is issue #43.)
 
 ## Exporting from an instance leaves files you must not ship
 

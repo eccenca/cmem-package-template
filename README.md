@@ -246,6 +246,13 @@ Further metadata can be added to the `cpa-manifest.json` file:
 
 Add files (package contents) by copying or linking those into the package folder (or respective sub-folder) and referencing them in the files section.
 
+A project package keeps its graphs in `graphs/`, its project exports in `projects/` and its images in `images/`, beside
+the three text files - the layout the marketplace's authoring guide describes (`package_build_guide` of the marketplace
+MCP server), so authors, reviewers and agents find a file where they expect it. A vocabulary package, one graph and an
+icon, may stay flat. The marketplace checks every path when it builds the package: one directory level at most,
+lowercase, `.ttl`, `.zip` or `.png` (plus `README.md`, `CHANGELOG.md` and `LICENSE`), 2 to 30 characters per path
+segment before the extension, and every file in the package folder declared in the manifest.
+
 #### Graphs
 
 The following adds a graph.
@@ -303,18 +310,18 @@ We suggest to organize projects in a respective sub-folder (here `projects/`), b
 
 #### Icons and Images
 
-The following adds an image and/or icon:
+The following adds an image and/or icon, here in `images/`:
 
 ``` json
 "files": [
     …
     {
-        "file_path": "periodic-table.png",
+        "file_path": "images/periodic-table.png",
         "file_type": "image",
         "file_role": "marketplace"
     },
     {
-        "file_path": "icon.png",
+        "file_path": "images/icon.png",
         "file_type": "image",
         "file_role": "icon"
     },
