@@ -9,11 +9,11 @@ A package ships DataIntegration projects the way it ships graphs: as files
 declared in `cpa-manifest.json`. The manifest entry names a **`.zip`**:
 
 ```json
-{ "file_path": "build/<project-id>.zip", "file_type": "project", "project_id": "<project-id>" }
+{ "file_path": "projects/<project-id>.zip", "file_type": "project", "project_id": "<project-id>" }
 ```
 
 but what the repository holds is the **extracted** directory
-`build/<project-id>/`, so that changes are diffable in git. `cmemc package
+`projects/<project-id>/`, so that changes are diffable in git. `cmemc package
 build` and `package install` re-zip it on the fly. Do not commit the `.zip`, and
 do not change the manifest to point at the directory.
 
@@ -30,9 +30,9 @@ hand-edited files destroys them and leaves the server's untouched state in their
 place, uncommitted and without an error. The order is:
 
 ```bash
-cmemc project import <package_dir>/build/<project-id> <project-id>   # your edits go up
+cmemc project import <package_dir>/projects/<project-id> <project-id>   # your edits go up
 cmemc project export --extract --replace --without-userdata \
-    --output-dir <package_dir>/build <project-id>                   # the result comes back
+    --output-dir <package_dir>/projects <project-id>                 # the result comes back
 ```
 
 **`--without-userdata` is not optional in practice.** Without it, `config.xml`
@@ -48,7 +48,7 @@ that is every export but the first.
 ## What an export looks like
 
 ```text
-build/<project-id>/
+projects/<project-id>/
 ├── config.xml       project metadata, prefixes, variables config
 ├── variables.xml    project variables
 ├── tags.xml         tags used by tasks

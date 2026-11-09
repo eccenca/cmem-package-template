@@ -16,6 +16,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 - `package-content` says which graphs a package ships by what they hold, since an update with `install --replace` writes every graph of the manifest again: its own content ships filled and is replaced by the newest version, data its workflows rebuild ships holding only its description, and data only its users produce - including a curated categorisation the package only seeds - is not shipped at all: a workflow creates it and uninstalling leaves it; "ship every graph the package writes to" becomes "every graph the package owns"
 - `package-content` now states that the integration graph is the package's read-only root: it holds nothing but its description and imports, and neither a workflow nor a form writes into it. Intermediate integration graphs between the data and the root - a product's graph importing its components, say - may hold data of their own and stay editable
+- The skills show the marketplace's package layout: a project package keeps its graphs in `graphs/`, its project exports in `projects/` and its images in `images/` (#32)
+  - `build-projects` names `projects/<project-id>.zip` and exports into `projects/`; `shapes` wires the catalog as `graphs/shapes.ttl`
+  - `package-content` and the README say where a file goes and that a vocabulary package may stay flat; the README states the marketplace's path rule
+  - the layout is a recommendation: a package laid out otherwise still builds, and `.claude/skill-map.json` maps both `*/projects/**` and `*/build/**` to `build-projects`, so a package that has not moved keeps its reminders
 
 ## [1.8.0] 2026-10-18
 
