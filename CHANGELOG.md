@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 
 - `shapes`: packages adding to the page of one class attach their rows to one node shape - with node shapes of their own each package's rows land on a form of their own, and Explore opens the first; rows on Corporate Memory's own forms - read only, one shared row per instance
+- `shapes` gained `references/path-builder-queries.md`: the seven uses of a path builder query (subclass split, enriched stored relation, derived shortcut, back-link listing, read-only split, and the catalogued anti-patterns computed link and embedded widget), each with its row, query, validation treatment and `?graph` handling
+  - extra columns of a path builder or navigation list query: a column that names a thing projects its IRI, so Explore shows label, icon and link in the reader's language; every listed resource stays one row (group and reduce, a count where several values matter); `shui:ComplexResourceViewerWidget` shows a row comparing candidates as a table
+  - the **subclass split** in full - one property, one editable row per leaf class of its range, `shacl:class` at the range, one group per split property, a path builder query and a selectable resources query per row, no inline creation, curated links kept in a graph the build does not clear - grilled and measured on the product data demo (2026-10-07)
+- `bin/check_path_builder_queries.py`, run by `check_all.py`: classifies every path builder query row into the seven uses and fails a subclass split whose rows drift from their queries - a missing query, a query not mentioning the path, the leaf as `shacl:class`, `?graph` not bound through `FROM NAMED`/`GRAPH`, rows not sharing one group of their own, or a leaf of the range without a row; warns on inline creation, on a selectable resources query that offers held values, and on the two anti-patterns
+  - it fails every path builder query, of any use, that projects no `?graph` column: without it the Business Knowledge Editor's relation lookup fails with HTTP 500 for every resource on its canvas, read-only and derived rows included; `catalog-queries` makes the column a rule instead of a convention
 
 ### Changed
 
@@ -22,6 +27,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - a package class whose instances another node shape also reaches - through `rdfs:subClassOf` or a second type - gets `shacl:order 0`, so its form opens first
   - `askIf…` queries edit and remove a resource only in the graph that holds it, with string placeholders and an empty guard because Explore also runs them without a resource; clone and create decide by graph alone, since Explore passes them no resource
   - validate through the graph that imports what the shapes need, data must satisfy the system shapes, no managed class in a shipped graph users create in, table reports set both flags and carry counts of marks
+- `catalog-queries` names a query by its role and lets the slug say it; the exact suffixes are the organisation's
+- `catalog-queries` and `shapes` drop `{{shuiMainResource}}`: always `{{shuiResource}}`, and a widget about the page's own resource sits on the page's own node shape
+- the strip rule in `shapes/references/validation.md` keeps the subclass split and the enriched stored relation: their path is honest, and a split row's qualified value shape counts would otherwise never be checked
+- `shapes/references/paths.md` names the subclass split as the intended subset, not the "they differ" fault
+- `catalog-queries` names the three query roles - path builder query, selectable resources query, placeholder values query - and drops "value query", which meant two things; `check_placeholders.py` reports in the same terms
+- `catalog-queries` limits "no markup datatype is honoured" to extra columns: a value column typed `sysont:Markdown` renders as markup (checked in the browser)
+- `scripts/check-offline.py` matches a checker's verdict by name, not by column width (the summary pads names to the longest checker)
 
 ### Fixed
 
