@@ -10,6 +10,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
+- `vocabulary` depictions name the palette as Corporate Memory's interface palette
+- The `vocabulary` skill: a term's IRI and label always match; a property links to an upper ontology's property with `rdfs:seeAlso`, never `rdfs:subPropertyOf`, while a class may extend an upper ontology's class; German definitions; class colours from a fixed palette with families spaced 360°/n apart, one neutral class in black and dependents in their owner's hue
 
 ## [1.8.0] 2026-10-18
 
