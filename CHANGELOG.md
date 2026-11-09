@@ -7,6 +7,10 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- `package-content`: what bundling an ontology and giving it a package of its own each do, that a package id is the author's to structure beyond what the platform requires, and that an install replaces a graph under the same IRI - mint graph IRIs in the package's own namespace, compare before the first install
+
 ### Changed
 
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
