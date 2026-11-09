@@ -31,21 +31,48 @@ shape catalog - see its `shapes` skill.
 
 ## Colour
 
-**Hue carries the family.** Each top-level class owns one hue, and hues are
-kept at least 60° apart on the wheel so no two top-level classes read as
-related.
+**Colours come from a fixed palette** - the layout colours of Corporate
+Memory's own interface, defined in `@eccenca/gui-elements`
+(`src/configuration/_palettes.scss`, five tones per hue) - so packages installed
+side by side look like one product with the interface they appear in. Take the
+values from there rather than copying them. The palette's semantic colours
+(success, info, warning, danger, a separate group in the same file) are reserved
+for badges and marks, and a class hue keeps at least 26° away from them: a class
+drawn in the warning colour reads as a warning. The 26° is a convention, not a
+measurement: it is the gap between the palette's yellow and its warning colour,
+the smallest that keeps the yellow usable for a class. Choose a wider gap if the
+palette leaves room.
 
-A subclass takes a **tone of its superclass's hue** - a lightness step,
-optionally with a hue nudge of up to ±18° - never a hue of its own, because
-sharing a hue is what tells the user the two classes belong together.
-Conversely, a subclass tone must not drift into a neighbouring family's band.
+**Hue carries the family.** A family is an independent top-level class, a class
+that is merely related included. Not counted as families:
 
-Put the abstract superclass at the **mid** tone and the subclasses one step
-darker and one step lighter. Two subclasses both darker than the parent do not
-separate - they are indistinguishable at the size a form renders them.
+- at most one **neutral central class** per package, drawn black (the palette's
+  darkest grey) - never `currentColor`, which changes colour on mouse-over
+- **dependents** - classes whose instances cannot exist without their owner
+  (deleting the owner deletes them: a receipt line, a copy of a work). They take
+  the owner's hue, with the reason in a `skos:editorialNote`. "Part of" decides;
+  a mandatory reference alone does not make a dependent. A dependent of the
+  neutral class keeps a hue of its own.
+- a graph's root resource, which takes the family of what it describes
 
-A neutral (`currentColor`) is a good slot for a root entity, because no family
-can collide with it.
+**Families are spaced 360°/n apart**, n being their number, each taking the
+palette hue nearest its target. When the palette cannot reach that spacing, use
+every free hue once before two families share one, pick the set with the largest
+smallest gap, and never leave a free hue unused while two families sit less than
+26° apart. Only when there are more families than free hues - after checking
+honestly that each one really is independent - do two families share a hue,
+split by tone, paired so that they are far apart in meaning and the glyph tells
+them apart.
+
+**Within a family, tones of the one hue**, never a hue of its own: sharing a hue
+is what tells the user two classes belong together. Put an abstract superclass
+at the mid tone and the subclasses one step darker and one lighter - two
+subclasses both darker than the parent are indistinguishable at form size.
+Every drawn tone reaches at least 3:1 contrast against white (WCAG, non-text); a
+tone that fails takes the next darker one. A family with three or more drawn
+classes takes a hue whose lightest needed tone still passes; when none is free,
+the extra class shares a tone with its sibling and the glyph tells them apart.
+No colours outside the palette.
 
 ## Always look at an icon before committing it
 
@@ -68,3 +95,42 @@ antialiases at natural size, where a heavy stroke on a small viewBox goes
 blurry instead of crisp. Keep stroked shapes at **1.6** on a 24-unit viewBox
 and **2** on a 32-unit one, and verify in the running UI rather than in a
 blown-up PNG.
+
+## Property icons
+
+The Business Knowledge Editor draws a property's `foaf:depiction` on its box,
+so a drawing of the model can say what each relation and attribute is about
+instead of showing one built-in icon for all. *A reviewer reading a drawing of
+a competency question sees "located in" and "email" at a glance.*
+
+- **A relation shows its kind and its direction**: an arrow into a glyph -
+  `part-of`, `located-in`, `supplied-by`, `categorised-as`, `made-by`,
+  `member-of`, `owned-by`, `in-series`, `copy-of`, `seen-on`,
+  `record-elsewhere`, `set-aside-for`, `preceded-by` - or `range`, the range
+  class's own icon behind the arrow, for a relation named after the role its
+  range plays (`hasSupplier`). It takes the range class's colour. A relation
+  you do not map keeps Corporate Memory's built-in icon: a glyph that
+  contradicts the name is worse than none.
+- **An attribute shows its meaning and never an arrow** - `email`, `name`,
+  `address`, `title`, `identifier`, `amount`, `quantity`, `due-date` - and
+  takes its domain class's colour, so a class and its attributes read as one
+  unit. Every attribute gets one: where you map none, the kind of its value
+  stands in, read from its range alone - `text`, `number`, `count` (a
+  non-negative or positive integer), `date`, `time` (a time or a point in time),
+  `year`, `yes-no`, `link`, `location`. *A range says what the value is in every
+  naming convention; a name does not.*
+- Map them in `icons/property-icons.json` (property IRI to glyph name, under
+  `relations` and `attributes`) and run `task icons`: `bin/property_icons.py`
+  writes each icon into the property's block as one line ending in
+  `# property-icons: <glyph>`, and `task check:offline` fails when one is
+  missing, stale or not drawing only. A depiction you drew by hand on a
+  property stays, and the property gets none from the script.
+- The shared glyphs are in `bin/glyphs/` and come with template updates, so the
+  same meaning looks the same in every package. Draw a glyph of your own domain
+  (flow rate, failure mode) into `icons/glyphs/relations/` or
+  `icons/glyphs/attributes/` - stroked line art on a 24-unit viewBox in
+  `currentColor`, a relation's glyph within x 10-22, right of the arrow. Every
+  glyph must be drawing only: a script, an event handler or a reference outside
+  the SVG is refused, because the icon is shown inside Corporate Memory's pages.
+- Only the package's own properties get icons, as only its own classes do.
+

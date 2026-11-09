@@ -1,0 +1,6 @@
+{
+  "package_id": "icon-fixture",
+  "files": [
+    {"file_type": "graph", "file_path": "graphs/vocab.ttl", "graph_iri": "https://example.org/icons/", "register_as_vocabulary": true}
+  ]
+}
