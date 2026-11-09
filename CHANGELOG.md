@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Added
 
 - `shapes`: packages adding to the page of one class attach their rows to one node shape - with node shapes of their own each package's rows land on a form of their own, and Explore opens the first; rows on Corporate Memory's own forms - read only, one shared row per instance
+- A `thesauri` skill for project packages: the shape of a SKOS taxonomy that resources are categorized by, who maintains it (taxonomy editor, external term library, seed), linking a standard classification without copying it, what the taxonomy editor reads and writes, icons for schemes and concepts, typing editor-made concepts on use, concept forms, where categorization links are saved, importing a term library; a concept form whose thesaurus has another master answers every `askIf…` query false
 
 ### Changed
 
@@ -22,6 +23,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - a package class whose instances another node shape also reaches - through `rdfs:subClassOf` or a second type - gets `shacl:order 0`, so its form opens first
   - `askIf…` queries edit and remove a resource only in the graph that holds it, with string placeholders and an empty guard because Explore also runs them without a resource; clone and create decide by graph alone, since Explore passes them no resource
   - validate through the graph that imports what the shapes need, data must satisfy the system shapes, no managed class in a shipped graph users create in, table reports set both flags and carry counts of marks
+- `thesauri`: a scheme's icon shows the class it collects and a project carries one class glyph, drawn the package's way; the curated categorization graph is named by its role; a notation names its source by a link to the external concept where the classification publishes IRIs, inside the string where it does not - a typed notation shows a "?" badge and cannot be saved in the concept form
 
 ### Fixed
 
