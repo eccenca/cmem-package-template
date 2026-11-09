@@ -119,6 +119,11 @@ tasks:
         msg: >
           No package archive for version {{.PACKAGE_VERSION}} found in
           {{.DIST_DIR}}. Run 'task build' first.
+      - sh: test -n "${ECCENCA_MARKETPLACE_URL}"
+        msg: >
+          ECCENCA_MARKETPLACE_URL is not set. Name the marketplace this package
+          publishes to (https://eccenca.market for a public package): without it
+          cmemc publishes to https://eccenca.market.
     cmds:
       - cmemc package publish {{.DIST_DIR}}/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa
 

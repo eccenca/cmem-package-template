@@ -19,6 +19,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
   - **a package that already replaced `LICENSE` by hand** (a W3C or CC BY 1.0 mirror, say) answers its identifier on the next update and gets a conflict in `LICENSE` once: keep its own text
   - **a package whose `license` answer was dropped** by an update to a release without the question (seen on 1.8.0) is asked again, and the default would switch it back; answer the identifier in its manifest
   - `LicenseRef-scancode-unknown` makes an internal package: no `LICENSE`, no manifest entry for it; an update to that answer deletes the root `LICENSE` but leaves the package directory's `LICENSE` link behind - delete it
+- The publish job and `task publish` refuse to run while `ECCENCA_MARKETPLACE_URL` is unset: without it `cmemc package publish` publishes to `https://eccenca.market`, so a package meant for a self-hosted marketplace went public on its first merge to main. A package published to eccenca.market sets `ECCENCA_MARKETPLACE_URL=https://eccenca.market` in its CI variables once
 
 ## [1.8.0] 2026-10-18
 
