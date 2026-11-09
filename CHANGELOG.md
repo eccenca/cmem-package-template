@@ -10,6 +10,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 ### Changed
 
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
+- Generated packages are asked for their licence, and a vocabulary package now defaults to `CC-BY-4.0` instead of `Apache-2.0`
+  - an ontology is content rather than software, and CC BY is what vocabularies are usually published under; a project package bundles workflows and shapes with its data and keeps `Apache-2.0`
+  - the `LICENSE` file and `metadata.license` in `cpa-manifest.json` both follow the answer
+  - **a `copier update` of an existing vocabulary package asks the new question**, and accepting the default switches its licence; answer `Apache-2.0` to keep the old one
+- The `license` question offers every identifier the marketplace accepts, so a package that redistributes outside content declares that content's licence (the `package-content` skill says when)
+  - `Apache-2.0` and `CC-BY-4.0` get their `LICENSE` text from the template; for any other answer `LICENSE` starts as a placeholder for the source's own text, `task build` refuses to run while it is there, and later updates never write over the text
+  - **a package that already replaced `LICENSE` by hand** (a W3C or CC BY 1.0 mirror, say) answers its identifier on the next update and gets a conflict in `LICENSE` once: keep its own text
+  - **a package whose `license` answer was dropped** by an update to a release without the question (seen on 1.8.0) is asked again, and the default would switch it back; answer the identifier in its manifest
+  - `LicenseRef-scancode-unknown` makes an internal package: no `LICENSE`, no manifest entry for it; an update to that answer deletes the root `LICENSE` but leaves the package directory's `LICENSE` link behind - delete it
+- The publish job and `task publish` refuse to run while `ECCENCA_MARKETPLACE_URL` is unset: without it `cmemc package publish` publishes to `https://eccenca.market`, so a package meant for a self-hosted marketplace went public on its first merge to main. A package published to eccenca.market sets `ECCENCA_MARKETPLACE_URL=https://eccenca.market` in its CI variables once
 
 ## [1.8.0] 2026-10-18
 

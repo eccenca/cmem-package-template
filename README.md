@@ -91,7 +91,7 @@ copier copy -r develop gh:eccenca/cmem-package-template your-new-vocabulary-pack
 | `package_description` | Short description | - |
 | `python_dependencies` | Comma-separated Python package dependencies (project packages only) | - |
 | `vocab_dependencies` | Comma-separated vocabulary/project dependencies (project packages only) | - |
-| `marketplace` | Publish this package to the marketplace? A no leaves the publish job out of `.gitlab-ci.yml` | `true` |
+| `marketplace` | Publish this package to a marketplace? The publish job and `task publish` publish to the marketplace `ECCENCA_MARKETPLACE_URL` names and refuse to run without it; a no leaves the publish job out of `.gitlab-ci.yml` | `true` |
 | `github_page` | Link to GitHub page of the package | - |
 
 ## Generated Structure
@@ -140,7 +140,7 @@ nothing leaves every constraint on its row with nothing to check. `task check`
 and `task import` both run them first. They need [uv](https://docs.astral.sh/uv/),
 which resolves `rdflib` from each script's inline metadata.
 
-The default license we add is _Apache License 2.0 ([`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html))_, see <https://spdx.org/licenses/> if you need a different.
+The `license` question picks the package licence from the identifiers the marketplace accepts, and the `LICENSE` text and the manifest's `metadata.license` follow it. A package that redistributes outside content answers with that content's licence and supplies its text: the template carries the texts of `Apache-2.0` and `CC-BY-4.0` only, and `task build` refuses to run while `LICENSE` still holds the placeholder. A vocabulary package defaults to _Creative Commons Attribution 4.0 ([`CC-BY-4.0`](https://spdx.org/licenses/CC-BY-4.0.html))_, because an ontology is content rather than software; a project package defaults to _Apache License 2.0 ([`Apache-2.0`](https://spdx.org/licenses/Apache-2.0.html))_, because it bundles workflows and shapes with its data. The marketplace accepts exactly one identifier from a fixed list - an expression such as `Apache-2.0 AND CC-BY-4.0` is rejected by `cmemc package build` - so data bundled under another licence is declared in `DOCUMENTATION.md`, not in the manifest.
 
 ## Development Tasks
 
