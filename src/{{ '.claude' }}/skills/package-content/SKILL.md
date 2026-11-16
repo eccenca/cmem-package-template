@@ -204,8 +204,13 @@ success.
 A build into a temporary directory catches every manifest and content problem:
 
 ```bash
-cmemc package build <package_dir> --output-dir /tmp/pkg-check --version v0.0.0-test --replace
+task cmemc -- package build <package_dir> --output-dir /tmp/pkg-check --version v0.0.0-test --replace
 ```
+
+`task cmemc` runs the cmemc release the package's tasks are pinned to, so the
+check builds with the same cmemc a release would; an installed cmemc may be a
+different version, and a development build of it has written manifests an
+older Corporate Memory cannot install.
 
 **A clean build is not a validation pass.** `package build` checks the manifest
 against the directory and ignores RDF syntax errors entirely - a `.ttl` that no
