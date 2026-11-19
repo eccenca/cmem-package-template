@@ -156,7 +156,7 @@ Once it has happened, every later install fails with "Another process locked
 the package project", and nothing about the message suggests that the cause is
 a previous run rather than the package.
 
-`cmemc` 26.2.1 carries `--ignore-lock` on both `package install` and
+The pinned cmemc release carries `--ignore-lock` on both `package install` and
 `package uninstall` for exactly this. The manual equivalent is deleting
 `mp-lock.json` from the `marketplace-packages` project over the workspace files
 API.
