@@ -103,6 +103,6 @@ untested combination, and it is the one that has failed: such a placeholder was
 built, installed and removed again because its picker never filled. Check a
 custom key in the query editor before shipping it.
 
-`cmemc query open <iri>` opens a query in the editor to check a picker, but its
-`--catalog-graph` defaults to `https://ns.eccenca.com/data/queries/`. Pass the
-package's own shapes graph, or it will not find the query.
+`task cmemc -- query open <iri>` opens a query in the editor to check a picker,
+but its `--catalog-graph` defaults to `https://ns.eccenca.com/data/queries/`.
+Pass the package's own shapes graph, or it will not find the query.
