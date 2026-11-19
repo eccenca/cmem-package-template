@@ -56,24 +56,25 @@ and report the specific reason; do not attempt to fix it silently.
    user to push first — the next check depends on it.
 5. **Normal branch state.** `git merge-base --is-ancestor main develop` succeeds.
    If it fails, this is the hotfix or divergence case: stop.
-6. **The two cmemc pins agree.**
+6. **cmemc is pinned once, and only in the generated Taskfile.**
 
    ```bash
-   grep -o 'cmem-cmemc[=@]*[0-9.]*' .github/workflows/check.yml src/.gitlab-ci.yml.jinja
+   grep -n '^  CMEMC_VERSION: [0-9]' src/Taskfile.yaml
+   grep -n 'cmem-cmemc' .github/workflows/check.yml src/.gitlab-ci.yml.jinja
    ```
 
-   `.github/workflows/check.yml` pins the cmemc that *this repository's* CI
-   tests with; `src/.gitlab-ci.yml.jinja` pins the cmemc that *generated
-   packages* will run. They are independent literals with no coupling and
-   have silently diverged before. If the versions differ, stop: a release in
-   that state ships packages tested against a different cmemc than they use,
-   and a published tag cannot be withdrawn.
+   The first must print exactly one line: `CMEMC_VERSION` is the cmemc
+   release every generated task runs, locally and in both pipelines. The
+   second must print nothing. A cmemc install in either pipeline is a second
+   pin, and when there were two they silently diverged, so a release could
+   ship packages tested against a different cmemc than they use. If either
+   check fails, stop: a published tag cannot be withdrawn.
 
-   If `grep` reports either file as missing, treat that as a failure of this
+   If `grep` reports a file as missing, treat that as a failure of this
    check rather than a reason to skip it — the generated pipeline has been
    renamed before (it gained the `.jinja` suffix in 1.5.0, when the
    `marketplace` answer made it a rendered template), and a stale path here
-   silently compares nothing.
+   silently checks nothing.
 
 7. **Changelog is ready.** `CHANGELOG.md` contains a `## [Unreleased]` heading
    followed by at least one `### Added|Changed|Deprecated|Removed|Fixed|Security`
@@ -90,9 +91,7 @@ and report the specific reason; do not attempt to fix it silently.
 
    Changes *outside* `src/` — this repository's own `Taskfile.yaml`, `tests/`,
    `.github/`, or this skill — are template-internal and are normally not
-   listed at all. The exception is the cmemc pin in
-   `.github/workflows/check.yml`, which is bumped in lockstep with the one in
-   `src/` and is named in the entry the `src/` change earns.
+   listed at all.
 
 8. **Signing works.** Verify gpg can sign non-interactively *now*, rather than
    discovering it cannot after the release commit exists:

@@ -49,14 +49,13 @@ Adding a `tests/<name>.yml` copier answers file automatically adds a test case �
 - It mutates shared state, so both pipelines serialize it — GitHub Actions via `concurrency: testing_environment`, GitLab via `resource_group: testing-server`. A local run can collide with the nightly 3am GitHub run.
 - Generated directories are `git init`-ed by `check:generate:case` on purpose: the generated `task build` has a precondition on `git describe`, because `PACKAGE_VERSION` is derived from it (`v0.0.0-<describe>` when the describe output is not already a `v…` tag).
 
-## cmemc is pinned in two places and drifts
+## cmemc is pinned in one place: the generated Taskfile
 
-- `src/.gitlab-ci.yml` — `uv tool install cmem-cmemc@<version>`, the version *generated projects* use.
-- `.github/workflows/check.yml` — `pip install cmem-cmemc==<version>`, the version *this repo's* CI uses.
+`CMEMC_VERSION` in `src/Taskfile.yaml` is the only cmemc pin. Every generated task runs `{{.CMEMC}}`, which defaults to `uvx --from cmem-cmemc==<version> cmemc`, so a generated package never uses the locally installed cmemc — a package was once built with a development build of cmemc, published with `null`s in its manifest, and broke an older Corporate Memory that installed it. Neither pipeline installs cmemc: the generated GitLab pipeline and this repository's GitHub workflow both run the tasks, and so the pinned release. Bump the version there and note it in `CHANGELOG.md`.
 
-These are independent literals with no coupling; they have silently diverged before. Always update both together, and note the version in `CHANGELOG.md`.
+Before this, the version was a literal in `src/.gitlab-ci.yml.jinja` and another in `.github/workflows/check.yml`, and the two silently diverged. Do not reintroduce a cmemc install in either pipeline. A package can set `CMEMC` in `.env` to run another cmemc on purpose; the default is a shell `${CMEMC:-…}` expansion precisely so that `.env` can override it, because a Taskfile `vars:` entry would otherwise win over the environment.
 
-The same split catches tooling generally: the two pipelines install their tools differently, so a dependency the payload needs has to be checked in both. `uv` is the live example — the generated `task check:offline` runs the checks in `bin/` by path through their `uv run --script` shebang, which generated packages get for free because their image already installs cmemc with it, while this repository installs cmemc with pip and had to add `astral-sh/setup-uv` to `.github/workflows/check.yml` explicitly. Confirming a tool exists in one pipeline says nothing about the other.
+The two pipelines still install their other tools differently, so a dependency the payload needs has to be checked in both. `uv` is the live example — generated packages get it from their GitLab image, while this repository had to add `astral-sh/setup-uv` to `.github/workflows/check.yml` explicitly. Confirming a tool exists in one pipeline says nothing about the other.
 
 ## Generated package anatomy
 

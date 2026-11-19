@@ -89,9 +89,16 @@ shared state on whichever deployment those point at. Know which deployment you
 are aimed at before running it, and do not run it concurrently with a pipeline
 doing the same thing.
 
-**The generated tasks invoke `cmemc` without `-c`**, so they act on the
-default connection. Drop to the bare `cmemc` commands with an explicit `-c`
-when that is not the instance you mean.
+**The generated tasks run a pinned cmemc release**, `CMEMC_VERSION` in
+`Taskfile.yaml`, through `uvx` - never the cmemc installed on the machine. A
+development build of cmemc once wrote a manifest an older Corporate Memory
+could not install, and the package was published that way. Run other cmemc
+commands as `task cmemc -- <args>` for the same reason, and do not set
+`CMEMC` in `.env` for a build that will be published.
+
+**The generated tasks invoke cmemc without `-c`**, so they act on the
+default connection. Use `task cmemc -- -c <connection> ...` with an explicit
+`-c` when that is not the instance you mean.
 
 `task check:offline` is the exception: it runs the checks in `bin/` over the
 shipped RDF and touches no deployment at all, so it is always safe to run.

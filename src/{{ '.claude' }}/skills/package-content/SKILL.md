@@ -156,7 +156,7 @@ Once it has happened, every later install fails with "Another process locked
 the package project", and nothing about the message suggests that the cause is
 a previous run rather than the package.
 
-`cmemc` 26.2.1 carries `--ignore-lock` on both `package install` and
+The pinned cmemc release carries `--ignore-lock` on both `package install` and
 `package uninstall` for exactly this. The manual equivalent is deleting
 `mp-lock.json` from the `marketplace-packages` project over the workspace files
 API.
@@ -204,8 +204,13 @@ success.
 A build into a temporary directory catches every manifest and content problem:
 
 ```bash
-cmemc package build <package_dir> --output-dir /tmp/pkg-check --version v0.0.0-test --replace
+task cmemc -- package build <package_dir> --output-dir /tmp/pkg-check --version v0.0.0-test --replace
 ```
+
+`task cmemc` runs the cmemc release the package's tasks are pinned to, so the
+check builds with the same cmemc a release would; an installed cmemc may be a
+different version, and a development build of it has written manifests an
+older Corporate Memory cannot install.
 
 **A clean build is not a validation pass.** `package build` checks the manifest
 against the directory and ignores RDF syntax errors entirely - a `.ttl` that no

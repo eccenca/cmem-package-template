@@ -15,6 +15,16 @@ vars:
     sh: git describe --tags --always --dirty 2>/dev/null || echo ""
   PACKAGE_VERSION:
     sh: echo {{if regexMatch "^v.*" .GIT_DESCRIBE}}{{.GIT_DESCRIBE}}{{else}}v0.0.0-{{.GIT_DESCRIBE}}{{end}}
+  # Every task runs this cmemc release, never whatever cmemc happens to be
+  # installed: a development build of cmemc can write a manifest that an
+  # older Corporate Memory cannot install, and a package built with it reaches
+  # the marketplace as easily as any other. The GitLab pipeline runs these
+  # tasks too, so this is the only place the version is pinned.
+  CMEMC_VERSION: 26.2.1
+  # Set CMEMC in .env to run another cmemc on purpose, e.g. `CMEMC=cmemc` for
+  # the installed one while testing a cmemc change. The default is expanded by
+  # the shell at run time, which is what lets .env override it.
+  CMEMC: ${CMEMC:-uvx --from cmem-cmemc=={{.CMEMC_VERSION}} cmemc}
 
 includes:
   custom:
@@ -38,11 +48,15 @@ tasks:
 
   check:
     desc: Run whole test suite
+    preconditions:
+      - &cmemc_runner
+        sh: '[ -n "$CMEMC" ] || command -v uvx'
+        msg: "The tasks run a pinned cmemc release through uv. Install it: https://docs.astral.sh/uv/"
     cmds:
       - task: check:offline
       - task: build
-      - cmemc package install --replace --input {{.DIST_DIR}}/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa
-      - cmemc package uninstall {{.PACKAGE_ID}}
+      - '{{.CMEMC}} package install --replace --input {{.DIST_DIR}}/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa'
+      - '{{.CMEMC}} package uninstall {{.PACKAGE_ID}}'
 
   check:offline:
     desc: Check shipped RDF without a Corporate Memory connection
@@ -74,11 +88,12 @@ tasks:
     preconditions:
       - sh: git describe --tags --always --dirty 2>/dev/null
         msg: "Package directory must be a git repository. Run: git init; git add .; git commit -m 'init'"
+      - *cmemc_runner
     deps:
       - clean
     cmds:
       - >
-        cmemc package build {{.PACKAGE_DIR}}
+        {{.CMEMC}} package build {{.PACKAGE_DIR}}
         --output-dir {{.DIST_DIR}}
         --version {{.PACKAGE_VERSION}}
 
@@ -93,20 +108,26 @@ tasks:
       SHACL service answer HTTP 500 for every graph on that deployment. They
       run before the installed package is deleted, so a failed check leaves
       the instance as it was.
+    preconditions:
+      - *cmemc_runner
     cmds:
       - task: check:offline
       - task: delete
-      - cmemc package install --input {{.PACKAGE_DIR}}
+      - '{{.CMEMC}} package install --input {{.PACKAGE_DIR}}'
 
   export:
     desc: Export package content from Corporate Memory
+    preconditions:
+      - *cmemc_runner
     cmds:
-      - cmemc package export --replace --extract {{.PACKAGE_ID}}
+      - '{{.CMEMC}} package export --replace --extract {{.PACKAGE_ID}}'
 
   delete:
     desc: Delete (uninstall) package from Corporate Memory
+    preconditions:
+      - *cmemc_runner
     cmds:
-      - cmd: cmemc package uninstall {{.PACKAGE_ID}}
+      - cmd: '{{.CMEMC}} package uninstall {{.PACKAGE_ID}}'
         ignore_error: true
 
   publish:
@@ -116,6 +137,17 @@ tasks:
         msg: >
           No package archive for version {{.PACKAGE_VERSION}} found in
           {{.DIST_DIR}}. Run 'task build' first.
+      - *cmemc_runner
     cmds:
-      - cmemc package publish {{.DIST_DIR}}/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa
+      - '{{.CMEMC}} package publish {{.DIST_DIR}}/{{.PACKAGE_ID}}-{{.PACKAGE_VERSION}}.cpa'
 
+  cmemc:
+    desc: Run the pinned cmemc, e.g. task cmemc -- -c my-instance graph list
+    summary: |
+      Runs the same cmemc release the other tasks use, with everything after
+      `--` passed on. Use it instead of an installed cmemc for the commands no
+      task wraps, so that they too run the release this package is built with.
+    preconditions:
+      - *cmemc_runner
+    cmds:
+      - '{{.CMEMC}} {{.CLI_ARGS}}'

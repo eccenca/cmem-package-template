@@ -7,7 +7,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
+### Added
+
+- `task cmemc -- <args>` runs the pinned cmemc release for commands no task wraps
+
 ### Changed
+
+- Generated packages no longer use the locally installed cmemc: every task that runs cmemc - `build`, `check`, `import`, `export`, `delete`, `publish` - runs the release pinned as `CMEMC_VERSION` in `Taskfile.yaml` (26.2.1) through `uvx`, so a package can no longer be built or published with a development version of cmemc
+  - the generated GitLab pipeline no longer installs cmemc itself and uses the same pinned release, so `Taskfile.yaml` is now the only place the version is set; this repository's GitHub workflow no longer installs cmemc either
+  - cmemc is no longer a prerequisite of a generated package, uv is; setting `CMEMC` in `.env` (e.g. `CMEMC=cmemc`) runs another cmemc on purpose
+  - the shipped `package-content`, `build-projects`, `shapes` and `catalog-queries` skills run cmemc commands as `task cmemc -- <args>`
 
 - The `shapes` skill says that a class the package does not own - from a vocabulary it ships unchanged or depends on, such as QUDT or FOAF - gets its icon from a `foaf:depiction` on the package's node shape, so its resources show an icon in Explore without the package changing the source's vocabulary; the `vocabulary` skill's depictions reference points there
 
