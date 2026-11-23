@@ -16,7 +16,7 @@ things that are invisible until after an install:
 ## Validating against the instance
 
 ```sh
-cmemc -c <connection> graph validation execute <graph-iri> --wait --inspect
+task cmemc -- -c <connection> graph validation execute <graph-iri> --wait --inspect
 ```
 
 Run this over every graph the change could touch after any edit to the
