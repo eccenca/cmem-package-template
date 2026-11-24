@@ -66,8 +66,9 @@ Read the issue in full, then check it in this order and stop at the first hit:
 Weigh an accepted finding against both `package_type`s and against `marketplace`
 and `github_page` being answered either way. A change that only makes sense for
 project packages belongs behind a `package_type != 'vocabulary'` condition, not
-in the shared path - vocabulary packages cannot declare dependencies at all,
-which is why the dependency questions are already conditional.
+in the shared path - vocabulary packages cannot depend on Python packages and
+may depend on other vocabulary packages only, which is why the dependency
+questions are already conditional.
 
 ## Implement an accepted finding
 

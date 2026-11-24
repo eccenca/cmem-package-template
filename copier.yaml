@@ -52,8 +52,10 @@ package_description:
       Package description must be at most 150 characters
     {% endif %}
 
-# Vocabulary packages cannot have dependencies at all, so both dependency
-# questions below are asked for project packages only.
+# Both dependency questions below are asked for project packages only. A
+# vocabulary package cannot depend on Python packages; it may depend on other
+# vocabulary packages, which is rare enough to be added to cpa-manifest.json
+# by hand instead of being asked for.
 python_dependencies:
   type: str
   when: "{{ package_type != 'vocabulary' }}"

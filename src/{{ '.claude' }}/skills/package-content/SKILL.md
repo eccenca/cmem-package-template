@@ -89,11 +89,13 @@ pipeline then has to assert for itself, see
 
 ## Dependencies have to cover every namespace the graphs use
 
-This section is about project packages. A vocabulary package declares no
-dependencies at all - `cmemc` rejects a vocabulary manifest that carries any,
-with `Vocabulary Packages do not allow dependencies`, so there is nowhere for
-the entries below to go. (The published manifest schema does not express the
-restriction, so `manifest_check` will not catch it either; the build will.)
+This section is about project packages. A vocabulary package may depend on
+other vocabulary packages only - one that imports and extends another, say.
+`cmemc` rejects a vocabulary manifest with a `python-package` dependency
+(`Vocabulary Packages do not allow python-package dependencies.`), and a
+marketplace refuses one whose dependency is not a vocabulary package when the
+version is published. The template asks a vocabulary package no dependency
+question, so such an entry is added to `dependencies` by hand.
 
 In a project package a `dependency_type: marketplace-package` entry is needed
 for **every** namespace the shipped graphs mention - `w3c-rdf-vocab`, `w3c-rdfs-vocab`,

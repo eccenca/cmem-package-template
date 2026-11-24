@@ -7,7 +7,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/) and this p
 
 ## [Unreleased]
 
-TODO: add at least one Added, Changed, Deprecated, Removed, Fixed or Security section
+### Added
+
+- The README of the template and the README of a generated package link to the package development documentation and to its manifest reference (dependencies with version constraints, application views, version revisions)
+
+### Fixed
+
+- The template no longer states that a vocabulary package cannot declare dependencies: it cannot depend on Python packages, but it may depend on other vocabulary packages. `copier.yaml`, the README, `CLAUDE.md` and the `package-content` and `template-triage` skills say so; the dependency questions stay with project packages, and a vocabulary package adds such a dependency to `cpa-manifest.json` by hand
 
 ## [1.9.0] 2026-11-23
 
