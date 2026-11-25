@@ -28,9 +28,11 @@ catalog of Corporate Memory, where it becomes available to the tools that build
 on it. This is also why the graph needs an `owl:Ontology` declaration carrying
 VANN namespace metadata, see [Graphs](#graphs).
 
-A marketplace vocabulary package cannot declare dependencies at all, so the
-template does not ask for `python_dependencies` or `vocab_dependencies` - an
-answer would have nowhere to go in the manifest.
+A marketplace vocabulary package cannot depend on Python packages, and the only
+marketplace packages it may depend on are other vocabulary packages - a
+vocabulary that imports and extends another one, for example. The template
+therefore does not ask for `python_dependencies` or `vocab_dependencies`; add
+such a dependency to the `dependencies` of `cpa-manifest.json` by hand.
 
 ### Project Package (`project`)
 
@@ -57,7 +59,7 @@ Everything else is the same for both types - the repository layout, the
 | | vocabulary | project |
 |---|---|---|
 | generated graph entry | `register_as_vocabulary: true` | `register_as_vocabulary: false` |
-| dependency questions | not asked | `python_dependencies`, `vocab_dependencies` |
+| dependency questions | not asked (vocabulary dependencies are added by hand) | `python_dependencies`, `vocab_dependencies` |
 | shipped [skills](#generated-structure) | `package-content`, `template-feedback` | the same, plus `build-projects` and `shapes` |
 
 ## Prerequisites
@@ -161,7 +163,13 @@ task publish      # Publish to marketplace
 
 Packages describe themselves in the `cpa-manifest.json` file.
 Some metadata has been asked during the `copier` process.
-Further metadata can be added to the `cpa-manifest.json` file:
+Further metadata can be added to the `cpa-manifest.json` file.
+
+This section covers the entries most packages need. The complete and current
+description of the manifest - dependencies with version constraints,
+application views, version revisions and the checks a marketplace makes on
+publishing - is the [manifest reference][manifest-reference] of the
+[package development documentation][package-docs].
 
 ### Metadata
 
@@ -364,4 +372,6 @@ all - the marketplace rejects that combination.
 [copier]: https://copier.readthedocs.io/
 [copier-shield]: https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/copier-org/copier/master/img/badge/badge-grayscale-inverted-border-purple.json
 [cmem]: https://documentation.eccenca.com
+[package-docs]: https://go.eccenca.com/feature/marketplace-packages
+[manifest-reference]: https://documentation.eccenca.com/latest/develop/marketplace-packages/development/#manifest
 [cmem-shield]: https://img.shields.io/endpoint?url=https://dev.documentation.eccenca.com/badge.json

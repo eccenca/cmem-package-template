@@ -236,9 +236,10 @@ future reader to carry somebody else's uncertainty.
 `python_dependencies` and `vocab_dependencies` in `copier.yaml` carry
 `when: "{{ package_type != 'vocabulary' }}"`, so a vocabulary package is never
 asked about either. This is not a missing question: a marketplace vocabulary
-package cannot declare dependencies at all, so an answer would have nowhere to
-go in `cpa-manifest.json`. Asking anyway would invite an answer that is
-silently dropped.
+package cannot depend on Python packages at all, and the only marketplace
+packages it may depend on are other vocabulary packages. That case is rare
+enough to be added to `cpa-manifest.json` by hand, as the README says, rather
+than to be asked of everybody who creates a vocabulary package.
 
 ### `main` carries no commits of its own
 
